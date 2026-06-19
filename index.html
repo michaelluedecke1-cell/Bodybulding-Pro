@@ -8,14 +8,14 @@
   <meta name="theme-color" content="#0d0d1a" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <style>
-    /* ===== Pull-to-Refresh deaktivieren ===== */
-    html, body {
-      overscroll-behavior: none;
-      overflow: auto;
-      touch-action: pan-y;
-    }
-
+    /* ===== Alle Styles wie gehabt ===== */
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
+    
+    /* Deaktiviert Pull-to-Refresh in modernen Browsern */
+    html, body {
+      overscroll-behavior-y: none;
+    }
+    
     body { background: #0d0d1a; color: #e0e0e0; min-height: 100vh; padding: 0 12px 80px; font-size: 0.9rem; }
     .app-header {
       display: flex; justify-content: space-between; align-items: center;
@@ -630,14 +630,45 @@
   </div>
 
   <script>
-    /* ===== PULL-TO-REFRESH KOMPLETT DEAKTIVIEREN ===== */
-    document.addEventListener('touchmove', function(e) {
-      if (window.scrollY === 0 && e.target.closest('#app')) {
-        e.preventDefault();
-      }
+    // JS-Fallback für ältere iOS Safari Versionen gegen Pull-to-Refresh
+    let _startY = 0;
+    document.addEventListener('touchstart', e => { _startY = e.touches[0].pageY; }, { passive: true });
+    document.addEventListener('touchmove', e => {
+      const y = e.touches[0].pageY;
+      if (window.scrollY === 0 && y > _startY) e.preventDefault();
     }, { passive: false });
 
-    // ===== REST DES CODES =====
+    // ========== INDEXED-DB WRAPPER ==========
+    const dbPromise = new Promise((resolve, reject) => {
+      const request = indexedDB.open('BodybuildingProDB', 1);
+      request.onupgradeneeded = (e) => {
+        e.target.result.createObjectStore('store');
+      };
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+
+    async function idbSet(key, val) {
+      const db = await dbPromise;
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction('store', 'readwrite');
+        tx.objectStore('store').put(val, key);
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(tx.error);
+      });
+    }
+
+    async function idbGet(key) {
+      const db = await dbPromise;
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction('store', 'readonly');
+        const req = tx.objectStore('store').get(key);
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(tx.error);
+      });
+    }
+    // =========================================
+
     let exercises = [], plans = [], logs = [];
     let currentTab = 'exercises', editingId = null, editingType = null;
     let calendarDate = new Date();
@@ -690,7 +721,12 @@
       const m = Math.floor(sec / 60), s = Math.floor(sec % 60);
       return `${m}m ${s}s`;
     }
-    function getToday() { return new Date().toISOString().split('T')[0]; }
+    
+    // 🔥 ZEITZONEN-BUG GEFIXT: Baut das Datum streng lokal in YYYY-MM-DD
+    function getToday() {
+      const d = new Date();
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    }
     function formatDate(d) { if (!d) return ''; const p = d.split('-'); return `${p[2]}.${p[1]}.${p[0]}`; }
 
     function getExerciseIcon(ex) {
@@ -799,70 +835,97 @@
       }
     }
 
-    // ========== SPEICHERN & LADEN ==========
+    // ========== SPEICHERN & LADEN (INDEXED-DB) ==========
     function saveData() {
-      localStorage.setItem('bb_exercises', JSON.stringify(exercises));
-      localStorage.setItem('bb_plans', JSON.stringify(plans));
-      localStorage.setItem('bb_logs', JSON.stringify(logs));
-      localStorage.setItem('bb_activePlan', activePlanId || '');
-      try {
-        const backupData = { exercises, plans, logs, activePlanId };
-        localStorage.setItem('bb_auto_backup', JSON.stringify(backupData));
-        console.log('✅ Auto-Backup gespeichert');
-      } catch (e) { console.warn('Auto-Backup fehlgeschlagen:', e); }
+      // Speichern blockiert nicht die UI
+      idbSet('bb_exercises', exercises).catch(console.warn);
+      idbSet('bb_plans', plans).catch(console.warn);
+      idbSet('bb_logs', logs).catch(console.warn);
+      idbSet('bb_activePlan', activePlanId || '').catch(console.warn);
+      
+      const backupData = { exercises, plans, logs, activePlanId };
+      idbSet('bb_auto_backup', backupData).then(() => {
+        console.log('✅ Auto-Backup in IndexedDB gespeichert');
+      }).catch(console.warn);
     }
-    function loadData() {
+    
+    async function loadData() {
       try {
-        const e = localStorage.getItem('bb_exercises');
-        if (e) exercises = JSON.parse(e);
-        const p = localStorage.getItem('bb_plans');
-        if (p) plans = JSON.parse(p);
-        const l = localStorage.getItem('bb_logs');
-        if (l) logs = JSON.parse(l);
-        activePlanId = localStorage.getItem('bb_activePlan') || null;
-      } catch(err) {}
+        const e = await idbGet('bb_exercises');
+        if (e) exercises = e;
+        const p = await idbGet('bb_plans');
+        if (p) plans = p;
+        const l = await idbGet('bb_logs');
+        if (l) logs = l;
+        const act = await idbGet('bb_activePlan');
+        if (act !== undefined) activePlanId = act;
+      } catch(err) { console.warn('Laden fehlgeschlagen:', err); }
+
+      // ==========================================
+      // AUTOMATISCHE MIGRATION VON LOCALSTORAGE
+      // ==========================================
+      if (exercises.length === 0 && plans.length === 0 && logs.length === 0) {
+        const oldEx = localStorage.getItem('bb_exercises');
+        if (oldEx) {
+          console.log('🔄 Migriere Daten von LocalStorage zu IndexedDB...');
+          try {
+            exercises = JSON.parse(oldEx);
+            plans = JSON.parse(localStorage.getItem('bb_plans') || '[]');
+            logs = JSON.parse(localStorage.getItem('bb_logs') || '[]');
+            activePlanId = localStorage.getItem('bb_activePlan') || null;
+            
+            // Nach erfolgreicher Migration den alten Speicher leeren
+            localStorage.removeItem('bb_exercises');
+            localStorage.removeItem('bb_plans');
+            localStorage.removeItem('bb_logs');
+            localStorage.removeItem('bb_activePlan');
+            localStorage.removeItem('bb_auto_backup');
+            
+            saveData();
+          } catch(err) { console.warn('Migrationsfehler:', err); }
+        }
+      }
+
+      // Format-Sicherstellung
       exercises.forEach(ex => { if (!ex.type) ex.type = 'strength'; });
       logs.forEach(log => {
         log.entries.forEach(entry => { if (!entry.cardioData) entry.cardioData = { time: 0, distance: 0 }; });
         if (log.duration === undefined) log.duration = 0;
       });
+
+      // Wenn absolut leer -> Backup prüfen oder Dummy Daten anlegen
       if (exercises.length === 0 && plans.length === 0 && logs.length === 0) {
-        const autoBackup = localStorage.getItem('bb_auto_backup');
-        if (autoBackup) {
-          try {
-            const backup = JSON.parse(autoBackup);
-            if (backup.exercises && backup.plans && backup.logs) {
-              exercises = backup.exercises;
-              plans = backup.plans;
-              logs = backup.logs;
-              activePlanId = backup.activePlanId || null;
-              saveData();
-              console.log('✅ Auto-Backup wiederhergestellt');
-            }
-          } catch(e) {}
+        const autoBackup = await idbGet('bb_auto_backup');
+        if (autoBackup && autoBackup.exercises && autoBackup.plans && autoBackup.logs) {
+            exercises = autoBackup.exercises;
+            plans = autoBackup.plans;
+            logs = autoBackup.logs;
+            activePlanId = autoBackup.activePlanId || null;
+            saveData();
+            console.log('✅ Auto-Backup wiederhergestellt');
+        } else {
+            // Standard-Dummy-Daten für Erstanwender
+            const ex1 = { id: generateId(), name: 'Schulterpresse (Maschine)', image: '', pause: 90, type: 'strength' };
+            const ex2 = { id: generateId(), name: 'Rudermaschine sitzend', image: '', pause: 90, type: 'strength' };
+            const ex3 = { id: generateId(), name: 'Laufband', image: '', pause: 60, type: 'cardio' };
+            exercises = [ex1, ex2, ex3];
+            const planId = generateId();
+            plans = [{ id: planId, name: 'Ganzkörper', exerciseIds: [ex1.id, ex2.id, ex3.id] }];
+            activePlanId = planId;
+            logs = [{
+              id: generateId(), planId: planId, date: getToday(), duration: 0,
+              entries: [
+                { exerciseId: ex1.id, sets: [{ kg: 28, wdh: 12 }, { kg: 28, wdh: 12 }, { kg: 28, wdh: 12 }], cardioData: { time: 0, distance: 0 }, notiz: '1kg pro Woche mehr' },
+                { exerciseId: ex2.id, sets: [{ kg: 60, wdh: 12 }], cardioData: { time: 0, distance: 0 }, notiz: '' },
+                { exerciseId: ex3.id, sets: [], cardioData: { time: 15, distance: 2.5 }, notiz: 'Steigung 2%' }
+              ]
+            }];
+            saveData();
         }
-      }
-      if (exercises.length === 0 && plans.length === 0 && logs.length === 0) {
-        const ex1 = { id: generateId(), name: 'Schulterpresse (Maschine)', image: '', pause: 90, type: 'strength' };
-        const ex2 = { id: generateId(), name: 'Rudermaschine sitzend', image: '', pause: 90, type: 'strength' };
-        const ex3 = { id: generateId(), name: 'Laufband', image: '', pause: 60, type: 'cardio' };
-        exercises = [ex1, ex2, ex3];
-        const planId = generateId();
-        plans = [{ id: planId, name: 'Ganzkörper', exerciseIds: [ex1.id, ex2.id, ex3.id] }];
-        activePlanId = planId;
-        logs = [{
-          id: generateId(), planId: planId, date: getToday(), duration: 0,
-          entries: [
-            { exerciseId: ex1.id, sets: [{ kg: 28, wdh: 12 }, { kg: 28, wdh: 12 }, { kg: 28, wdh: 12 }], cardioData: { time: 0, distance: 0 }, notiz: '1kg pro Woche mehr' },
-            { exerciseId: ex2.id, sets: [{ kg: 60, wdh: 12 }], cardioData: { time: 0, distance: 0 }, notiz: '' },
-            { exerciseId: ex3.id, sets: [], cardioData: { time: 15, distance: 2.5 }, notiz: 'Steigung 2%' }
-          ]
-        }];
-        saveData();
       }
     }
 
-    // ========== Letzte Werte pro Übung ==========
+    // ========== Letzte Werte pro Übung holen ==========
     function getLastSetForExercise(exerciseId) {
       const sortedLogs = [...logs].sort((a, b) => (a.date || '').localeCompare(b.date || '') * -1);
       for (const log of sortedLogs) {
@@ -964,7 +1027,6 @@
       }
       const year = calendarDate.getFullYear();
       const month = calendarDate.getMonth();
-      const today = new Date();
       const todayStr = getToday();
 
       const firstDay = new Date(year, month, 1);
@@ -997,9 +1059,10 @@
         const prevDate = new Date(year, month, 0 - (startOffset - i - 1));
         html += `<div class="day-cell other-month">${prevDate.getDate()}</div>`;
       }
+      
+      // 🔥 ZEITZONEN-BUG GEFIXT: Baut das Datum manuell (ohne toISOString())
       for (let d = 1; d <= daysInMonth; d++) {
-        const dateObj = new Date(year, month, d);
-        const dateStr = dateObj.toISOString().split('T')[0];
+        const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
         const isToday = dateStr === todayStr;
         const hasTraining = !!logMap[dateStr];
         let classes = 'day-cell';
@@ -1007,6 +1070,7 @@
         if (hasTraining) classes += ' has-training';
         html += `<div class="${classes}" data-date="${dateStr}" data-logid="${logMap[dateStr] || ''}">${d}</div>`;
       }
+      
       const remaining = (7 - ((startOffset + daysInMonth) % 7)) % 7;
       for (let i = 1; i <= remaining; i++) {
         const nextDate = new Date(year, month + 1, i);
@@ -1059,7 +1123,6 @@
     // ========== JAHRESKALENDER ==========
     function renderYearView() {
       const year = calendarDate.getFullYear();
-      const today = new Date();
       const todayStr = getToday();
 
       const logMap = {};
@@ -1098,9 +1161,10 @@
         for (let i = 0; i < startOffset; i++) {
           miniDaysHtml += `<div class="mini-day other-month"></div>`;
         }
+        
+        // 🔥 ZEITZONEN-BUG GEFIXT: Baut das Datum manuell (ohne toISOString())
         for (let d = 1; d <= daysInMonth; d++) {
-          const dateObj = new Date(year, m, d);
-          const dateStr = dateObj.toISOString().split('T')[0];
+          const dateStr = `${year}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
           const hasTraining = !!logMap[dateStr];
           const isToday = dateStr === todayStr;
           let cls = 'mini-day';
@@ -1108,6 +1172,7 @@
           if (isToday) cls += ' today';
           miniDaysHtml += `<div class="${cls}" data-date="${dateStr}" data-logid="${logMap[dateStr] || ''}">${d}</div>`;
         }
+        
         const total = startOffset + daysInMonth;
         const rem = (7 - (total % 7)) % 7;
         for (let i = 0; i < rem; i++) {
@@ -1169,10 +1234,13 @@
       const now = new Date();
       const currentMonth = now.getMonth();
       const currentYear = now.getFullYear();
+      
+      // 🔥 ZEITZONEN-BUG GEFIXT: Sicheres Aufteilen des Datum-Strings
       const daysThisMonth = logs.filter(log => {
         if (!log.date) return false;
-        const d = new Date(log.date);
-        return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
+        const [y, m, d] = log.date.split('-');
+        const logD = new Date(y, m - 1, d);
+        return logD.getMonth() === currentMonth && logD.getFullYear() === currentYear;
       }).length;
 
       let totalVolumeAll = 0;
@@ -1229,13 +1297,20 @@
         const weekStart = new Date();
         weekStart.setDate(weekStart.getDate() - (weekStart.getDay() + 6) % 7 - w * 7);
         weekStart.setHours(0,0,0,0);
+        
         const weekEnd = new Date(weekStart);
         weekEnd.setDate(weekEnd.getDate() + 6);
-        const weekLabel = `${weekStart.getDate()}.${weekStart.getMonth()+1}`;
+        weekEnd.setHours(23,59,59,999); 
+        
+        const weekLabel = `So. ${weekEnd.getDate()}.${weekEnd.getMonth()+1}.`;
+        
         let weekVol = 0;
+        // 🔥 ZEITZONEN-BUG GEFIXT: Sicheres Aufteilen des Datum-Strings
         logs.forEach(log => {
           if (!log.date) return;
-          const logDate = new Date(log.date);
+          const [y, m, d] = log.date.split('-');
+          const logDate = new Date(y, m - 1, d);
+          
           if (logDate >= weekStart && logDate <= weekEnd) {
             log.entries.forEach(entry => {
               weekVol += calcVolume(entry);
@@ -1272,8 +1347,8 @@
         const height = Math.max(5, (w.vol / maxWeekVol) * 80);
         html += `
           <div style="display:flex; flex-direction:column; align-items:center; flex:1;">
-            <div style="background:#2ecc71; width:100%; max-width:30px; height:${height}px; border-radius:4px 4px 0 0;"></div>
-            <div style="font-size:0.7rem; color:#888; margin-top:4px;">${w.label}</div>
+            <div style="background:#2ecc71; width:100%; max-width:40px; height:${height}px; border-radius:4px 4px 0 0;"></div>
+            <div style="font-size:0.65rem; color:#888; margin-top:4px;">${w.label}</div>
             <div style="font-size:0.6rem; color:#aaa;">${w.vol.toLocaleString()}</div>
           </div>
         `;
@@ -1606,7 +1681,7 @@
       saveData(); renderAll();
     }
 
-    // -------- QuickStart --------
+    // -------- QuickStart (mit Übernahme der letzten Werte) --------
     function quickStart() {
       if (!activePlanId) {
         alert('Kein aktiver Plan ausgewählt. Markiere einen Plan mit ⭐ als aktiv.');
@@ -1622,6 +1697,7 @@
         return;
       }
 
+      // Neues Log mit übernommenen Werten
       const newLog = {
         id: generateId(),
         planId: activePlanId,
@@ -1666,7 +1742,7 @@
       wakeLockManual = false;
     }
 
-    // -------- Log CRUD --------
+    // -------- Log CRUD (mit Übernahme der letzten Werte bei neuem Log) --------
     function openLogForm(id = null, startTimer = false) {
       const isEdit = !!id;
       let log = isEdit ? logs.find(l => l.id === id) : null;
@@ -1681,10 +1757,7 @@
         } else {
           overallTimerRunning = false;
           overallTimerStart = null;
-          if (overallTimerInterval) {
-            clearInterval(overallTimerInterval);
-            overallTimerInterval = null;
-          }
+          if (overallTimerInterval) { clearInterval(overallTimerInterval); overallTimerInterval = null; }
         }
       } else {
         editingId = id;
@@ -1694,10 +1767,7 @@
         } else {
           if (!overallTimerRunning) {
             overallTimerStart = null;
-            if (overallTimerInterval) {
-              clearInterval(overallTimerInterval);
-              overallTimerInterval = null;
-            }
+            if (overallTimerInterval) { clearInterval(overallTimerInterval); overallTimerInterval = null; }
           }
         }
       }
@@ -1710,7 +1780,6 @@
       const exerciseIds = plan ? plan.exerciseIds : [];
       const entries = log.entries || [];
 
-      // Wenn Plan gewählt, aber keine Entries, mit letzten Werten befüllen
       if (plan && exerciseIds.length > 0 && entries.length === 0) {
         if (!isEdit || log.entries.length === 0) {
           log.entries = exerciseIds.map(exId => {
@@ -1918,12 +1987,7 @@
           if (planObj && planObj.exerciseIds) {
             logObj.entries = planObj.exerciseIds.map(exId => {
               const last = getLastSetForExercise(exId);
-              return {
-                exerciseId: exId,
-                sets: [{ kg: last.kg, wdh: last.wdh }],
-                cardioData: { time: 0, distance: 0 },
-                notiz: ''
-              };
+              return { exerciseId: exId, sets: [{ kg: last.kg, wdh: last.wdh }], cardioData: { time: 0, distance: 0 }, notiz: '' };
             });
           } else {
             logObj.entries = [];
@@ -1939,7 +2003,6 @@
         document.getElementById('btnDeleteLog').addEventListener('click', () => { deleteLog(id); closeDetail(); });
       }
 
-      attachLogFormEvents(editingId);
       updateOverallTimer();
     }
 
@@ -1991,110 +2054,6 @@
       const total = log.entries.reduce((sum, entry) => sum + calcVolume(entry), 0);
       const display = document.getElementById('totalVolumeDisplay');
       if (display) display.textContent = total + ' kg';
-    }
-
-    function attachLogFormEvents(logId) {
-      document.querySelectorAll('.btn-timer').forEach(btn => {
-        btn.addEventListener('click', function() {
-          toggleTimer(this.dataset.logid, this.dataset.exid, this);
-        });
-      });
-      document.querySelectorAll('.btn-add-set').forEach(btn => {
-        btn.addEventListener('click', function() {
-          addSetToLogEntry(this.dataset.logid, this.dataset.exid);
-        });
-      });
-      document.querySelectorAll('.btn-remove-set').forEach(btn => {
-        btn.addEventListener('click', function() {
-          removeSetFromLogEntry(this.dataset.logid, this.dataset.exid, parseInt(this.dataset.idx));
-        });
-      });
-      document.querySelectorAll('.set-controls button').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-          e.stopPropagation();
-          const logId = this.dataset.logid;
-          const exId = this.dataset.exid;
-          const idx = parseInt(this.dataset.idx);
-          const field = this.dataset.field;
-          const step = parseFloat(this.dataset.step) || 0.5;
-          const isInc = this.classList.contains('inc');
-          const row = this.closest('tr');
-          const input = row.querySelector(`.set-${field}`);
-          if (!input) return;
-          let val = parseFloat(input.value) || 0;
-          val = isInc ? val + step : val - step;
-          if (val < 0) val = 0;
-          if (field === 'wdh') val = Math.round(val);
-          else val = Math.round(val * 10) / 10;
-          input.value = val;
-          input.dispatchEvent(new Event('change'));
-        });
-      });
-      document.querySelectorAll('.set-kg').forEach(inp => {
-        inp.addEventListener('change', function() {
-          const logId = this.dataset.logid;
-          const exId = this.dataset.exid;
-          const idx = parseInt(this.dataset.idx);
-          const val = parseFloat(this.value) || 0;
-          updateSetValueInLog(logId, exId, idx, 'kg', val);
-          updateVolumeDisplay(logId);
-        });
-      });
-      document.querySelectorAll('.set-wdh').forEach(inp => {
-        inp.addEventListener('change', function() {
-          const logId = this.dataset.logid;
-          const exId = this.dataset.exid;
-          const idx = parseInt(this.dataset.idx);
-          const val = parseInt(this.value) || 0;
-          updateSetValueInLog(logId, exId, idx, 'wdh', val);
-          updateVolumeDisplay(logId);
-        });
-      });
-      document.querySelectorAll('.cardio-time').forEach(inp => {
-        inp.addEventListener('change', function() {
-          const logId = this.dataset.logid;
-          const exId = this.dataset.exid;
-          const val = parseFloat(this.value) || 0;
-          updateCardioData(logId, exId, 'time', val);
-        });
-      });
-      document.querySelectorAll('.cardio-dist').forEach(inp => {
-        inp.addEventListener('change', function() {
-          const logId = this.dataset.logid;
-          const exId = this.dataset.exid;
-          const val = parseFloat(this.value) || 0;
-          updateCardioData(logId, exId, 'distance', val);
-        });
-      });
-      document.querySelectorAll('.ex-notiz-text').forEach(ta => {
-        ta.addEventListener('change', function() {
-          const logId = this.dataset.logid;
-          const exId = this.dataset.exid;
-          const val = this.value;
-          updateNotizInLog(logId, exId, val);
-        });
-      });
-      document.querySelectorAll('.ex-header .del').forEach(btn => {
-        btn.addEventListener('click', function() {
-          const exId = this.dataset.exid;
-          const logId = editingId;
-          removeExerciseFromLog(logId, exId);
-        });
-      });
-      document.querySelectorAll('.exercise-entry .sets-table tbody tr').forEach(row => {
-        row.addEventListener('click', function(e) {
-          if (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON') return;
-          const exEntry = this.closest('.exercise-entry');
-          const exId = exEntry.dataset.exid;
-          const logId = exEntry.dataset.logid;
-          const idx = parseInt(this.dataset.setidx);
-          if (isNaN(idx)) return;
-          const mapKey = `${logId}_${exId}`;
-          activeSetMap[mapKey] = idx;
-          collectLogEntries(logId);
-          openLogForm(logId, overallTimerRunning);
-        });
-      });
     }
 
     // -------- Log Operationen --------
@@ -2156,17 +2115,12 @@
         log.duration = (log.duration || 0) + elapsed;
         releaseOverallTimer();
       }
-      // Datum aus Input-Feld lesen
       const dateInput = document.getElementById('formLogDate');
-      if (dateInput && dateInput.value) {
-        log.date = dateInput.value;
-      }
+      if (dateInput) log.date = dateInput.value || getToday();
       const planId = document.getElementById('formLogPlan').value;
       log.planId = planId;
       collectLogEntries(logId);
-      saveData();
-      renderAll();
-      closeDetail();
+      saveData(); renderAll(); closeDetail();
     }
     function deleteLog(id) {
       if (!confirm('Training aus dem Log löschen?')) return;
@@ -2293,7 +2247,7 @@
       timerInterval = setInterval(updateTimerDisplay, 1000);
     }
 
-    // ========== BACKUP ==========
+    // ========== BACKUP (asynchron) ==========
     function exportData() {
       const data = { exercises, plans, logs };
       const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -2321,20 +2275,20 @@
       };
       reader.readAsText(file);
     }
-    function restoreAutoBackup() {
-      const autoBackup = localStorage.getItem('bb_auto_backup');
-      if (!autoBackup) {
-        alert('Kein automatisches Backup vorhanden.');
-        return;
-      }
+    
+    async function restoreAutoBackup() {
       try {
-        const data = JSON.parse(autoBackup);
-        if (data.exercises && data.plans && data.logs) {
+        const autoBackup = await idbGet('bb_auto_backup');
+        if (!autoBackup) {
+          alert('Kein automatisches Backup vorhanden.');
+          return;
+        }
+        if (autoBackup.exercises && autoBackup.plans && autoBackup.logs) {
           if (confirm('Auto-Backup wiederherstellen? Aktuelle Daten werden überschrieben.')) {
-            exercises = data.exercises;
-            plans = data.plans;
-            logs = data.logs;
-            activePlanId = data.activePlanId || null;
+            exercises = autoBackup.exercises;
+            plans = autoBackup.plans;
+            logs = autoBackup.logs;
+            activePlanId = autoBackup.activePlanId || null;
             saveData();
             renderAll();
             backupOverlay.classList.remove('active');
@@ -2374,14 +2328,93 @@
       if (tab === 'exercises') { pageExercises.classList.add('active'); renderExercises(); }
       else if (tab === 'plans') { pagePlans.classList.add('active'); renderPlans(); }
       else if (tab === 'logs') { pageLogs.classList.add('active'); renderLogs(); }
-      else if (tab === 'calendar') {
-        pageCalendar.classList.add('active');
-        renderCalendar();
-      }
+      else if (tab === 'calendar') { pageCalendar.classList.add('active'); renderCalendar(); }
       else if (tab === 'stats') { pageStats.classList.add('active'); renderStats(); }
       tabBtns.forEach(btn => { btn.classList.toggle('active', btn.dataset.tab === tab); });
       detailContainer.style.display = 'none';
     }
+
+    // ========== EVENT DELEGATION FÜR LOG-FORMULAR ==========
+    detailContainer.addEventListener('click', function(e) {
+      if (editingType !== 'log') return;
+      const target = e.target;
+
+      const btnTimer = target.closest('.btn-timer');
+      if (btnTimer) { toggleTimer(btnTimer.dataset.logid, btnTimer.dataset.exid, btnTimer); return; }
+
+      const btnAddSet = target.closest('.btn-add-set');
+      if (btnAddSet) { addSetToLogEntry(btnAddSet.dataset.logid, btnAddSet.dataset.exid); return; }
+
+      const btnRemoveSet = target.closest('.btn-remove-set');
+      if (btnRemoveSet) { removeSetFromLogEntry(btnRemoveSet.dataset.logid, btnRemoveSet.dataset.exid, parseInt(btnRemoveSet.dataset.idx)); return; }
+
+      const btnSetControl = target.closest('.set-controls button');
+      if (btnSetControl) {
+        e.preventDefault();
+        const btn = btnSetControl;
+        const field = btn.dataset.field;
+        const step = parseFloat(btn.dataset.step) || 0.5;
+        const isInc = btn.classList.contains('inc');
+        const row = btn.closest('tr');
+        const input = row.querySelector(`.set-${field}`);
+        if (!input) return;
+
+        let val = parseFloat(input.value) || 0;
+        val = isInc ? val + step : val - step;
+        if (val < 0) val = 0;
+        if (field === 'wdh') val = Math.round(val);
+        else val = Math.round(val * 10) / 10;
+        
+        input.value = val;
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+        return;
+      }
+
+      const btnDelEx = target.closest('.ex-header .del');
+      if (btnDelEx) {
+        removeExerciseFromLog(editingId, btnDelEx.dataset.exid);
+        return;
+      }
+
+      const trActiveSet = target.closest('.exercise-entry .sets-table tbody tr');
+      if (trActiveSet) {
+        if (target.tagName === 'INPUT' || target.tagName === 'BUTTON' || target.closest('button')) return;
+        const exEntry = trActiveSet.closest('.exercise-entry');
+        const exId = exEntry.dataset.exid;
+        const logId = exEntry.dataset.logid;
+        const idx = parseInt(trActiveSet.dataset.setidx);
+        if (isNaN(idx)) return;
+        
+        const mapKey = `${logId}_${exId}`;
+        activeSetMap[mapKey] = idx;
+        collectLogEntries(logId);
+        openLogForm(logId, overallTimerRunning);
+        return;
+      }
+    });
+
+    detailContainer.addEventListener('change', function(e) {
+      if (editingType !== 'log') return;
+      const target = e.target;
+
+      if (target.classList.contains('set-kg')) {
+        updateSetValueInLog(target.dataset.logid, target.dataset.exid, parseInt(target.dataset.idx), 'kg', parseFloat(target.value) || 0);
+        updateVolumeDisplay(target.dataset.logid);
+      }
+      else if (target.classList.contains('set-wdh')) {
+        updateSetValueInLog(target.dataset.logid, target.dataset.exid, parseInt(target.dataset.idx), 'wdh', parseInt(target.value) || 0);
+        updateVolumeDisplay(target.dataset.logid);
+      }
+      else if (target.classList.contains('cardio-time')) {
+        updateCardioData(target.dataset.logid, target.dataset.exid, 'time', parseFloat(target.value) || 0);
+      }
+      else if (target.classList.contains('cardio-dist')) {
+        updateCardioData(target.dataset.logid, target.dataset.exid, 'distance', parseFloat(target.value) || 0);
+      }
+      else if (target.classList.contains('ex-notiz-text')) {
+        updateNotizInLog(target.dataset.logid, target.dataset.exid, target.value);
+      }
+    });
 
     // -------- Event-Listener --------
     tabBtns.forEach(btn => {
@@ -2403,14 +2436,19 @@
     });
     backupOverlay.addEventListener('click', function(e) { if (e.target === this) this.classList.remove('active'); });
 
-    // -------- Initialisierung --------
-    loadData();
-    enablePersistentStorage();
-    showTab('exercises');
-    if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission();
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('sw.js').catch(() => {});
+    // ======== INITIALISIERUNG (Asynchron wegen IndexedDB) ========
+    async function initApp() {
+      await loadData();
+      enablePersistentStorage();
+      showTab('exercises');
+      if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission();
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js').catch(() => {});
+      }
     }
+    
+    // Start!
+    initApp();
   </script>
 </body>
 </html>
