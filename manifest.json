@@ -1,0 +1,13 @@
+{
+  "name": "Bodybuilding Pro",
+  "short_name": "BB Pro",
+  "description": "Trainingslogger mit Cardio",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#0d0d1a",
+  "theme_color": "#0d0d1a",
+  "icons": [
+    { "src": "gym-123.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "gym-123.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

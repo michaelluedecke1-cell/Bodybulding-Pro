@@ -1,0 +1,2413 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
+  <title>Bodybuilding Pro</title>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#0d0d1a" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    /* ===== Alle Styles wie gehabt (Platz sparend gekürzt) ===== */
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
+    body { background: #0d0d1a; color: #e0e0e0; min-height: 100vh; padding: 0 12px 80px; font-size: 0.9rem; }
+    .app-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 12px 0 10px;
+      border-bottom: 1px solid #2a2a44;
+      margin-bottom: 14px;
+    }
+    .app-header h1 {
+      font-size: 1.4rem; font-weight: 700;
+      background: linear-gradient(135deg, #f39c12, #e74c3c);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .header-actions { display: flex; gap: 8px; align-items: center; }
+    .btn-icon {
+      background: #2a2a44; border: none; color: #ddd; font-size: 1.3rem;
+      width: 38px; height: 38px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: background 0.2s;
+    }
+    .btn-icon:active { background: #3a3a5a; }
+    .btn-icon.primary { background: #2ecc71; color: #fff; box-shadow: 0 4px 12px rgba(46,204,113,0.3); }
+    .btn-icon.backup { background: #3498db; color: #fff; }
+    .btn-icon.quickstart { background: #f39c12; color: #fff; }
+
+    .tab-bar {
+      display: flex; gap: 4px; background: #1a1a2e; border-radius: 12px;
+      padding: 4px; margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    .tab-btn {
+      flex: 1; background: transparent; border: none; color: #888;
+      padding: 8px 0; font-weight: 600; font-size: 0.7rem;
+      border-radius: 10px; cursor: pointer; transition: all 0.2s;
+      min-width: 50px;
+    }
+    .tab-btn.active { background: #2a2a44; color: #fff; }
+    .tab-btn:active { transform: scale(0.96); }
+
+    .page { display: none; flex-direction: column; gap: 12px; }
+    .page.active { display: flex; }
+
+    .list-item {
+      background: #1a1a2e; border-radius: 12px; padding: 12px 14px;
+      display: flex; align-items: center; gap: 12px;
+      border-left: 4px solid #f39c12; cursor: pointer;
+      transition: background 0.15s; box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+    }
+    .list-item:active { background: #252540; }
+    .list-item .info { flex: 1; }
+    .list-item .info h4 { font-size: 0.95rem; font-weight: 500; }
+    .list-item .info .sub { font-size: 0.75rem; color: #aaa; margin-top: 2px; }
+    .list-item .thumbnail {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: #2a2a44;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      color: #f39c12;
+      overflow: hidden;
+    }
+    .list-item .thumbnail img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .list-item .actions {
+      display: flex; gap: 6px;
+    }
+    .list-item .actions button {
+      background: none; border: none; color: #aaa; font-size: 1.1rem;
+      cursor: pointer; padding: 0 4px;
+    }
+    .list-item .actions .del { color: #e74c3c; }
+    .list-item .actions .star { color: #f39c12; }
+    .list-item .actions .star.active { color: #2ecc71; }
+
+    .empty-state {
+      text-align: center; color: #666; padding: 30px 0;
+      font-size: 0.85rem;
+    }
+
+    .detail-card {
+      background: #1a1a2e; border-radius: 12px; padding: 14px;
+      border: 1px solid #2a2a44;
+    }
+    .detail-card .row {
+      display: flex; gap: 10px; flex-wrap: wrap;
+      margin-bottom: 8px;
+    }
+    .detail-card .row label { flex: 1; min-width: 100px; font-size: 0.85rem; }
+    .detail-card input, .detail-card textarea, .detail-card select {
+      width: 100%; background: #2a2a44; border: 1px solid #444;
+      border-radius: 8px; padding: 8px 10px; color: #fff;
+      font-size: 0.9rem;
+    }
+    .detail-card input::placeholder, .detail-card textarea::placeholder { color: #888; }
+    .detail-card .btn-row {
+      display: flex; gap: 8px; margin-top: 8px;
+    }
+    .detail-card .btn-row button {
+      flex: 1; padding: 10px; border: none; border-radius: 10px;
+      font-weight: 700; font-size: 0.9rem; cursor: pointer;
+    }
+    .btn-save { background: #2ecc71; color: #fff; }
+    .btn-cancel { background: #555; color: #fff; }
+    .btn-danger { background: #e74c3c; color: #fff; }
+
+    .plan-exercise-list {
+      list-style: none; padding: 0; margin: 6px 0;
+    }
+    .plan-exercise-list li {
+      display: flex; align-items: center; gap: 10px;
+      background: #111122; padding: 8px 10px; border-radius: 8px;
+      margin-bottom: 4px; border: 1px solid #2a2a44;
+    }
+    .plan-exercise-list li input[type="checkbox"] {
+      width: 20px; height: 20px; accent-color: #2ecc71; flex-shrink: 0;
+    }
+    .plan-exercise-list li .ex-name { flex: 1; font-size: 0.9rem; }
+    .plan-exercise-list li .ex-type { font-size: 0.7rem; color: #888; margin-right: 4px; }
+    .plan-exercise-list li .move-buttons { display: flex; gap: 4px; }
+    .plan-exercise-list li .move-buttons button {
+      background: #2a2a44; border: none; color: #ddd; font-size: 1.2rem;
+      width: 30px; height: 30px; border-radius: 6px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s;
+    }
+    .plan-exercise-list li .move-buttons button:active { background: #3a3a5a; }
+
+    .exercise-entry {
+      background: #111122; border-radius: 10px; padding: 8px 10px;
+      margin-bottom: 8px; border: 1px solid #2a2a44;
+    }
+    .exercise-entry .ex-header {
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .exercise-entry .ex-header .ex-name { font-weight: 500; font-size: 0.85rem; }
+    .exercise-entry .ex-header .ex-actions button {
+      background: none; border: none; color: #aaa; font-size: 1rem;
+      cursor: pointer; padding: 0 4px;
+    }
+    .exercise-entry .ex-header .ex-actions .del { color: #e74c3c; }
+    .exercise-entry img {
+      max-width: 100%; max-height: 80px; object-fit: contain;
+      border-radius: 6px; margin: 4px 0; background: #0d0d1a;
+    }
+
+    .exercise-entry .sets-table input[type="number"] {
+      width: 60px;
+      font-size: 1.0rem;
+      padding: 6px 4px;
+      background: #2a2a44;
+      border: 1px solid #444;
+      border-radius: 6px;
+      color: #fff;
+      text-align: center;
+      -moz-appearance: textfield;
+    }
+    .exercise-entry .sets-table input[type="number"]::-webkit-outer-spin-button,
+    .exercise-entry .sets-table input[type="number"]::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    .exercise-entry .sets-table .set-controls {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+    .exercise-entry .sets-table .set-controls button {
+      background: #2a2a44;
+      border: none;
+      color: #ddd;
+      font-size: 1.0rem;
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+      touch-action: manipulation;
+      font-weight: 700;
+    }
+    .exercise-entry .sets-table .set-controls button:active {
+      background: #3a3a5a;
+      transform: scale(0.94);
+    }
+    .exercise-entry .sets-table .set-controls button.inc {
+      color: #2ecc71;
+    }
+    .exercise-entry .sets-table .set-controls button.dec {
+      color: #e74c3c;
+    }
+
+    .exercise-entry .sets-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 4px 0;
+    }
+    .exercise-entry .sets-table th {
+      text-align: left;
+      padding: 4px 4px;
+      color: #aaa;
+      font-weight: 400;
+      font-size: 0.7rem;
+      border-bottom: 1px solid #333;
+    }
+    .exercise-entry .sets-table td {
+      padding: 3px 3px;
+      border-bottom: 1px solid #2a2a44;
+      vertical-align: middle;
+    }
+    .exercise-entry .sets-table .btn-remove-set {
+      background: none;
+      border: none;
+      color: #e74c3c;
+      font-size: 1.0rem;
+      cursor: pointer;
+      padding: 0 4px;
+    }
+    .exercise-entry .sets-table tr.active-set {
+      background: #2a4a3a;
+      border-left: 3px solid #2ecc71;
+    }
+    .exercise-entry .sets-table tr.active-set td {
+      border-bottom-color: #2ecc71;
+    }
+    .exercise-entry .sets-table .set-number {
+      color: #888;
+      width: 28px;
+      text-align: center;
+      font-weight: 600;
+      font-size: 0.8rem;
+    }
+
+    .exercise-entry .set-progress {
+      font-size: 0.7rem; color: #aaa; margin: 2px 0;
+      display: flex; justify-content: space-between;
+    }
+    .exercise-entry .set-progress .current-set-label {
+      color: #2ecc71; font-weight: 600;
+    }
+
+    .exercise-entry .ex-actions-row {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 4px;
+    }
+    .exercise-entry .ex-actions-row button {
+      padding: 6px 12px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      min-height: 38px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      background: #2a2a44;
+      color: #ddd;
+      flex: 1;
+      min-width: 80px;
+      transition: background 0.2s;
+      touch-action: manipulation;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+    .exercise-entry .ex-actions-row button:active {
+      transform: scale(0.96);
+    }
+    .exercise-entry .ex-actions-row .btn-timer {
+      background: #3498db;
+      color: #fff;
+    }
+    .exercise-entry .ex-actions-row .btn-timer.active {
+      background: #e74c3c;
+    }
+    .exercise-entry .ex-actions-row .btn-add-set {
+      background: #2ecc71;
+      color: #fff;
+    }
+
+    .exercise-entry .timer-display {
+      font-size: 1.4rem;
+      font-weight: 700;
+      text-align: center;
+      background: #0d0d1a;
+      border-radius: 8px;
+      padding: 4px 0;
+      margin: 4px 0;
+      border: 1px solid #333;
+      transition: background 0.3s;
+    }
+    .exercise-entry .timer-display.timer-alarm {
+      background: #8b0000;
+      animation: blink 0.5s infinite alternate;
+    }
+    @keyframes blink {
+      0% { background: #8b0000; }
+      100% { background: #ff0000; }
+    }
+
+    .exercise-entry .ex-notiz {
+      background: #1a1a2e; padding: 4px 8px; border-radius: 6px;
+      margin-top: 4px;
+    }
+    .exercise-entry .ex-notiz textarea {
+      width: 100%; background: transparent; border: none;
+      color: #ddd; resize: vertical; font-size: 0.8rem;
+      outline: none; min-height: 24px;
+    }
+
+    .volume-summary {
+      background: #1a1a2e; padding: 6px 10px; border-radius: 8px;
+      margin: 4px 0 8px;
+      display: flex; flex-wrap: wrap; gap: 12px;
+      justify-content: space-around;
+      border: 1px solid #2a2a44;
+    }
+    .volume-summary .item { text-align: center; }
+    .volume-summary .item .label { font-size: 0.65rem; color: #888; }
+    .volume-summary .item .value { font-size: 1rem; font-weight: 700; color: #2ecc71; }
+
+    .chart-container {
+      background: #111122; border-radius: 8px; padding: 8px;
+      margin: 4px 0; border: 1px solid #2a2a44;
+      overflow-x: auto;
+    }
+    .chart-container canvas { width: 100%; height: 100px; }
+
+    .cardio-row {
+      display: flex; gap: 10px; margin: 4px 0; align-items: center;
+      background: #1a1a2e; padding: 4px 8px; border-radius: 8px;
+    }
+    .cardio-row label { font-size: 0.75rem; color: #aaa; }
+    .cardio-row input {
+      width: 60px; background: #2a2a44; border: 1px solid #444;
+      border-radius: 6px; color: #fff; padding: 4px 6px;
+      font-size: 0.85rem;
+    }
+
+    .calendar-container {
+      background: #1a1a2e;
+      border-radius: 12px;
+      padding: 12px;
+      border: 1px solid #2a2a44;
+    }
+    .calendar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .calendar-header .month-year {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+    .calendar-header .nav-btn {
+      background: #2a2a44;
+      border: none;
+      color: #ddd;
+      font-size: 1.2rem;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .calendar-header .nav-btn:active { background: #3a3a5a; }
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+      text-align: center;
+    }
+    .calendar-grid .day-name {
+      font-size: 0.7rem;
+      color: #888;
+      padding: 4px 0;
+    }
+    .calendar-grid .day-cell {
+      background: #111122;
+      border-radius: 6px;
+      padding: 6px 0;
+      font-size: 0.85rem;
+      cursor: default;
+      transition: background 0.2s;
+      position: relative;
+    }
+    .calendar-grid .day-cell.other-month {
+      color: #555;
+    }
+    .calendar-grid .day-cell.has-training {
+      background: #1a3a2a;
+      cursor: pointer;
+    }
+    .calendar-grid .day-cell.has-training::after {
+      content: '';
+      position: absolute;
+      bottom: 2px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: #2ecc71;
+    }
+    .calendar-grid .day-cell.today {
+      border: 1px solid #f39c12;
+    }
+    .calendar-grid .day-cell:active { background: #2a2a44; }
+
+    .calendar-year-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin: 10px 0;
+    }
+    .calendar-year-grid .month-card {
+      background: #111122;
+      border-radius: 8px;
+      padding: 6px 4px;
+      text-align: center;
+      border: 1px solid #2a2a44;
+    }
+    .calendar-year-grid .month-card .month-name {
+      font-size: 0.7rem;
+      color: #aaa;
+      margin-bottom: 4px;
+    }
+    .calendar-year-grid .month-card .mini-days {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 1px;
+    }
+    .calendar-year-grid .month-card .mini-day {
+      width: 100%;
+      aspect-ratio: 1;
+      border-radius: 2px;
+      background: #1a1a2e;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.45rem;
+      color: #555;
+      cursor: default;
+    }
+    .calendar-year-grid .month-card .mini-day.has-training {
+      background: #2ecc71;
+      color: #0d0d1a;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .calendar-year-grid .month-card .mini-day.other-month {
+      opacity: 0.3;
+    }
+
+    .calendar-stats {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 10px;
+      font-size: 0.85rem;
+      color: #aaa;
+    }
+    .calendar-stats span { background: #111122; padding: 4px 12px; border-radius: 20px; }
+    .calendar-stats .count { color: #2ecc71; font-weight: 700; }
+
+    .stat-card {
+      background: #1a1a2e;
+      border-radius: 12px;
+      padding: 12px 14px;
+      border: 1px solid #2a2a44;
+    }
+    .stat-card .stat-value {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #2ecc71;
+    }
+    .stat-card .stat-label {
+      font-size: 0.8rem;
+      color: #aaa;
+    }
+    .stat-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .stat-row .stat-card {
+      flex: 1;
+      min-width: 100px;
+      text-align: center;
+    }
+    .stat-list {
+      list-style: none;
+      padding: 0;
+    }
+    .stat-list li {
+      display: flex;
+      justify-content: space-between;
+      padding: 6px 0;
+      border-bottom: 1px solid #2a2a44;
+    }
+    .stat-list li .name { color: #ddd; }
+    .stat-list li .value { color: #2ecc71; font-weight: 600; }
+
+    .backup-overlay {
+      display: none;
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.7); justify-content: center; align-items: center;
+      z-index: 1000;
+    }
+    .backup-overlay.active { display: flex; }
+    .backup-modal {
+      background: #1a1a2e; padding: 24px; border-radius: 16px;
+      max-width: 90%; width: 400px; text-align: center;
+    }
+    .backup-modal h3 { margin-bottom: 12px; }
+    .backup-modal .btn-row {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+    .backup-modal .btn-row button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .backup-modal .btn-row button:active { transform: scale(0.96); }
+
+    .wake-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #2a2a44;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: background 0.3s;
+      border: 1px solid #444;
+      user-select: none;
+    }
+    .wake-toggle.active {
+      background: #1a4a3a;
+      border-color: #2ecc71;
+    }
+    .wake-toggle:active { transform: scale(0.96); }
+
+    @media (min-width: 600px) {
+      body { max-width: 480px; margin: 0 auto; padding: 10px 16px 80px; }
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <header class="app-header">
+      <h1>🏋️ Pro</h1>
+      <div class="header-actions">
+        <button class="btn-icon quickstart" id="btnQuickStart" title="Training starten"><i class="fas fa-play"></i></button>
+        <button class="btn-icon backup" id="btnBackup" title="Backup & Auto-Backup"><i class="fas fa-database"></i></button>
+        <button class="btn-icon primary" id="btnGlobalAdd" title="Neu"><i class="fas fa-plus"></i></button>
+      </div>
+    </header>
+
+    <div class="tab-bar">
+      <button class="tab-btn active" data-tab="exercises"><i class="fas fa-dumbbell"></i> Übungen</button>
+      <button class="tab-btn" data-tab="plans"><i class="fas fa-list"></i> Pläne</button>
+      <button class="tab-btn" data-tab="logs"><i class="fas fa-history"></i> Logs</button>
+      <button class="tab-btn" data-tab="calendar"><i class="fas fa-calendar-alt"></i> Kalender</button>
+      <button class="tab-btn" data-tab="stats"><i class="fas fa-chart-bar"></i> Statistik</button>
+    </div>
+
+    <div id="page-exercises" class="page active"><div id="exerciseList" class="list-container"></div></div>
+    <div id="page-plans" class="page"><div id="planList" class="list-container"></div></div>
+    <div id="page-logs" class="page"><div id="logList" class="list-container"></div></div>
+    <div id="page-calendar" class="page"><div id="calendarContainer"></div></div>
+    <div id="page-stats" class="page"><div id="statsContainer"></div></div>
+
+    <div id="detailContainer" style="display:none;"></div>
+
+    <div id="backupOverlay" class="backup-overlay">
+      <div class="backup-modal">
+        <h3>💾 Backup & Wiederherstellung</h3>
+        <p style="margin-bottom:12px; font-size:0.9rem; color:#aaa;">
+          Automatisches Backup wird bei jedem Speichern erstellt.
+        </p>
+        <div class="btn-row">
+          <button class="btn-save" id="btnExport"><i class="fas fa-download"></i> Exportieren</button>
+          <button class="btn-cancel" id="btnImportTrigger"><i class="fas fa-upload"></i> Importieren</button>
+          <button class="btn-save" id="btnRestoreAutoBackup" style="background:#f39c12; color:#fff;"><i class="fas fa-undo-alt"></i> Auto-Backup</button>
+          <button class="btn-danger" id="btnCloseBackup"><i class="fas fa-times"></i> Schließen</button>
+        </div>
+        <input type="file" id="fileInput" accept=".json" style="display:none;" />
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let exercises = [], plans = [], logs = [];
+    let currentTab = 'exercises', editingId = null, editingType = null;
+    let calendarDate = new Date();
+    let calendarView = 'month';
+    let activePlanId = null;
+
+    let timerInterval = null, timerRunning = false;
+    let currentTimerLogId = null, currentTimerExId = null;
+    let timerStartTime = null, timerTotalSeconds = 0, timerRemainingSeconds = 0;
+    let wakeLock = null;
+    let wakeLockManual = false;
+
+    let overallTimerStart = null;
+    let overallTimerInterval = null;
+    let overallTimerRunning = false;
+
+    const activeSetMap = {};
+
+    const pageExercises = document.getElementById('page-exercises');
+    const pagePlans = document.getElementById('page-plans');
+    const pageLogs = document.getElementById('page-logs');
+    const pageCalendar = document.getElementById('page-calendar');
+    const pageStats = document.getElementById('page-stats');
+    const exerciseList = document.getElementById('exerciseList');
+    const planList = document.getElementById('planList');
+    const logList = document.getElementById('logList');
+    const calendarContainer = document.getElementById('calendarContainer');
+    const statsContainer = document.getElementById('statsContainer');
+    const detailContainer = document.getElementById('detailContainer');
+    const btnGlobalAdd = document.getElementById('btnGlobalAdd');
+    const btnQuickStart = document.getElementById('btnQuickStart');
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const backupOverlay = document.getElementById('backupOverlay');
+    const btnBackup = document.getElementById('btnBackup');
+    const btnCloseBackup = document.getElementById('btnCloseBackup');
+    const btnExport = document.getElementById('btnExport');
+    const btnImportTrigger = document.getElementById('btnImportTrigger');
+    const btnRestoreAutoBackup = document.getElementById('btnRestoreAutoBackup');
+    const fileInput = document.getElementById('fileInput');
+
+    // ========== HILFSFUNKTIONEN ==========
+    function generateId() { return Date.now().toString(36) + Math.random().toString(36).substr(2, 5); }
+    function formatTime(sec) {
+      const m = String(Math.floor(sec / 60)).padStart(2, '0');
+      const s = String(Math.floor(sec % 60)).padStart(2, '0');
+      return `${m}:${s}`;
+    }
+    function formatDuration(sec) {
+      if (sec < 60) return `${Math.floor(sec)}s`;
+      const m = Math.floor(sec / 60), s = Math.floor(sec % 60);
+      return `${m}m ${s}s`;
+    }
+    function getToday() { return new Date().toISOString().split('T')[0]; }
+    function formatDate(d) { if (!d) return ''; const p = d.split('-'); return `${p[2]}.${p[1]}.${p[0]}`; }
+
+    function getExerciseIcon(ex) {
+      const name = ex.name.toLowerCase();
+      if (ex.type === 'cardio') return 'fa-person-running';
+      if (name.includes('bankdrücken') || name.includes('bench')) return 'fa-dumbbell';
+      if (name.includes('kniebeuge') || name.includes('squat')) return 'fa-person-walking';
+      if (name.includes('kreuzheben') || name.includes('deadlift')) return 'fa-weight-hanging';
+      if (name.includes('ruder')) return 'fa-rowing';
+      if (name.includes('schulter') || name.includes('shoulder')) return 'fa-hand-fist';
+      if (name.includes('curl')) return 'fa-hand-sparkles';
+      if (name.includes('trizeps') || name.includes('triceps')) return 'fa-hand-back-fist';
+      if (name.includes('klimmzug') || name.includes('pull-up')) return 'fa-person-pulling-up';
+      if (name.includes('liegestütz') || name.includes('push-up')) return 'fa-person-push-up';
+      if (name.includes('plank')) return 'fa-table';
+      if (name.includes('laufband') || name.includes('treadmill')) return 'fa-person-running';
+      if (name.includes('rad') || name.includes('bike')) return 'fa-bicycle';
+      if (name.includes('rudergerät') || name.includes('ergometer')) return 'fa-oar';
+      return 'fa-dumbbell';
+    }
+
+    function playBeep() {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const o1 = ctx.createOscillator(), o2 = ctx.createOscillator();
+        const g = ctx.createGain();
+        o1.connect(g); o2.connect(g); g.connect(ctx.destination);
+        o1.frequency.value = 440; o1.type = 'square';
+        o2.frequency.value = 660; o2.type = 'sine';
+        g.gain.setValueAtTime(0.6, ctx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.8);
+        o1.start(); o2.start();
+        o1.stop(ctx.currentTime + 0.8); o2.stop(ctx.currentTime + 0.8);
+      } catch(e) { console.log('🔔 Timer abgelaufen!'); }
+    }
+    function sendNotification(msg) {
+      if (!('Notification' in window)) return;
+      if (Notification.permission === 'granted') new Notification('⏰ Timer abgelaufen', { body: msg, icon: '🏋️' });
+      else if (Notification.permission !== 'denied') {
+        Notification.requestPermission().then(p => { if (p === 'granted') new Notification('⏰ Timer abgelaufen', { body: msg, icon: '🏋️' }); });
+      }
+    }
+
+    // ========== WAKE LOCK ==========
+    async function requestWakeLock() {
+      try {
+        if ('wakeLock' in navigator) {
+          if (wakeLock) {
+            try { await wakeLock.release(); } catch(e) {}
+            wakeLock = null;
+          }
+          wakeLock = await navigator.wakeLock.request('screen');
+          console.log('✅ WakeLock aktiviert');
+          updateWakeToggleUI(true);
+        }
+      } catch (err) {
+        console.warn('WakeLock nicht verfügbar:', err);
+        updateWakeToggleUI(false);
+      }
+    }
+    function releaseWakeLock() {
+      if (wakeLock) {
+        try {
+          wakeLock.release();
+          wakeLock = null;
+          console.log('✅ WakeLock freigegeben');
+          updateWakeToggleUI(false);
+        } catch(e) { /* ignore */ }
+      } else {
+        updateWakeToggleUI(false);
+      }
+    }
+    function toggleWakeLock() {
+      if (wakeLock) {
+        wakeLockManual = true;
+        releaseWakeLock();
+      } else {
+        wakeLockManual = false;
+        requestWakeLock();
+      }
+    }
+    function updateWakeToggleUI(active) {
+      const btn = document.getElementById('wakeToggleBtn');
+      if (btn) {
+        if (active) {
+          btn.classList.add('active');
+          btn.innerHTML = '<i class="fas fa-desktop"></i> Bildschirm an';
+        } else {
+          btn.classList.remove('active');
+          btn.innerHTML = '<i class="fas fa-desktop"></i> Bildschirm aus';
+        }
+      }
+    }
+
+    // ========== PERSISTENT STORAGE ==========
+    async function enablePersistentStorage() {
+      if ('storage' in navigator && 'persist' in navigator.storage) {
+        try {
+          const isPersisted = await navigator.storage.persisted();
+          if (!isPersisted) {
+            const granted = await navigator.storage.persist();
+            if (granted) console.log('✅ Persistent Storage aktiviert');
+            else console.warn('⚠️ Persistent Storage nicht gewährt');
+          } else console.log('✅ Persistent Storage bereits aktiv');
+        } catch (err) { console.warn('⚠️ Fehler:', err); }
+      }
+    }
+
+    // ========== SPEICHERN & LADEN ==========
+    function saveData() {
+      localStorage.setItem('bb_exercises', JSON.stringify(exercises));
+      localStorage.setItem('bb_plans', JSON.stringify(plans));
+      localStorage.setItem('bb_logs', JSON.stringify(logs));
+      localStorage.setItem('bb_activePlan', activePlanId || '');
+      try {
+        const backupData = { exercises, plans, logs, activePlanId };
+        localStorage.setItem('bb_auto_backup', JSON.stringify(backupData));
+        console.log('✅ Auto-Backup gespeichert');
+      } catch (e) { console.warn('Auto-Backup fehlgeschlagen:', e); }
+    }
+    function loadData() {
+      try {
+        const e = localStorage.getItem('bb_exercises');
+        if (e) exercises = JSON.parse(e);
+        const p = localStorage.getItem('bb_plans');
+        if (p) plans = JSON.parse(p);
+        const l = localStorage.getItem('bb_logs');
+        if (l) logs = JSON.parse(l);
+        activePlanId = localStorage.getItem('bb_activePlan') || null;
+      } catch(err) {}
+      exercises.forEach(ex => { if (!ex.type) ex.type = 'strength'; });
+      logs.forEach(log => {
+        log.entries.forEach(entry => { if (!entry.cardioData) entry.cardioData = { time: 0, distance: 0 }; });
+        if (log.duration === undefined) log.duration = 0;
+      });
+      if (exercises.length === 0 && plans.length === 0 && logs.length === 0) {
+        const autoBackup = localStorage.getItem('bb_auto_backup');
+        if (autoBackup) {
+          try {
+            const backup = JSON.parse(autoBackup);
+            if (backup.exercises && backup.plans && backup.logs) {
+              exercises = backup.exercises;
+              plans = backup.plans;
+              logs = backup.logs;
+              activePlanId = backup.activePlanId || null;
+              saveData();
+              console.log('✅ Auto-Backup wiederhergestellt');
+            }
+          } catch(e) {}
+        }
+      }
+      if (exercises.length === 0 && plans.length === 0 && logs.length === 0) {
+        const ex1 = { id: generateId(), name: 'Schulterpresse (Maschine)', image: '', pause: 90, type: 'strength' };
+        const ex2 = { id: generateId(), name: 'Rudermaschine sitzend', image: '', pause: 90, type: 'strength' };
+        const ex3 = { id: generateId(), name: 'Laufband', image: '', pause: 60, type: 'cardio' };
+        exercises = [ex1, ex2, ex3];
+        const planId = generateId();
+        plans = [{ id: planId, name: 'Ganzkörper', exerciseIds: [ex1.id, ex2.id, ex3.id] }];
+        activePlanId = planId;
+        logs = [{
+          id: generateId(), planId: planId, date: getToday(), duration: 0,
+          entries: [
+            { exerciseId: ex1.id, sets: [{ kg: 28, wdh: 12 }, { kg: 28, wdh: 12 }, { kg: 28, wdh: 12 }], cardioData: { time: 0, distance: 0 }, notiz: '1kg pro Woche mehr' },
+            { exerciseId: ex2.id, sets: [{ kg: 60, wdh: 12 }], cardioData: { time: 0, distance: 0 }, notiz: '' },
+            { exerciseId: ex3.id, sets: [], cardioData: { time: 15, distance: 2.5 }, notiz: 'Steigung 2%' }
+          ]
+        }];
+        saveData();
+      }
+    }
+
+    // ========== NEU: Letzte Werte pro Übung holen ==========
+    function getLastSetForExercise(exerciseId) {
+      // Alle Logs nach Datum absteigend sortieren
+      const sortedLogs = [...logs].sort((a, b) => (a.date || '').localeCompare(b.date || '') * -1);
+      for (const log of sortedLogs) {
+        const entry = log.entries.find(e => e.exerciseId === exerciseId);
+        if (entry && entry.sets && entry.sets.length > 0) {
+          // Letzten Satz (höchster Index) zurückgeben
+          const lastSet = entry.sets[entry.sets.length - 1];
+          return { kg: lastSet.kg || 0, wdh: lastSet.wdh || 0 };
+        }
+      }
+      return { kg: 0, wdh: 0 };
+    }
+
+    // ========== VOLUMEN & DIAGRAMM ==========
+    function calcVolume(entry) {
+      if (!entry.sets) return 0;
+      return entry.sets.reduce((sum, set) => sum + (set.kg || 0) * (set.wdh || 0), 0);
+    }
+
+    function renderChart(exerciseId, container) {
+      const logsForEx = logs.filter(log => log.entries.some(e => e.exerciseId === exerciseId && e.sets && e.sets.length > 0));
+      if (logsForEx.length < 2) {
+        container.innerHTML = `<div style="text-align:center; color:#666; padding:10px;">Nicht genug Daten für Diagramm (mind. 2 Trainings nötig).</div>`;
+        return;
+      }
+      logsForEx.sort((a, b) => (a.date || '').localeCompare(b.date || ''));
+      const data = logsForEx.map(log => {
+        const entry = log.entries.find(e => e.exerciseId === exerciseId);
+        if (!entry) return null;
+        const maxKg = entry.sets.reduce((max, set) => Math.max(max, set.kg || 0), 0);
+        return { date: log.date, kg: maxKg };
+      }).filter(d => d !== null);
+      if (data.length < 2) {
+        container.innerHTML = `<div style="text-align:center; color:#666; padding:10px;">Nicht genug Daten für Diagramm.</div>`;
+        return;
+      }
+      const canvas = document.createElement('canvas');
+      container.innerHTML = '';
+      container.appendChild(canvas);
+      const ctx = canvas.getContext('2d');
+      const width = container.clientWidth || 300;
+      const height = 100;
+      canvas.width = width * 2;
+      canvas.height = height * 2;
+      canvas.style.width = width + 'px';
+      canvas.style.height = height + 'px';
+      ctx.scale(2, 2);
+      const padding = { top: 10, bottom: 20, left: 30, right: 10 };
+      const chartWidth = width - padding.left - padding.right;
+      const chartHeight = height - padding.top - padding.bottom;
+      const maxKg = Math.max(...data.map(d => d.kg)) * 1.1;
+      const minKg = Math.min(...data.map(d => d.kg)) * 0.9;
+      const range = maxKg - minKg || 1;
+      ctx.fillStyle = '#0d0d1a';
+      ctx.fillRect(0, 0, width, height);
+      ctx.strokeStyle = '#444';
+      ctx.lineWidth = 0.5;
+      ctx.beginPath();
+      ctx.moveTo(padding.left, padding.top);
+      ctx.lineTo(padding.left, height - padding.bottom);
+      ctx.lineTo(width - padding.right, height - padding.bottom);
+      ctx.stroke();
+      if (data.length > 1) {
+        ctx.beginPath();
+        ctx.strokeStyle = '#2ecc71';
+        ctx.lineWidth = 2;
+        data.forEach((d, i) => {
+          const x = padding.left + (i / (data.length - 1)) * chartWidth;
+          const y = padding.top + chartHeight - ((d.kg - minKg) / range) * chartHeight;
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        });
+        ctx.stroke();
+        data.forEach((d, i) => {
+          const x = padding.left + (i / (data.length - 1)) * chartWidth;
+          const y = padding.top + chartHeight - ((d.kg - minKg) / range) * chartHeight;
+          ctx.fillStyle = '#2ecc71';
+          ctx.beginPath();
+          ctx.arc(x, y, 3, 0, 2 * Math.PI);
+          ctx.fill();
+          ctx.fillStyle = '#888';
+          ctx.font = '8px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText(formatDate(d.date), x, height - 4);
+        });
+      }
+      ctx.fillStyle = '#aaa';
+      ctx.font = '8px sans-serif';
+      ctx.textAlign = 'right';
+      ctx.fillText(Math.round(maxKg) + 'kg', padding.left - 4, padding.top + 10);
+      ctx.fillText(Math.round(minKg) + 'kg', padding.left - 4, height - padding.bottom - 4);
+    }
+
+    // ========== KALENDER ==========
+    function renderCalendar() {
+      if (!calendarContainer) return;
+      if (calendarView === 'year') {
+        renderYearView();
+        return;
+      }
+      const year = calendarDate.getFullYear();
+      const month = calendarDate.getMonth();
+      const today = new Date();
+      const todayStr = getToday();
+
+      const firstDay = new Date(year, month, 1);
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const startDayOfWeek = firstDay.getDay();
+
+      const logMap = {};
+      logs.forEach(log => {
+        if (log.date) {
+          logMap[log.date] = log.id;
+        }
+      });
+
+      let html = `
+        <div class="calendar-container">
+          <div class="calendar-header">
+            <button class="nav-btn" id="calPrev">‹</button>
+            <span class="month-year">${firstDay.toLocaleDateString('de-DE', { month: 'long', year: 'numeric' })}</span>
+            <button class="nav-btn" id="calNext">›</button>
+            <button class="nav-btn" id="calYearView" style="background:#f39c12; color:#fff; font-size:0.9rem; padding:0 10px;">Jahr</button>
+          </div>
+          <div class="calendar-grid">
+            <div class="day-name">Mo</div><div class="day-name">Di</div><div class="day-name">Mi</div>
+            <div class="day-name">Do</div><div class="day-name">Fr</div><div class="day-name">Sa</div>
+            <div class="day-name">So</div>
+      `;
+
+      let startOffset = startDayOfWeek === 0 ? 6 : startDayOfWeek - 1;
+      for (let i = 0; i < startOffset; i++) {
+        const prevDate = new Date(year, month, 0 - (startOffset - i - 1));
+        html += `<div class="day-cell other-month">${prevDate.getDate()}</div>`;
+      }
+      for (let d = 1; d <= daysInMonth; d++) {
+        const dateObj = new Date(year, month, d);
+        const dateStr = dateObj.toISOString().split('T')[0];
+        const isToday = dateStr === todayStr;
+        const hasTraining = !!logMap[dateStr];
+        let classes = 'day-cell';
+        if (isToday) classes += ' today';
+        if (hasTraining) classes += ' has-training';
+        html += `<div class="${classes}" data-date="${dateStr}" data-logid="${logMap[dateStr] || ''}">${d}</div>`;
+      }
+      const remaining = (7 - ((startOffset + daysInMonth) % 7)) % 7;
+      for (let i = 1; i <= remaining; i++) {
+        const nextDate = new Date(year, month + 1, i);
+        html += `<div class="day-cell other-month">${nextDate.getDate()}</div>`;
+      }
+      html += `</div>`;
+
+      const monthStr = String(month+1).padStart(2,'0');
+      const logsThisMonth = logs.filter(log => log.date && log.date.startsWith(`${year}-${monthStr}`));
+      const daysTrained = logsThisMonth.length;
+      let totalVol = 0;
+      logsThisMonth.forEach(log => {
+        log.entries.forEach(entry => { totalVol += calcVolume(entry); });
+      });
+      const avgVol = daysTrained > 0 ? Math.round(totalVol / daysTrained) : 0;
+
+      html += `
+        <div class="calendar-stats">
+          <span>📅 Trainingstage: <span class="count">${daysTrained}</span></span>
+          <span>📊 Volumen: <span class="count">${totalVol} kg</span></span>
+          <span>📈 Ø: <span class="count">${avgVol} kg</span></span>
+        </div>
+      </div>`;
+
+      calendarContainer.innerHTML = html;
+
+      document.getElementById('calPrev')?.addEventListener('click', () => {
+        calendarDate.setMonth(calendarDate.getMonth() - 1);
+        renderCalendar();
+      });
+      document.getElementById('calNext')?.addEventListener('click', () => {
+        calendarDate.setMonth(calendarDate.getMonth() + 1);
+        renderCalendar();
+      });
+      document.getElementById('calYearView')?.addEventListener('click', () => {
+        calendarView = 'year';
+        renderCalendar();
+      });
+      document.querySelectorAll('.day-cell.has-training').forEach(el => {
+        el.addEventListener('click', function() {
+          const logId = this.dataset.logid;
+          if (logId) {
+            showTab('logs');
+            openLogForm(logId, false);
+          }
+        });
+      });
+    }
+
+    // ========== JAHRESKALENDER ==========
+    function renderYearView() {
+      const year = calendarDate.getFullYear();
+      const today = new Date();
+      const todayStr = getToday();
+
+      const logMap = {};
+      logs.forEach(log => {
+        if (log.date) {
+          logMap[log.date] = log.id;
+        }
+      });
+
+      const yearStr = String(year);
+      const logsThisYear = logs.filter(log => log.date && log.date.startsWith(yearStr));
+      const daysTrained = logsThisYear.length;
+      let totalVol = 0;
+      logsThisYear.forEach(log => {
+        log.entries.forEach(entry => { totalVol += calcVolume(entry); });
+      });
+      const avgVol = daysTrained > 0 ? Math.round(totalVol / daysTrained) : 0;
+
+      let html = `
+        <div class="calendar-container">
+          <div class="calendar-header">
+            <button class="nav-btn" id="yearPrev">‹</button>
+            <span class="month-year">${year}</span>
+            <button class="nav-btn" id="yearNext">›</button>
+            <button class="nav-btn" id="yearMonthView" style="background:#f39c12; color:#fff; font-size:0.9rem; padding:0 10px;">Monat</button>
+          </div>
+          <div class="calendar-year-grid">
+      `;
+
+      for (let m = 0; m < 12; m++) {
+        const monthName = new Date(year, m, 1).toLocaleDateString('de-DE', { month: 'short' });
+        const daysInMonth = new Date(year, m + 1, 0).getDate();
+        const firstDay = new Date(year, m, 1).getDay();
+        let startOffset = firstDay === 0 ? 6 : firstDay - 1;
+        let miniDaysHtml = '';
+        for (let i = 0; i < startOffset; i++) {
+          miniDaysHtml += `<div class="mini-day other-month"></div>`;
+        }
+        for (let d = 1; d <= daysInMonth; d++) {
+          const dateObj = new Date(year, m, d);
+          const dateStr = dateObj.toISOString().split('T')[0];
+          const hasTraining = !!logMap[dateStr];
+          const isToday = dateStr === todayStr;
+          let cls = 'mini-day';
+          if (hasTraining) cls += ' has-training';
+          if (isToday) cls += ' today';
+          miniDaysHtml += `<div class="${cls}" data-date="${dateStr}" data-logid="${logMap[dateStr] || ''}">${d}</div>`;
+        }
+        const total = startOffset + daysInMonth;
+        const rem = (7 - (total % 7)) % 7;
+        for (let i = 0; i < rem; i++) {
+          miniDaysHtml += `<div class="mini-day other-month"></div>`;
+        }
+
+        html += `
+          <div class="month-card">
+            <div class="month-name">${monthName}</div>
+            <div class="mini-days">${miniDaysHtml}</div>
+          </div>
+        `;
+      }
+
+      html += `
+          </div>
+          <div class="calendar-stats">
+            <span>📅 Trainingstage: <span class="count">${daysTrained}</span></span>
+            <span>📊 Volumen: <span class="count">${totalVol} kg</span></span>
+            <span>📈 Ø: <span class="count">${avgVol} kg</span></span>
+          </div>
+        </div>
+      `;
+
+      calendarContainer.innerHTML = html;
+
+      document.getElementById('yearPrev')?.addEventListener('click', () => {
+        calendarDate.setFullYear(calendarDate.getFullYear() - 1);
+        renderCalendar();
+      });
+      document.getElementById('yearNext')?.addEventListener('click', () => {
+        calendarDate.setFullYear(calendarDate.getFullYear() + 1);
+        renderCalendar();
+      });
+      document.getElementById('yearMonthView')?.addEventListener('click', () => {
+        calendarView = 'month';
+        renderCalendar();
+      });
+      document.querySelectorAll('.mini-day.has-training').forEach(el => {
+        el.addEventListener('click', function() {
+          const logId = this.dataset.logid;
+          if (logId) {
+            showTab('logs');
+            openLogForm(logId, false);
+          }
+        });
+      });
+    }
+
+    // ========== STATISTIK ==========
+    function renderStats() {
+      if (!statsContainer) return;
+      const totalLogs = logs.length;
+      if (totalLogs === 0) {
+        statsContainer.innerHTML = `<div class="empty-state">Noch keine Trainingsdaten für Statistiken.<br/>Mache dein erstes Training!</div>`;
+        return;
+      }
+
+      const now = new Date();
+      const currentMonth = now.getMonth();
+      const currentYear = now.getFullYear();
+      const daysThisMonth = logs.filter(log => {
+        if (!log.date) return false;
+        const d = new Date(log.date);
+        return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
+      }).length;
+
+      let totalVolumeAll = 0;
+      logs.forEach(log => {
+        log.entries.forEach(entry => {
+          totalVolumeAll += calcVolume(entry);
+        });
+      });
+
+      const avgVolume = totalLogs > 0 ? Math.round(totalVolumeAll / totalLogs) : 0;
+
+      const exerciseCount = {};
+      logs.forEach(log => {
+        log.entries.forEach(entry => {
+          const exId = entry.exerciseId;
+          if (exId) {
+            exerciseCount[exId] = (exerciseCount[exId] || 0) + 1;
+          }
+        });
+      });
+      let mostTrainedExId = null;
+      let mostTrainedCount = 0;
+      for (const [id, count] of Object.entries(exerciseCount)) {
+        if (count > mostTrainedCount) {
+          mostTrainedCount = count;
+          mostTrainedExId = id;
+        }
+      }
+      const mostTrainedEx = exercises.find(e => e.id === mostTrainedExId);
+      const mostTrainedName = mostTrainedEx ? mostTrainedEx.name : '—';
+
+      const volumePerExercise = {};
+      logs.forEach(log => {
+        log.entries.forEach(entry => {
+          const exId = entry.exerciseId;
+          if (exId) {
+            volumePerExercise[exId] = (volumePerExercise[exId] || 0) + calcVolume(entry);
+          }
+        });
+      });
+      let highestVolExId = null;
+      let highestVol = 0;
+      for (const [id, vol] of Object.entries(volumePerExercise)) {
+        if (vol > highestVol) {
+          highestVol = vol;
+          highestVolExId = id;
+        }
+      }
+      const highestVolEx = exercises.find(e => e.id === highestVolExId);
+      const highestVolName = highestVolEx ? highestVolEx.name : '—';
+
+      const weeks = [];
+      for (let w = 3; w >= 0; w--) {
+        const weekStart = new Date();
+        weekStart.setDate(weekStart.getDate() - (weekStart.getDay() + 6) % 7 - w * 7);
+        weekStart.setHours(0,0,0,0);
+        const weekEnd = new Date(weekStart);
+        weekEnd.setDate(weekEnd.getDate() + 6);
+        const weekLabel = `${weekStart.getDate()}.${weekStart.getMonth()+1}`;
+        let weekVol = 0;
+        logs.forEach(log => {
+          if (!log.date) return;
+          const logDate = new Date(log.date);
+          if (logDate >= weekStart && logDate <= weekEnd) {
+            log.entries.forEach(entry => {
+              weekVol += calcVolume(entry);
+            });
+          }
+        });
+        weeks.push({ label: weekLabel, vol: weekVol });
+      }
+
+      let html = `
+        <div class="stat-card">
+          <div style="display:flex; gap:12px; flex-wrap:wrap; justify-content:space-around;">
+            <div><span class="stat-value">${daysThisMonth}</span><div class="stat-label">Trainingstage diesen Monat</div></div>
+            <div><span class="stat-value">${totalLogs}</span><div class="stat-label">Trainings insgesamt</div></div>
+            <div><span class="stat-value">${avgVolume.toLocaleString()}</span><div class="stat-label">Ø Volumen pro Training (kg)</div></div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div style="font-weight:600; margin-bottom:6px;">🏆 Meist trainierte Übung</div>
+          <div style="font-size:1.2rem; color:#2ecc71;">${mostTrainedName}</div>
+          <div style="font-size:0.8rem; color:#888;">${mostTrainedCount} mal ausgeführt</div>
+        </div>
+        <div class="stat-card">
+          <div style="font-weight:600; margin-bottom:6px;">💪 Höchstes Gesamtvolumen</div>
+          <div style="font-size:1.2rem; color:#2ecc71;">${highestVolName}</div>
+          <div style="font-size:0.8rem; color:#888;">${highestVol.toLocaleString()} kg insgesamt</div>
+        </div>
+        <div class="stat-card">
+          <div style="font-weight:600; margin-bottom:6px;">📊 Wöchentliches Volumen (letzte 4 Wochen)</div>
+          <div style="display:flex; gap:8px; justify-content:space-around; align-items:flex-end; height:100px; padding-top:8px;">
+      `;
+      const maxWeekVol = Math.max(...weeks.map(w => w.vol), 1);
+      weeks.forEach(w => {
+        const height = Math.max(5, (w.vol / maxWeekVol) * 80);
+        html += `
+          <div style="display:flex; flex-direction:column; align-items:center; flex:1;">
+            <div style="background:#2ecc71; width:100%; max-width:30px; height:${height}px; border-radius:4px 4px 0 0;"></div>
+            <div style="font-size:0.7rem; color:#888; margin-top:4px;">${w.label}</div>
+            <div style="font-size:0.6rem; color:#aaa;">${w.vol.toLocaleString()}</div>
+          </div>
+        `;
+      });
+      html += `</div></div>`;
+
+      const sortedVol = Object.entries(volumePerExercise)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5)
+        .map(([id, vol]) => {
+          const ex = exercises.find(e => e.id === id);
+          return { name: ex ? ex.name : 'unbekannt', vol };
+        });
+
+      if (sortedVol.length) {
+        html += `
+          <div class="stat-card">
+            <div style="font-weight:600; margin-bottom:6px;">🏅 Top 5 Übungen nach Volumen</div>
+            <ul class="stat-list">
+              ${sortedVol.map((item, i) => `
+                <li><span class="name">${i+1}. ${item.name}</span><span class="value">${item.vol.toLocaleString()} kg</span></li>
+              `).join('')}
+            </ul>
+          </div>
+        `;
+      }
+
+      statsContainer.innerHTML = html;
+    }
+
+    // ========== RENDERN ==========
+    function renderAll() { renderExercises(); renderPlans(); renderLogs(); if (currentTab === 'calendar') renderCalendar(); if (currentTab === 'stats') renderStats(); }
+
+    function renderExercises() {
+      if (!exercises.length) {
+        exerciseList.innerHTML = `<div class="empty-state"><i class="fas fa-dumbbell" style="font-size:2rem; display:block; margin-bottom:10px;"></i>Keine Übungen vorhanden.<br/>Klicke auf +, um eine anzulegen.</div>`;
+        return;
+      }
+      exerciseList.innerHTML = exercises.map(ex => {
+        let thumbHtml = '';
+        if (ex.image && ex.image.startsWith('data:image')) {
+          thumbHtml = `<img src="${ex.image}" alt="${ex.name}" />`;
+        } else {
+          const icon = getExerciseIcon(ex);
+          thumbHtml = `<i class="fas ${icon}"></i>`;
+        }
+        return `
+          <div class="list-item" data-id="${ex.id}">
+            <div class="thumbnail">${thumbHtml}</div>
+            <div class="info"><h4>${ex.name}</h4>
+            <div class="sub">⏱️ ${formatTime(ex.pause || 90)} • ${ex.type === 'cardio' ? 'Cardio' : 'Kraft'}</div></div>
+            <div class="actions">
+              <button class="edit" data-id="${ex.id}" title="Bearbeiten"><i class="fas fa-edit"></i></button>
+              <button class="del" data-id="${ex.id}" title="Löschen"><i class="fas fa-trash"></i></button>
+            </div>
+          </div>
+        `;
+      }).join('');
+      exerciseList.querySelectorAll('.edit').forEach(btn => {
+        btn.addEventListener('click', (e) => { e.stopPropagation(); openExerciseForm(btn.dataset.id); });
+      });
+      exerciseList.querySelectorAll('.del').forEach(btn => {
+        btn.addEventListener('click', (e) => { e.stopPropagation(); deleteExercise(btn.dataset.id); });
+      });
+      exerciseList.querySelectorAll('.list-item').forEach(item => {
+        item.addEventListener('click', () => openExerciseForm(item.dataset.id));
+      });
+    }
+
+    function renderPlans() {
+      if (!plans.length) {
+        planList.innerHTML = `<div class="empty-state"><i class="fas fa-list" style="font-size:2rem; display:block; margin-bottom:10px;"></i>Keine Trainingspläne.<br/>Klicke auf +, um einen zu erstellen.</div>`;
+        return;
+      }
+      planList.innerHTML = plans.map(plan => {
+        const isActive = plan.id === activePlanId;
+        return `
+          <div class="list-item" data-id="${plan.id}" style="${isActive ? 'border-left-color: #2ecc71;' : ''}">
+            <div class="thumbnail"><i class="fas ${isActive ? 'fa-star' : 'fa-clipboard-list'}"></i></div>
+            <div class="info">
+              <h4>${plan.name} ${isActive ? '⭐' : ''}</h4>
+              <div class="sub">🏋️ ${plan.exerciseIds ? plan.exerciseIds.length : 0} Übungen</div>
+            </div>
+            <div class="actions">
+              <button class="star ${isActive ? 'active' : ''}" data-id="${plan.id}" title="Als aktiv markieren"><i class="fas fa-star"></i></button>
+              <button class="edit" data-id="${plan.id}" title="Bearbeiten"><i class="fas fa-edit"></i></button>
+              <button class="del" data-id="${plan.id}" title="Löschen"><i class="fas fa-trash"></i></button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      planList.querySelectorAll('.star').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const id = btn.dataset.id;
+          if (activePlanId === id) activePlanId = null;
+          else activePlanId = id;
+          saveData();
+          renderPlans();
+        });
+      });
+      planList.querySelectorAll('.edit').forEach(btn => {
+        btn.addEventListener('click', (e) => { e.stopPropagation(); openPlanForm(btn.dataset.id); });
+      });
+      planList.querySelectorAll('.del').forEach(btn => {
+        btn.addEventListener('click', (e) => { e.stopPropagation(); deletePlan(btn.dataset.id); });
+      });
+      planList.querySelectorAll('.list-item').forEach(item => {
+        item.addEventListener('click', () => openPlanForm(item.dataset.id));
+      });
+    }
+
+    function renderLogs() {
+      if (!logs.length) {
+        logList.innerHTML = `<div class="empty-state"><i class="fas fa-history" style="font-size:2rem; display:block; margin-bottom:10px;"></i>Keine Trainingslogs.<br/>Klicke auf +, um ein Training zu protokollieren.</div>`;
+        return;
+      }
+      const sorted = [...logs].sort((a, b) => (a.date || '').localeCompare(b.date || '') * -1);
+      logList.innerHTML = sorted.map(log => {
+        const plan = plans.find(p => p.id === log.planId);
+        const planName = plan ? plan.name : 'unbekannter Plan';
+        const exCount = log.entries ? log.entries.length : 0;
+        return `
+          <div class="list-item" data-id="${log.id}">
+            <div class="thumbnail"><i class="fas fa-calendar-check"></i></div>
+            <div class="info"><h4>${planName}</h4>
+            <div class="sub">📅 ${formatDate(log.date)} • ${exCount} Übungen • ⏱️ ${formatDuration(log.duration || 0)}</div></div>
+            <div class="actions">
+              <button class="edit" data-id="${log.id}" title="Bearbeiten"><i class="fas fa-edit"></i></button>
+              <button class="del" data-id="${log.id}" title="Löschen"><i class="fas fa-trash"></i></button>
+            </div>
+          </div>
+        `;
+      }).join('');
+      logList.querySelectorAll('.edit').forEach(btn => {
+        btn.addEventListener('click', (e) => { e.stopPropagation(); openLogForm(btn.dataset.id, false); });
+      });
+      logList.querySelectorAll('.del').forEach(btn => {
+        btn.addEventListener('click', (e) => { e.stopPropagation(); deleteLog(btn.dataset.id); });
+      });
+      logList.querySelectorAll('.list-item').forEach(item => {
+        item.addEventListener('click', () => openLogForm(item.dataset.id, false));
+      });
+    }
+
+    // -------- Exercise CRUD --------
+    function openExerciseForm(id = null) {
+      const isEdit = !!id;
+      const ex = isEdit ? exercises.find(e => e.id === id) : null;
+      editingId = id; editingType = 'exercise';
+      detailContainer.style.display = 'block'; hideAllPages();
+      detailContainer.innerHTML = `
+        <div class="detail-card">
+          <h3 style="margin-bottom:10px; font-size:1.1rem;">${isEdit ? 'Übung bearbeiten' : 'Neue Übung'}</h3>
+          <div class="row"><label>Name</label><input type="text" id="formExName" value="${isEdit ? ex.name : ''}" placeholder="z.B. Bankdrücken" /></div>
+          <div class="row"><label>Typ</label>
+            <select id="formExType">
+              <option value="strength" ${isEdit && ex.type === 'strength' ? 'selected' : ''}>Kraft (KG/WDH)</option>
+              <option value="cardio" ${isEdit && ex.type === 'cardio' ? 'selected' : ''}>Cardio (Zeit/Distanz)</option>
+            </select>
+          </div>
+          <div class="row"><label>Pause (Sek.)</label><input type="number" id="formExPause" value="${isEdit ? ex.pause : 90}" /></div>
+          <div class="row" style="flex-direction:column; gap:4px;">
+            <label>Bild (vom Gerät)</label>
+            <input type="file" id="formExImageFile" accept="image/*" />
+            ${isEdit && ex.image ? `<img src="${ex.image}" style="max-width:100px; border-radius:6px; margin-top:4px;" />` : ''}
+          </div>
+          <div class="btn-row">
+            <button class="btn-save" id="btnSaveExercise">${isEdit ? 'Aktualisieren' : 'Speichern'}</button>
+            <button class="btn-cancel" id="btnCancelDetail">Abbrechen</button>
+            ${isEdit ? `<button class="btn-danger" id="btnDeleteExercise">Löschen</button>` : ''}
+          </div>
+        </div>
+      `;
+      document.getElementById('btnSaveExercise').addEventListener('click', () => saveExerciseForm());
+      document.getElementById('btnCancelDetail').addEventListener('click', closeDetail);
+      if (isEdit) {
+        document.getElementById('btnDeleteExercise').addEventListener('click', () => { deleteExercise(id); closeDetail(); });
+      }
+    }
+
+    function saveExerciseForm() {
+      const name = document.getElementById('formExName').value.trim();
+      if (!name) { alert('Bitte Namen eingeben.'); return; }
+      const type = document.getElementById('formExType').value;
+      const pause = parseInt(document.getElementById('formExPause').value) || 90;
+      let image = '';
+      const file = document.getElementById('formExImageFile').files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) { image = e.target.result; saveExerciseFinal(name, type, pause, image); };
+        reader.readAsDataURL(file);
+        return;
+      }
+      if (editingId) { const ex = exercises.find(e => e.id === editingId); if (ex) image = ex.image || ''; }
+      saveExerciseFinal(name, type, pause, image);
+    }
+    function saveExerciseFinal(name, type, pause, image) {
+      if (editingId) {
+        const ex = exercises.find(e => e.id === editingId);
+        if (ex) { ex.name = name; ex.type = type; ex.pause = pause; if (image) ex.image = image; saveData(); renderAll(); closeDetail(); }
+      } else {
+        exercises.push({ id: generateId(), name, type, image, pause });
+        saveData(); renderAll(); closeDetail();
+      }
+    }
+    function deleteExercise(id) {
+      if (!confirm('Übung löschen?')) return;
+      exercises = exercises.filter(e => e.id !== id);
+      plans.forEach(p => { p.exerciseIds = p.exerciseIds.filter(eid => eid !== id); });
+      logs.forEach(log => { log.entries = log.entries.filter(entry => entry.exerciseId !== id); });
+      saveData(); renderAll();
+    }
+
+    // -------- Plan CRUD --------
+    function openPlanForm(id = null) {
+      const isEdit = !!id;
+      const plan = isEdit ? plans.find(p => p.id === id) : null;
+      editingId = id; editingType = 'plan';
+      detailContainer.style.display = 'block'; hideAllPages();
+      detailContainer.innerHTML = `
+        <div class="detail-card">
+          <h3 style="margin-bottom:10px; font-size:1.1rem;">${isEdit ? 'Plan bearbeiten' : 'Neuer Plan'}</h3>
+          <div class="row"><label>Name</label><input type="text" id="formPlanName" value="${isEdit ? plan.name : ''}" placeholder="z.B. Push-Tag" /></div>
+          <div class="row" style="flex-direction:column; gap:4px;">
+            <label>Übungen (Reihenfolge durch Pfeile änderbar)</label>
+            <ul class="plan-exercise-list" id="planExerciseList"></ul>
+            <span style="font-size:0.7rem; color:#888;">✔ Auswählen, ⬆⬇ Reihenfolge ändern</span>
+          </div>
+          <div class="btn-row">
+            <button class="btn-save" id="btnSavePlan">${isEdit ? 'Aktualisieren' : 'Speichern'}</button>
+            <button class="btn-cancel" id="btnCancelDetail">Abbrechen</button>
+            ${isEdit ? `<button class="btn-danger" id="btnDeletePlan">Löschen</button>` : ''}
+          </div>
+        </div>
+      `;
+      const listContainer = document.getElementById('planExerciseList');
+      if (listContainer) updatePlanExerciseList(listContainer, plan ? plan.exerciseIds : []);
+      document.getElementById('btnSavePlan').addEventListener('click', () => savePlanForm());
+      document.getElementById('btnCancelDetail').addEventListener('click', closeDetail);
+      if (isEdit) {
+        document.getElementById('btnDeletePlan').addEventListener('click', () => { deletePlan(id); closeDetail(); });
+      }
+    }
+
+    function updatePlanExerciseList(container, selectedIds) {
+      if (!container) return;
+      const selected = selectedIds || [];
+      const available = exercises.filter(ex => !selected.includes(ex.id));
+      const ordered = [];
+      selected.forEach(id => { const ex = exercises.find(e => e.id === id); if (ex) ordered.push(ex); });
+      available.sort((a, b) => a.name.localeCompare(b.name));
+      const allItems = [...ordered, ...available];
+      container.innerHTML = allItems.map((ex, index) => {
+        const isChecked = selected.includes(ex.id);
+        return `
+          <li data-id="${ex.id}">
+            <input type="checkbox" ${isChecked ? 'checked' : ''} />
+            <span class="ex-name">${ex.name}</span>
+            <span class="ex-type">(${ex.type === 'cardio' ? 'Cardio' : 'Kraft'})</span>
+            <div class="move-buttons">
+              <button class="move-up" data-id="${ex.id}" ${index === 0 ? 'disabled style="opacity:0.4;"' : ''}>⬆</button>
+              <button class="move-down" data-id="${ex.id}" ${index === allItems.length-1 ? 'disabled style="opacity:0.4;"' : ''}>⬇</button>
+            </div>
+          </li>
+        `;
+      }).join('');
+      container.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+        cb.addEventListener('change', function() {
+          const listItems = container.querySelectorAll('li');
+          const selectedIds = [];
+          listItems.forEach(li => {
+            const cbx = li.querySelector('input[type="checkbox"]');
+            if (cbx && cbx.checked) selectedIds.push(li.dataset.id);
+          });
+          updatePlanExerciseList(container, selectedIds);
+        });
+      });
+      container.querySelectorAll('.move-up').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          const li = this.closest('li');
+          const prev = li.previousElementSibling;
+          if (prev) { const parent = li.parentNode; parent.insertBefore(li, prev); updateOrderFromList(container); }
+        });
+      });
+      container.querySelectorAll('.move-down').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          const li = this.closest('li');
+          const next = li.nextElementSibling;
+          if (next) { const parent = li.parentNode; parent.insertBefore(next, li); updateOrderFromList(container); }
+        });
+      });
+    }
+    function updateOrderFromList(container) {
+      const listItems = container.querySelectorAll('li');
+      const selectedIds = [];
+      listItems.forEach(li => {
+        const cb = li.querySelector('input[type="checkbox"]');
+        if (cb && cb.checked) selectedIds.push(li.dataset.id);
+      });
+      updatePlanExerciseList(container, selectedIds);
+    }
+    function savePlanForm() {
+      const name = document.getElementById('formPlanName').value.trim();
+      if (!name) { alert('Bitte Namen eingeben.'); return; }
+      const listContainer = document.getElementById('planExerciseList');
+      if (!listContainer) { alert('Fehler beim Laden der Übungsliste.'); return; }
+      const listItems = listContainer.querySelectorAll('li');
+      const exerciseIds = [];
+      listItems.forEach(li => {
+        const cb = li.querySelector('input[type="checkbox"]');
+        if (cb && cb.checked) exerciseIds.push(li.dataset.id);
+      });
+      if (!exerciseIds.length) { alert('Bitte mindestens eine Übung auswählen.'); return; }
+      if (editingId) {
+        const plan = plans.find(p => p.id === editingId);
+        if (plan) { plan.name = name; plan.exerciseIds = exerciseIds; saveData(); renderAll(); closeDetail(); }
+      } else {
+        plans.push({ id: generateId(), name, exerciseIds });
+        saveData(); renderAll(); closeDetail();
+      }
+    }
+    function deletePlan(id) {
+      if (!confirm('Plan löschen?')) return;
+      plans = plans.filter(p => p.id !== id);
+      if (activePlanId === id) activePlanId = null;
+      saveData(); renderAll();
+    }
+
+    // -------- QuickStart (mit Übernahme der letzten Werte) --------
+    function quickStart() {
+      if (!activePlanId) {
+        alert('Kein aktiver Plan ausgewählt. Markiere einen Plan mit ⭐ als aktiv.');
+        showTab('plans');
+        return;
+      }
+      const plan = plans.find(p => p.id === activePlanId);
+      if (!plan) {
+        alert('Der aktive Plan existiert nicht mehr. Wähle einen neuen aktiven Plan.');
+        activePlanId = null;
+        saveData();
+        renderPlans();
+        return;
+      }
+
+      // Neues Log mit übernommenen Werten
+      const newLog = {
+        id: generateId(),
+        planId: activePlanId,
+        date: getToday(),
+        duration: 0,
+        entries: plan.exerciseIds.map(exId => {
+          const last = getLastSetForExercise(exId);
+          return {
+            exerciseId: exId,
+            sets: [{ kg: last.kg, wdh: last.wdh }],
+            cardioData: { time: 0, distance: 0 },
+            notiz: ''
+          };
+        })
+      };
+      logs.push(newLog);
+      saveData();
+      showTab('logs');
+      openLogForm(newLog.id, true);
+    }
+
+    // -------- Gesamttimer --------
+    function startOverallTimer() {
+      if (!overallTimerRunning) {
+        overallTimerStart = Date.now();
+        overallTimerRunning = true;
+        if (overallTimerInterval) clearInterval(overallTimerInterval);
+        overallTimerInterval = setInterval(updateOverallTimer, 1000);
+        if (!wakeLockManual) {
+          requestWakeLock();
+        }
+      }
+    }
+    function releaseOverallTimer() {
+      if (overallTimerInterval) {
+        clearInterval(overallTimerInterval);
+        overallTimerInterval = null;
+      }
+      overallTimerRunning = false;
+      overallTimerStart = null;
+      releaseWakeLock();
+      wakeLockManual = false;
+    }
+
+    // -------- Log CRUD (mit Übernahme der letzten Werte bei neuem Log) --------
+    function openLogForm(id = null, startTimer = false) {
+      const isEdit = !!id;
+      let log = isEdit ? logs.find(l => l.id === id) : null;
+
+      // Wenn neues Log (id = null)
+      if (!isEdit) {
+        // Plan auswählen? Im Formular wird ein Plan ausgewählt – wir initialisieren mit leerem Plan.
+        // Die Übungen werden erst beim Plan-Wechsel oder Speichern befüllt.
+        log = { id: generateId(), planId: '', date: getToday(), duration: 0, entries: [] };
+        editingId = log.id;
+        logs.push(log);
+        saveData();
+        // Timer starten NUR wenn startTimer = true (QuickStart)
+        if (startTimer) {
+          startOverallTimer();
+        } else {
+          overallTimerRunning = false;
+          overallTimerStart = null;
+          if (overallTimerInterval) {
+            clearInterval(overallTimerInterval);
+            overallTimerInterval = null;
+          }
+        }
+      } else {
+        editingId = id;
+        if (!log.duration) log.duration = 0;
+        if (startTimer) {
+          startOverallTimer();
+        } else {
+          if (!overallTimerRunning) {
+            overallTimerStart = null;
+            if (overallTimerInterval) {
+              clearInterval(overallTimerInterval);
+              overallTimerInterval = null;
+            }
+          }
+        }
+      }
+      editingType = 'log';
+      detailContainer.style.display = 'block';
+      hideAllPages();
+
+      const planOptions = plans.map(p => `<option value="${p.id}" ${log.planId === p.id ? 'selected' : ''}>${p.name}</option>`).join('');
+      const plan = plans.find(p => p.id === log.planId);
+      const exerciseIds = plan ? plan.exerciseIds : [];
+      const entries = log.entries || [];
+
+      // Wenn Plan gewählt, aber noch keine Entries existieren, dann mit letzten Werten befüllen
+      if (plan && exerciseIds.length > 0 && entries.length === 0) {
+        // Nur für neue Logs (nicht für bestehende)
+        if (!isEdit || log.entries.length === 0) {
+          log.entries = exerciseIds.map(exId => {
+            const last = getLastSetForExercise(exId);
+            return {
+              exerciseId: exId,
+              sets: [{ kg: last.kg, wdh: last.wdh }],
+              cardioData: { time: 0, distance: 0 },
+              notiz: ''
+            };
+          });
+          // Daten speichern, damit sie nicht verloren gehen
+          saveData();
+        }
+      }
+
+      // Jetzt nochmal die aktuellen entries holen (nach möglicher Befüllung)
+      const currentEntries = log.entries || [];
+
+      let exercisesHtml = '';
+      let totalVolume = 0;
+      if (exerciseIds.length) {
+        exerciseIds.forEach((exId, idx) => {
+          const ex = exercises.find(e => e.id === exId);
+          if (!ex) return;
+          const entry = currentEntries.find(e => e.exerciseId === exId) || { exerciseId: exId, sets: [{ kg: 0, wdh: 0 }], cardioData: { time: 0, distance: 0 }, notiz: '' };
+          const sets = entry.sets || [{ kg: 0, wdh: 0 }];
+          const mapKey = `${log.id}_${exId}`;
+          const activeIdx = activeSetMap[mapKey] !== undefined ? activeSetMap[mapKey] : 0;
+
+          let setHtml = '';
+          let exVolume = 0;
+          if (ex.type === 'cardio') {
+            const time = entry.cardioData?.time || 0;
+            const dist = entry.cardioData?.distance || 0;
+            setHtml = `
+              <div class="cardio-row">
+                <label>⏱️ Zeit (min)</label>
+                <input type="number" class="cardio-time" value="${time}" step="0.5" data-logid="${log.id}" data-exid="${exId}" />
+                <label>📏 Distanz (km)</label>
+                <input type="number" class="cardio-dist" value="${dist}" step="0.1" data-logid="${log.id}" data-exid="${exId}" />
+              </div>
+            `;
+            exVolume = 0;
+          } else {
+            exVolume = calcVolume(entry);
+            totalVolume += exVolume;
+            let setRows = sets.map((set, si) => {
+              const isActive = si === activeIdx;
+              return `
+                <tr class="${isActive ? 'active-set' : ''}" data-setidx="${si}">
+                  <td class="set-number">${si+1}</td>
+                  <td>
+                    <div class="set-controls">
+                      <button class="dec" data-logid="${log.id}" data-exid="${exId}" data-idx="${si}" data-field="kg" data-step="0.5">−</button>
+                      <input type="number" class="set-kg" value="${set.kg}" data-logid="${log.id}" data-exid="${exId}" data-idx="${si}" step="0.5" />
+                      <button class="inc" data-logid="${log.id}" data-exid="${exId}" data-idx="${si}" data-field="kg" data-step="0.5">+</button>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="set-controls">
+                      <button class="dec" data-logid="${log.id}" data-exid="${exId}" data-idx="${si}" data-field="wdh" data-step="1">−</button>
+                      <input type="number" class="set-wdh" value="${set.wdh}" data-logid="${log.id}" data-exid="${exId}" data-idx="${si}" step="1" />
+                      <button class="inc" data-logid="${log.id}" data-exid="${exId}" data-idx="${si}" data-field="wdh" data-step="1">+</button>
+                    </div>
+                  </td>
+                  <td><button class="btn-remove-set" data-logid="${log.id}" data-exid="${exId}" data-idx="${si}">✕</button></td>
+                </tr>
+              `;
+            }).join('');
+
+            setHtml = `
+              <div class="set-progress">
+                <span>Satz <span class="current-set-label">${activeIdx + 1}</span> von ${sets.length}</span>
+                <span style="color:#888;">(Klick auf Satzzeile zum Markieren)</span>
+              </div>
+              <table class="sets-table">
+                <thead><tr><th>Satz</th><th>KG</th><th>WDH</th><th></th></tr></thead>
+                <tbody>
+                  ${setRows}
+                </tbody>
+              </table>
+              <div class="ex-actions-row">
+                <button class="btn-add-set" data-logid="${log.id}" data-exid="${exId}"><i class="fas fa-plus-circle"></i> Satz</button>
+              </div>
+            `;
+          }
+          exercisesHtml += `
+            <div class="exercise-entry" data-exid="${exId}" data-logid="${log.id}">
+              <div class="ex-header">
+                <span class="ex-name">${ex.name} ${ex.type === 'cardio' ? '🏃' : '🏋️'}</span>
+                <div class="ex-actions">
+                  <button class="del" data-exid="${exId}" title="Aus Log entfernen" style="background:none; border:none; color:#e74c3c; cursor:pointer;">✕</button>
+                </div>
+              </div>
+              ${ex.image ? `<img src="${ex.image}" alt="${ex.name}" />` : ''}
+              <div style="margin:2px 0; font-size:0.75rem; color:#aaa;">⏱️ Pause: ${formatTime(ex.pause || 90)}</div>
+              <div class="timer-display" id="timer-${log.id}-${exId}">${formatTime(ex.pause || 90)}</div>
+              <div class="ex-actions-row">
+                <button class="btn-timer" data-logid="${log.id}" data-exid="${exId}"><i class="fas fa-play"></i> Timer starten</button>
+              </div>
+              ${setHtml}
+              ${ex.type === 'strength' ? `<div style="font-size:0.75rem; color:#aaa; text-align:right;">Volumen: ${exVolume} kg</div>` : ''}
+              <div class="ex-notiz">
+                <textarea class="ex-notiz-text" data-logid="${log.id}" data-exid="${exId}" placeholder="Notiz ...">${entry.notiz || ''}</textarea>
+              </div>
+            </div>
+          `;
+        });
+      } else {
+        exercisesHtml = `<div class="empty-state" style="padding:10px 0;">Wähle einen Plan aus, um Übungen zu laden.</div>`;
+      }
+
+      let chartHtml = '';
+      if (isEdit && exerciseIds.length) {
+        const firstStrength = exerciseIds.find(id => {
+          const ex = exercises.find(e => e.id === id);
+          return ex && ex.type === 'strength';
+        });
+        if (firstStrength) {
+          chartHtml = `
+            <div class="chart-container" id="chartContainer">
+              <div style="font-size:0.75rem; color:#aaa; margin-bottom:4px;">📈 KG-Verlauf (${exercises.find(e=>e.id===firstStrength)?.name})</div>
+            </div>
+          `;
+        }
+      }
+
+      let timerButtonHtml = '';
+      if (!overallTimerRunning) {
+        timerButtonHtml = `<button class="btn-save" id="btnStartOverallTimer" style="margin-bottom:6px; font-size:0.95rem; padding:10px 14px;"><i class="fas fa-play"></i> Training starten</button>`;
+      }
+
+      const wakeToggleHtml = `
+        <div style="display:flex; align-items:center; gap:8px; margin:4px 0 8px; flex-wrap:wrap;">
+          <span style="font-size:0.75rem; color:#aaa;">🖥️ Bildschirm:</span>
+          <div class="wake-toggle ${wakeLock ? 'active' : ''}" id="wakeToggleBtn" style="cursor:pointer;">
+            <i class="fas fa-desktop"></i> ${wakeLock ? 'an' : 'aus'}
+          </div>
+        </div>
+      `;
+
+      detailContainer.innerHTML = `
+        <div class="detail-card">
+          <h3 style="margin-bottom:8px; font-size:1rem;">${isEdit ? 'Training bearbeiten' : 'Neues Training'}</h3>
+          ${timerButtonHtml}
+          ${wakeToggleHtml}
+          <div class="row"><label>Plan</label><select id="formLogPlan"><option value="">-- Plan wählen --</option>${planOptions}</select></div>
+          <div class="row"><label>Datum</label><input type="date" id="formLogDate" value="${log.date || getToday()}" /></div>
+          <div style="display:flex; justify-content:space-between; align-items:center; background:#1a1a2e; padding:4px 8px; border-radius:8px; margin-bottom:4px;">
+            <span style="font-size:0.75rem; color:#aaa;">⏱️ Trainingsdauer:</span>
+            <span id="overallTimerDisplay" style="font-weight:700; color:#2ecc71; font-size:0.9rem;">${overallTimerRunning ? '00:00' : '⏸️ nicht gestartet'}</span>
+          </div>
+          <div class="volume-summary">
+            <div class="item"><span class="label">Gesamtvolumen</span><span class="value" id="totalVolumeDisplay">${totalVolume} kg</span></div>
+            <div class="item"><span class="label">Übungen</span><span class="value">${exerciseIds.length}</span></div>
+          </div>
+          ${chartHtml}
+          <div id="logExercisesContainer">${exercisesHtml}</div>
+          <div class="btn-row">
+            <button class="btn-save" id="btnSaveLog">${isEdit ? 'Aktualisieren' : 'Speichern'}</button>
+            <button class="btn-cancel" id="btnCancelDetail">Abbrechen</button>
+            ${isEdit ? `<button class="btn-danger" id="btnDeleteLog">Löschen</button>` : ''}
+          </div>
+        </div>
+      `;
+
+      const wakeToggleBtn = document.getElementById('wakeToggleBtn');
+      if (wakeToggleBtn) {
+        wakeToggleBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          toggleWakeLock();
+        });
+      }
+
+      const startBtn = document.getElementById('btnStartOverallTimer');
+      if (startBtn) {
+        startBtn.addEventListener('click', function() {
+          if (!overallTimerRunning) {
+            startOverallTimer();
+            this.style.display = 'none';
+            const display = document.getElementById('overallTimerDisplay');
+            if (display) display.textContent = '00:00';
+            updateWakeToggleUI(true);
+          }
+        });
+      }
+
+      if (isEdit && exerciseIds.length) {
+        const firstStrength = exerciseIds.find(id => {
+          const ex = exercises.find(e => e.id === id);
+          return ex && ex.type === 'strength';
+        });
+        if (firstStrength && document.getElementById('chartContainer')) {
+          renderChart(firstStrength, document.getElementById('chartContainer'));
+        }
+      }
+
+      // Plan-Wechsel: Wenn ein Plan ausgewählt wird, die Übungen mit letzten Werten befüllen
+      const planSelect = document.getElementById('formLogPlan');
+      planSelect.addEventListener('change', function() {
+        const newPlanId = this.value;
+        // Aktuelle Eingaben sichern, bevor wir den Plan wechseln
+        collectLogEntries(editingId);
+        const logObj = logs.find(l => l.id === editingId);
+        if (logObj) {
+          logObj.planId = newPlanId;
+          // Entries zurücksetzen, damit sie beim nächsten Rendern mit letzten Werten befüllt werden
+          const planObj = plans.find(p => p.id === newPlanId);
+          if (planObj && planObj.exerciseIds) {
+            logObj.entries = planObj.exerciseIds.map(exId => {
+              const last = getLastSetForExercise(exId);
+              return {
+                exerciseId: exId,
+                sets: [{ kg: last.kg, wdh: last.wdh }],
+                cardioData: { time: 0, distance: 0 },
+                notiz: ''
+              };
+            });
+          } else {
+            logObj.entries = [];
+          }
+          saveData();
+        }
+        openLogForm(editingId, overallTimerRunning);
+      });
+
+      document.getElementById('btnSaveLog').addEventListener('click', () => saveLogForm());
+      document.getElementById('btnCancelDetail').addEventListener('click', closeDetail);
+      if (isEdit) {
+        document.getElementById('btnDeleteLog').addEventListener('click', () => { deleteLog(id); closeDetail(); });
+      }
+
+      attachLogFormEvents(editingId);
+      updateOverallTimer();
+    }
+
+    function updateOverallTimer() {
+      if (!overallTimerRunning || !overallTimerStart) {
+        const display = document.getElementById('overallTimerDisplay');
+        if (display) display.textContent = '⏸️ nicht gestartet';
+        return;
+      }
+      const elapsed = Math.floor((Date.now() - overallTimerStart) / 1000);
+      const display = document.getElementById('overallTimerDisplay');
+      if (display) display.textContent = formatTime(elapsed);
+    }
+
+    function collectLogEntries(logId) {
+      const log = logs.find(l => l.id === logId);
+      if (!log) return;
+      const blocks = document.querySelectorAll('.exercise-entry');
+      const entries = [];
+      blocks.forEach(block => {
+        const exId = block.dataset.exid;
+        const ex = exercises.find(e => e.id === exId);
+        if (!ex) return;
+        let sets = [];
+        let cardioData = { time: 0, distance: 0 };
+        if (ex.type === 'cardio') {
+          const ti = block.querySelector('.cardio-time');
+          const di = block.querySelector('.cardio-dist');
+          if (ti) cardioData.time = parseFloat(ti.value) || 0;
+          if (di) cardioData.distance = parseFloat(di.value) || 0;
+        } else {
+          const kgs = block.querySelectorAll('.set-kg');
+          const wdhs = block.querySelectorAll('.set-wdh');
+          kgs.forEach((inp, i) => {
+            const kg = parseFloat(inp.value) || 0;
+            const wdh = parseInt(wdhs[i]?.value) || 0;
+            sets.push({ kg, wdh });
+          });
+        }
+        const notiz = block.querySelector('.ex-notiz-text')?.value || '';
+        entries.push({ exerciseId: exId, sets, cardioData, notiz });
+      });
+      log.entries = entries;
+    }
+
+    function updateVolumeDisplay(logId) {
+      const log = logs.find(l => l.id === logId);
+      if (!log) return;
+      const total = log.entries.reduce((sum, entry) => sum + calcVolume(entry), 0);
+      const display = document.getElementById('totalVolumeDisplay');
+      if (display) display.textContent = total + ' kg';
+    }
+
+    function attachLogFormEvents(logId) {
+      document.querySelectorAll('.btn-timer').forEach(btn => {
+        btn.addEventListener('click', function() {
+          toggleTimer(this.dataset.logid, this.dataset.exid, this);
+        });
+      });
+      document.querySelectorAll('.btn-add-set').forEach(btn => {
+        btn.addEventListener('click', function() {
+          addSetToLogEntry(this.dataset.logid, this.dataset.exid);
+        });
+      });
+      document.querySelectorAll('.btn-remove-set').forEach(btn => {
+        btn.addEventListener('click', function() {
+          removeSetFromLogEntry(this.dataset.logid, this.dataset.exid, parseInt(this.dataset.idx));
+        });
+      });
+      document.querySelectorAll('.set-controls button').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          const logId = this.dataset.logid;
+          const exId = this.dataset.exid;
+          const idx = parseInt(this.dataset.idx);
+          const field = this.dataset.field;
+          const step = parseFloat(this.dataset.step) || 0.5;
+          const isInc = this.classList.contains('inc');
+          const row = this.closest('tr');
+          const input = row.querySelector(`.set-${field}`);
+          if (!input) return;
+          let val = parseFloat(input.value) || 0;
+          val = isInc ? val + step : val - step;
+          if (val < 0) val = 0;
+          if (field === 'wdh') val = Math.round(val);
+          else val = Math.round(val * 10) / 10;
+          input.value = val;
+          input.dispatchEvent(new Event('change'));
+        });
+      });
+      document.querySelectorAll('.set-kg').forEach(inp => {
+        inp.addEventListener('change', function() {
+          const logId = this.dataset.logid;
+          const exId = this.dataset.exid;
+          const idx = parseInt(this.dataset.idx);
+          const val = parseFloat(this.value) || 0;
+          updateSetValueInLog(logId, exId, idx, 'kg', val);
+          updateVolumeDisplay(logId);
+        });
+      });
+      document.querySelectorAll('.set-wdh').forEach(inp => {
+        inp.addEventListener('change', function() {
+          const logId = this.dataset.logid;
+          const exId = this.dataset.exid;
+          const idx = parseInt(this.dataset.idx);
+          const val = parseInt(this.value) || 0;
+          updateSetValueInLog(logId, exId, idx, 'wdh', val);
+          updateVolumeDisplay(logId);
+        });
+      });
+      document.querySelectorAll('.cardio-time').forEach(inp => {
+        inp.addEventListener('change', function() {
+          const logId = this.dataset.logid;
+          const exId = this.dataset.exid;
+          const val = parseFloat(this.value) || 0;
+          updateCardioData(logId, exId, 'time', val);
+        });
+      });
+      document.querySelectorAll('.cardio-dist').forEach(inp => {
+        inp.addEventListener('change', function() {
+          const logId = this.dataset.logid;
+          const exId = this.dataset.exid;
+          const val = parseFloat(this.value) || 0;
+          updateCardioData(logId, exId, 'distance', val);
+        });
+      });
+      document.querySelectorAll('.ex-notiz-text').forEach(ta => {
+        ta.addEventListener('change', function() {
+          const logId = this.dataset.logid;
+          const exId = this.dataset.exid;
+          const val = this.value;
+          updateNotizInLog(logId, exId, val);
+        });
+      });
+      document.querySelectorAll('.ex-header .del').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const exId = this.dataset.exid;
+          const logId = editingId;
+          removeExerciseFromLog(logId, exId);
+        });
+      });
+      document.querySelectorAll('.exercise-entry .sets-table tbody tr').forEach(row => {
+        row.addEventListener('click', function(e) {
+          if (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON') return;
+          const exEntry = this.closest('.exercise-entry');
+          const exId = exEntry.dataset.exid;
+          const logId = exEntry.dataset.logid;
+          const idx = parseInt(this.dataset.setidx);
+          if (isNaN(idx)) return;
+          const mapKey = `${logId}_${exId}`;
+          activeSetMap[mapKey] = idx;
+          collectLogEntries(logId);
+          openLogForm(logId, overallTimerRunning);
+        });
+      });
+    }
+
+    // -------- Log Operationen --------
+    function addSetToLogEntry(logId, exId) {
+      const log = logs.find(l => l.id === logId);
+      if (!log) return;
+      let entry = log.entries.find(e => e.exerciseId === exId);
+      if (!entry) { entry = { exerciseId: exId, sets: [], cardioData: { time: 0, distance: 0 }, notiz: '' }; log.entries.push(entry); }
+      const last = entry.sets[entry.sets.length - 1] || { kg: 0, wdh: 0 };
+      entry.sets.push({ kg: last.kg, wdh: last.wdh });
+      saveData(); openLogForm(logId, overallTimerRunning);
+    }
+    function removeSetFromLogEntry(logId, exId, idx) {
+      const log = logs.find(l => l.id === logId);
+      if (!log) return;
+      const entry = log.entries.find(e => e.exerciseId === exId);
+      if (!entry || entry.sets.length <= 1) { alert('Mindestens ein Satz muss bleiben.'); return; }
+      entry.sets.splice(idx, 1);
+      const mapKey = `${logId}_${exId}`;
+      if (activeSetMap[mapKey] >= entry.sets.length) activeSetMap[mapKey] = entry.sets.length - 1;
+      saveData(); openLogForm(logId, overallTimerRunning);
+    }
+    function updateSetValueInLog(logId, exId, idx, field, value) {
+      const log = logs.find(l => l.id === logId);
+      if (!log) return;
+      const entry = log.entries.find(e => e.exerciseId === exId);
+      if (!entry || !entry.sets[idx]) return;
+      entry.sets[idx][field] = value;
+      saveData();
+    }
+    function updateCardioData(logId, exId, field, value) {
+      const log = logs.find(l => l.id === logId);
+      if (!log) return;
+      let entry = log.entries.find(e => e.exerciseId === exId);
+      if (!entry) { entry = { exerciseId: exId, sets: [], cardioData: { time: 0, distance: 0 }, notiz: '' }; log.entries.push(entry); }
+      entry.cardioData[field] = value;
+      saveData();
+    }
+    function updateNotizInLog(logId, exId, value) {
+      const log = logs.find(l => l.id === logId);
+      if (!log) return;
+      let entry = log.entries.find(e => e.exerciseId === exId);
+      if (!entry) { entry = { exerciseId: exId, sets: [], cardioData: { time: 0, distance: 0 }, notiz: '' }; log.entries.push(entry); }
+      entry.notiz = value;
+      saveData();
+    }
+    function removeExerciseFromLog(logId, exId) {
+      const log = logs.find(l => l.id === logId);
+      if (!log) return;
+      log.entries = log.entries.filter(e => e.exerciseId !== exId);
+      saveData(); openLogForm(logId, overallTimerRunning);
+    }
+    function saveLogForm() {
+      const logId = editingId;
+      let log = logs.find(l => l.id === logId);
+      if (!log) { log = { id: logId, planId: '', date: getToday(), duration: 0, entries: [] }; logs.push(log); }
+      if (overallTimerRunning && overallTimerStart) {
+        const elapsed = Math.floor((Date.now() - overallTimerStart) / 1000);
+        log.duration = (log.duration || 0) + elapsed;
+        releaseOverallTimer();
+      }
+      const dateInput = document.getElementById('formLogDate');
+      if (dateInput) log.date = dateInput.value || getToday();
+      const planId = document.getElementById('formLogPlan').value;
+      log.planId = planId;
+      collectLogEntries(logId);
+      saveData(); renderAll(); closeDetail();
+    }
+    function deleteLog(id) {
+      if (!confirm('Training aus dem Log löschen?')) return;
+      logs = logs.filter(l => l.id !== id);
+      saveData(); renderAll();
+    }
+
+    // ========== TIMER ==========
+    function updateTimerDisplay() {
+      if (!timerRunning) return;
+      const now = Date.now();
+      const elapsed = (now - timerStartTime) / 1000;
+      const remaining = Math.max(0, timerTotalSeconds - elapsed);
+      timerRemainingSeconds = remaining;
+      const display = document.getElementById(`timer-${currentTimerLogId}-${currentTimerExId}`);
+      if (display) display.textContent = formatTime(remaining);
+
+      if (remaining <= 0) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        timerRunning = false;
+
+        document.querySelectorAll('.btn-timer').forEach(b => {
+          if (b.dataset.logid === currentTimerLogId && b.dataset.exid === currentTimerExId) {
+            b.innerHTML = '<i class="fas fa-play"></i> Timer starten';
+            b.classList.remove('active');
+          }
+        });
+
+        if (display) {
+          display.textContent = '00:00';
+          display.classList.add('timer-alarm');
+        }
+
+        playBeep();
+        const exName = exercises.find(e => e.id === currentTimerExId)?.name || 'Übung';
+        sendNotification(`Pause für ${exName} beendet!`);
+        if (navigator.vibrate) navigator.vibrate(200);
+
+        const ex = exercises.find(e => e.id === currentTimerExId);
+        if (ex && ex.type === 'strength') {
+          const mapKey = `${currentTimerLogId}_${currentTimerExId}`;
+          const currentIdx = activeSetMap[mapKey] !== undefined ? activeSetMap[mapKey] : 0;
+          const log = logs.find(l => l.id === currentTimerLogId);
+          if (log) {
+            const entry = log.entries.find(e => e.exerciseId === currentTimerExId);
+            if (entry) {
+              const totalSets = entry.sets.length;
+              if (totalSets > 0 && currentIdx < totalSets - 1) {
+                activeSetMap[mapKey] = currentIdx + 1;
+                collectLogEntries(currentTimerLogId);
+                const oldLogId = currentTimerLogId;
+                currentTimerLogId = null;
+                currentTimerExId = null;
+                openLogForm(oldLogId, overallTimerRunning);
+                return;
+              } else {
+                alert('🏁 Letzter Satz erreicht!');
+                if (display && ex) {
+                  const pauseSec = ex.pause || 90;
+                  display.textContent = formatTime(pauseSec);
+                  display.classList.remove('timer-alarm');
+                }
+              }
+            }
+          }
+        } else {
+          if (display && ex) {
+            const pauseSec = ex.pause || 90;
+            display.textContent = formatTime(pauseSec);
+            display.classList.remove('timer-alarm');
+          }
+        }
+        currentTimerLogId = null;
+        currentTimerExId = null;
+      }
+    }
+
+    function toggleTimer(logId, exId, btnElement) {
+      if (timerRunning && (currentTimerLogId !== logId || currentTimerExId !== exId)) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        timerRunning = false;
+        document.querySelectorAll('.btn-timer').forEach(b => {
+          if (b.dataset.logid === currentTimerLogId && b.dataset.exid === currentTimerExId) {
+            b.innerHTML = '<i class="fas fa-play"></i> Timer starten';
+            b.classList.remove('active');
+          }
+        });
+        const oldDisplay = document.getElementById(`timer-${currentTimerLogId}-${currentTimerExId}`);
+        if (oldDisplay) oldDisplay.classList.remove('timer-alarm');
+      }
+
+      if (timerRunning && currentTimerLogId === logId && currentTimerExId === exId) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        timerRunning = false;
+        btnElement.innerHTML = '<i class="fas fa-play"></i> Timer starten';
+        btnElement.classList.remove('active');
+        const display = document.getElementById(`timer-${logId}-${exId}`);
+        if (display) display.classList.remove('timer-alarm');
+        return;
+      }
+
+      const ex = exercises.find(e => e.id === exId);
+      if (!ex) return;
+      const pauseSec = ex.pause || 90;
+      timerTotalSeconds = pauseSec;
+      timerStartTime = Date.now();
+      timerRemainingSeconds = pauseSec;
+      currentTimerLogId = logId;
+      currentTimerExId = exId;
+      timerRunning = true;
+      btnElement.innerHTML = '<i class="fas fa-stop"></i> Stopp';
+      btnElement.classList.add('active');
+
+      const display = document.getElementById(`timer-${logId}-${exId}`);
+      if (display) {
+        display.textContent = formatTime(pauseSec);
+        display.classList.remove('timer-alarm');
+      }
+
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(updateTimerDisplay, 1000);
+    }
+
+    // ========== BACKUP ==========
+    function exportData() {
+      const data = { exercises, plans, logs };
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `bb_pro_backup_${getToday()}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+    function importData(file) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const data = JSON.parse(e.target.result);
+          if (data.exercises && data.plans && data.logs) {
+            if (confirm('Aktuelle Daten werden durch die importierten ersetzt. Fortfahren?')) {
+              exercises = data.exercises; plans = data.plans; logs = data.logs;
+              saveData(); renderAll();
+              backupOverlay.classList.remove('active');
+              alert('Import erfolgreich!');
+            }
+          } else { alert('Ungültige Backup-Datei.'); }
+        } catch(err) { alert('Fehler beim Lesen der Datei.'); }
+      };
+      reader.readAsText(file);
+    }
+    function restoreAutoBackup() {
+      const autoBackup = localStorage.getItem('bb_auto_backup');
+      if (!autoBackup) {
+        alert('Kein automatisches Backup vorhanden.');
+        return;
+      }
+      try {
+        const data = JSON.parse(autoBackup);
+        if (data.exercises && data.plans && data.logs) {
+          if (confirm('Auto-Backup wiederherstellen? Aktuelle Daten werden überschrieben.')) {
+            exercises = data.exercises;
+            plans = data.plans;
+            logs = data.logs;
+            activePlanId = data.activePlanId || null;
+            saveData();
+            renderAll();
+            backupOverlay.classList.remove('active');
+            alert('Auto-Backup erfolgreich wiederhergestellt!');
+          }
+        } else {
+          alert('Auto-Backup enthält ungültige Daten.');
+        }
+      } catch(e) {
+        alert('Fehler beim Lesen des Auto-Backups.');
+      }
+    }
+
+    // -------- UI-Hilfen --------
+    function hideAllPages() { document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); }
+    function closeDetail() {
+      if (overallTimerRunning) {
+        releaseOverallTimer();
+      }
+      detailContainer.style.display = 'none';
+      showTab(currentTab);
+      editingId = null; editingType = null;
+      if (timerRunning) {
+        clearInterval(timerInterval); timerInterval = null; timerRunning = false;
+        document.querySelectorAll('.btn-timer').forEach(b => {
+          b.innerHTML = '<i class="fas fa-play"></i> Timer starten';
+          b.classList.remove('active');
+        });
+        const display = document.getElementById(`timer-${currentTimerLogId}-${currentTimerExId}`);
+        if (display) display.classList.remove('timer-alarm');
+        currentTimerLogId = null; currentTimerExId = null;
+      }
+    }
+    function showTab(tab) {
+      currentTab = tab;
+      hideAllPages();
+      if (tab === 'exercises') { pageExercises.classList.add('active'); renderExercises(); }
+      else if (tab === 'plans') { pagePlans.classList.add('active'); renderPlans(); }
+      else if (tab === 'logs') { pageLogs.classList.add('active'); renderLogs(); }
+      else if (tab === 'calendar') {
+        pageCalendar.classList.add('active');
+        renderCalendar();
+      }
+      else if (tab === 'stats') { pageStats.classList.add('active'); renderStats(); }
+      tabBtns.forEach(btn => { btn.classList.toggle('active', btn.dataset.tab === tab); });
+      detailContainer.style.display = 'none';
+    }
+
+    // -------- Event-Listener --------
+    tabBtns.forEach(btn => {
+      btn.addEventListener('click', () => { showTab(btn.dataset.tab); });
+    });
+    btnGlobalAdd.addEventListener('click', () => {
+      if (currentTab === 'exercises') openExerciseForm(null);
+      else if (currentTab === 'plans') openPlanForm(null);
+      else if (currentTab === 'logs') {
+        // Neues Log – ohne Timer-Start (Nutzer startet manuell)
+        openLogForm(null, false);
+      }
+    });
+    btnQuickStart.addEventListener('click', quickStart);
+    btnBackup.addEventListener('click', () => { backupOverlay.classList.add('active'); });
+    btnCloseBackup.addEventListener('click', () => { backupOverlay.classList.remove('active'); });
+    btnExport.addEventListener('click', exportData);
+    btnImportTrigger.addEventListener('click', () => { fileInput.click(); });
+    btnRestoreAutoBackup.addEventListener('click', restoreAutoBackup);
+    fileInput.addEventListener('change', function() {
+      if (this.files && this.files[0]) { importData(this.files[0]); this.value = ''; }
+    });
+    backupOverlay.addEventListener('click', function(e) { if (e.target === this) this.classList.remove('active'); });
+
+    // -------- Initialisierung --------
+    loadData();
+    enablePersistentStorage();
+    showTab('exercises');
+    if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission();
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js').catch(() => {});
+    }
+  </script>
+</body>
+</html>
