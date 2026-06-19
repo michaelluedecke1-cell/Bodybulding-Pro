@@ -8,7 +8,13 @@
   <meta name="theme-color" content="#0d0d1a" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <style>
-    /* ===== Alle Styles wie gehabt (Platz sparend gekürzt) ===== */
+    /* ===== Pull-to-Refresh deaktivieren ===== */
+    html, body {
+      overscroll-behavior: none;
+      overflow: auto;
+      touch-action: pan-y;
+    }
+
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
     body { background: #0d0d1a; color: #e0e0e0; min-height: 100vh; padding: 0 12px 80px; font-size: 0.9rem; }
     .app-header {
@@ -624,6 +630,14 @@
   </div>
 
   <script>
+    /* ===== PULL-TO-REFRESH KOMPLETT DEAKTIVIEREN ===== */
+    document.addEventListener('touchmove', function(e) {
+      if (window.scrollY === 0 && e.target.closest('#app')) {
+        e.preventDefault();
+      }
+    }, { passive: false });
+
+    // ===== REST DES CODES =====
     let exercises = [], plans = [], logs = [];
     let currentTab = 'exercises', editingId = null, editingType = null;
     let calendarDate = new Date();
@@ -848,14 +862,12 @@
       }
     }
 
-    // ========== NEU: Letzte Werte pro Übung holen ==========
+    // ========== Letzte Werte pro Übung ==========
     function getLastSetForExercise(exerciseId) {
-      // Alle Logs nach Datum absteigend sortieren
       const sortedLogs = [...logs].sort((a, b) => (a.date || '').localeCompare(b.date || '') * -1);
       for (const log of sortedLogs) {
         const entry = log.entries.find(e => e.exerciseId === exerciseId);
         if (entry && entry.sets && entry.sets.length > 0) {
-          // Letzten Satz (höchster Index) zurückgeben
           const lastSet = entry.sets[entry.sets.length - 1];
           return { kg: lastSet.kg || 0, wdh: lastSet.wdh || 0 };
         }
@@ -1594,7 +1606,7 @@
       saveData(); renderAll();
     }
 
-    // -------- QuickStart (mit Übernahme der letzten Werte) --------
+    // -------- QuickStart --------
     function quickStart() {
       if (!activePlanId) {
         alert('Kein aktiver Plan ausgewählt. Markiere einen Plan mit ⭐ als aktiv.');
@@ -1610,7 +1622,6 @@
         return;
       }
 
-      // Neues Log mit übernommenen Werten
       const newLog = {
         id: generateId(),
         planId: activePlanId,
@@ -1655,20 +1666,16 @@
       wakeLockManual = false;
     }
 
-    // -------- Log CRUD (mit Übernahme der letzten Werte bei neuem Log) --------
+    // -------- Log CRUD --------
     function openLogForm(id = null, startTimer = false) {
       const isEdit = !!id;
       let log = isEdit ? logs.find(l => l.id === id) : null;
 
-      // Wenn neues Log (id = null)
       if (!isEdit) {
-        // Plan auswählen? Im Formular wird ein Plan ausgewählt – wir initialisieren mit leerem Plan.
-        // Die Übungen werden erst beim Plan-Wechsel oder Speichern befüllt.
         log = { id: generateId(), planId: '', date: getToday(), duration: 0, entries: [] };
         editingId = log.id;
         logs.push(log);
         saveData();
-        // Timer starten NUR wenn startTimer = true (QuickStart)
         if (startTimer) {
           startOverallTimer();
         } else {
@@ -1703,9 +1710,8 @@
       const exerciseIds = plan ? plan.exerciseIds : [];
       const entries = log.entries || [];
 
-      // Wenn Plan gewählt, aber noch keine Entries existieren, dann mit letzten Werten befüllen
+      // Wenn Plan gewählt, aber keine Entries, mit letzten Werten befüllen
       if (plan && exerciseIds.length > 0 && entries.length === 0) {
-        // Nur für neue Logs (nicht für bestehende)
         if (!isEdit || log.entries.length === 0) {
           log.entries = exerciseIds.map(exId => {
             const last = getLastSetForExercise(exId);
@@ -1716,12 +1722,10 @@
               notiz: ''
             };
           });
-          // Daten speichern, damit sie nicht verloren gehen
           saveData();
         }
       }
 
-      // Jetzt nochmal die aktuellen entries holen (nach möglicher Befüllung)
       const currentEntries = log.entries || [];
 
       let exercisesHtml = '';
@@ -1903,16 +1907,13 @@
         }
       }
 
-      // Plan-Wechsel: Wenn ein Plan ausgewählt wird, die Übungen mit letzten Werten befüllen
       const planSelect = document.getElementById('formLogPlan');
       planSelect.addEventListener('change', function() {
         const newPlanId = this.value;
-        // Aktuelle Eingaben sichern, bevor wir den Plan wechseln
         collectLogEntries(editingId);
         const logObj = logs.find(l => l.id === editingId);
         if (logObj) {
           logObj.planId = newPlanId;
-          // Entries zurücksetzen, damit sie beim nächsten Rendern mit letzten Werten befüllt werden
           const planObj = plans.find(p => p.id === newPlanId);
           if (planObj && planObj.exerciseIds) {
             logObj.entries = planObj.exerciseIds.map(exId => {
@@ -2155,12 +2156,17 @@
         log.duration = (log.duration || 0) + elapsed;
         releaseOverallTimer();
       }
+      // Datum aus Input-Feld lesen
       const dateInput = document.getElementById('formLogDate');
-      if (dateInput) log.date = dateInput.value || getToday();
+      if (dateInput && dateInput.value) {
+        log.date = dateInput.value;
+      }
       const planId = document.getElementById('formLogPlan').value;
       log.planId = planId;
       collectLogEntries(logId);
-      saveData(); renderAll(); closeDetail();
+      saveData();
+      renderAll();
+      closeDetail();
     }
     function deleteLog(id) {
       if (!confirm('Training aus dem Log löschen?')) return;
@@ -2384,10 +2390,7 @@
     btnGlobalAdd.addEventListener('click', () => {
       if (currentTab === 'exercises') openExerciseForm(null);
       else if (currentTab === 'plans') openPlanForm(null);
-      else if (currentTab === 'logs') {
-        // Neues Log – ohne Timer-Start (Nutzer startet manuell)
-        openLogForm(null, false);
-      }
+      else if (currentTab === 'logs') openLogForm(null, false);
     });
     btnQuickStart.addEventListener('click', quickStart);
     btnBackup.addEventListener('click', () => { backupOverlay.classList.add('active'); });
