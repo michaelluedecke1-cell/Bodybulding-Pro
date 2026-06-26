@@ -1222,7 +1222,7 @@
       });
     }
 
-    // ========== STATISTIK ==========
+   // ========== STATISTIK ==========
     function renderStats() {
       if (!statsContainer) return;
       const totalLogs = logs.length;
@@ -1235,7 +1235,6 @@
       const currentMonth = now.getMonth();
       const currentYear = now.getFullYear();
       
-      // 🔥 ZEITZONEN-BUG GEFIXT: Sicheres Aufteilen des Datum-Strings
       const daysThisMonth = logs.filter(log => {
         if (!log.date) return false;
         const [y, m, d] = log.date.split('-');
@@ -1243,35 +1242,17 @@
         return logD.getMonth() === currentMonth && logD.getFullYear() === currentYear;
       }).length;
 
-      let totalVolumeAll = 0;
-      logs.forEach(log => {
-        log.entries.forEach(entry => {
-          totalVolumeAll += calcVolume(entry);
+      // Volumen des letzten Trainings berechnen
+      let lastTrainingVolume = 0;
+      if (logs.length > 0) {
+        const sortedLogs = [...logs].sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+        const lastLog = sortedLogs[0];
+        lastLog.entries.forEach(entry => {
+          lastTrainingVolume += calcVolume(entry);
         });
-      });
-
-      const avgVolume = totalLogs > 0 ? Math.round(totalVolumeAll / totalLogs) : 0;
-
-      const exerciseCount = {};
-      logs.forEach(log => {
-        log.entries.forEach(entry => {
-          const exId = entry.exerciseId;
-          if (exId) {
-            exerciseCount[exId] = (exerciseCount[exId] || 0) + 1;
-          }
-        });
-      });
-      let mostTrainedExId = null;
-      let mostTrainedCount = 0;
-      for (const [id, count] of Object.entries(exerciseCount)) {
-        if (count > mostTrainedCount) {
-          mostTrainedCount = count;
-          mostTrainedExId = id;
-        }
       }
-      const mostTrainedEx = exercises.find(e => e.id === mostTrainedExId);
-      const mostTrainedName = mostTrainedEx ? mostTrainedEx.name : '—';
 
+      // Gesamtvolumen pro Übung für die Liste unten sammeln
       const volumePerExercise = {};
       logs.forEach(log => {
         log.entries.forEach(entry => {
@@ -1281,43 +1262,34 @@
           }
         });
       });
-      let highestVolExId = null;
-      let highestVol = 0;
-      for (const [id, vol] of Object.entries(volumePerExercise)) {
-        if (vol > highestVol) {
-          highestVol = vol;
-          highestVolExId = id;
-        }
-      }
-      const highestVolEx = exercises.find(e => e.id === highestVolExId);
-      const highestVolName = highestVolEx ? highestVolEx.name : '—';
 
-      const weeks = [];
-      for (let w = 3; w >= 0; w--) {
-        const weekStart = new Date();
-        weekStart.setDate(weekStart.getDate() - (weekStart.getDay() + 6) % 7 - w * 7);
-        weekStart.setHours(0,0,0,0);
+      // Tägliches Volumen (Letzte 7 Tage)
+      const days = [];
+      const todayMidnight = new Date();
+      todayMidnight.setHours(0,0,0,0);
+
+      for (let i = 6; i >= 0; i--) {
+        const targetDate = new Date(todayMidnight);
+        targetDate.setDate(targetDate.getDate() - i);
         
-        const weekEnd = new Date(weekStart);
-        weekEnd.setDate(weekEnd.getDate() + 6);
-        weekEnd.setHours(23,59,59,999); 
+        const dayName = targetDate.toLocaleDateString('de-DE', { weekday: 'short' });
+        const dayLabel = `${dayName} ${targetDate.getDate()}.`;
         
-        const weekLabel = `So. ${weekEnd.getDate()}.${weekEnd.getMonth()+1}.`;
+        let dayVol = 0;
         
-        let weekVol = 0;
-        // 🔥 ZEITZONEN-BUG GEFIXT: Sicheres Aufteilen des Datum-Strings
         logs.forEach(log => {
           if (!log.date) return;
           const [y, m, d] = log.date.split('-');
           const logDate = new Date(y, m - 1, d);
+          logDate.setHours(0,0,0,0);
           
-          if (logDate >= weekStart && logDate <= weekEnd) {
+          if (logDate.getTime() === targetDate.getTime()) {
             log.entries.forEach(entry => {
-              weekVol += calcVolume(entry);
+              dayVol += calcVolume(entry);
             });
           }
         });
-        weeks.push({ label: weekLabel, vol: weekVol });
+        days.push({ label: dayLabel, vol: dayVol });
       }
 
       let html = `
@@ -1325,39 +1297,30 @@
           <div style="display:flex; gap:12px; flex-wrap:wrap; justify-content:space-around;">
             <div><span class="stat-value">${daysThisMonth}</span><div class="stat-label">Trainingstage diesen Monat</div></div>
             <div><span class="stat-value">${totalLogs}</span><div class="stat-label">Trainings insgesamt</div></div>
-            <div><span class="stat-value">${avgVolume.toLocaleString()}</span><div class="stat-label">Ø Volumen pro Training (kg)</div></div>
+            <div><span class="stat-value">${lastTrainingVolume.toLocaleString()}</span><div class="stat-label">Letztes Training (kg)</div></div>
           </div>
         </div>
         <div class="stat-card">
-          <div style="font-weight:600; margin-bottom:6px;">🏆 Meist trainierte Übung</div>
-          <div style="font-size:1.2rem; color:#2ecc71;">${mostTrainedName}</div>
-          <div style="font-size:0.8rem; color:#888;">${mostTrainedCount} mal ausgeführt</div>
-        </div>
-        <div class="stat-card">
-          <div style="font-weight:600; margin-bottom:6px;">💪 Höchstes Gesamtvolumen</div>
-          <div style="font-size:1.2rem; color:#2ecc71;">${highestVolName}</div>
-          <div style="font-size:0.8rem; color:#888;">${highestVol.toLocaleString()} kg insgesamt</div>
-        </div>
-        <div class="stat-card">
-          <div style="font-weight:600; margin-bottom:6px;">📊 Wöchentliches Volumen (letzte 4 Wochen)</div>
-          <div style="display:flex; gap:8px; justify-content:space-around; align-items:flex-end; height:100px; padding-top:8px;">
+          <div style="font-weight:600; margin-bottom:6px;">📊 Tägliches Volumen (letzte 7 Tage)</div>
+          <div style="display:flex; gap:4px; justify-content:space-around; align-items:flex-end; height:100px; padding-top:8px;">
       `;
-      const maxWeekVol = Math.max(...weeks.map(w => w.vol), 1);
-      weeks.forEach(w => {
-        const height = Math.max(5, (w.vol / maxWeekVol) * 80);
+      
+      const maxDayVol = Math.max(...days.map(d => d.vol), 1);
+      days.forEach(d => {
+        const height = Math.max(5, (d.vol / maxDayVol) * 80);
         html += `
           <div style="display:flex; flex-direction:column; align-items:center; flex:1;">
-            <div style="background:#2ecc71; width:100%; max-width:40px; height:${height}px; border-radius:4px 4px 0 0;"></div>
-            <div style="font-size:0.65rem; color:#888; margin-top:4px;">${w.label}</div>
-            <div style="font-size:0.6rem; color:#aaa;">${w.vol.toLocaleString()}</div>
+            <div style="background:#2ecc71; width:100%; max-width:25px; height:${height}px; border-radius:4px 4px 0 0;"></div>
+            <div style="font-size:0.6rem; color:#888; margin-top:4px; text-align:center;">${d.label}</div>
+            <div style="font-size:0.55rem; color:#aaa;">${d.vol > 0 ? d.vol.toLocaleString() : '-'}</div>
           </div>
         `;
       });
       html += `</div></div>`;
 
+      // Alle Übungen nach Volumen sortieren
       const sortedVol = Object.entries(volumePerExercise)
         .sort((a, b) => b[1] - a[1])
-        .slice(0, 5)
         .map(([id, vol]) => {
           const ex = exercises.find(e => e.id === id);
           return { name: ex ? ex.name : 'unbekannt', vol };
@@ -1366,7 +1329,7 @@
       if (sortedVol.length) {
         html += `
           <div class="stat-card">
-            <div style="font-weight:600; margin-bottom:6px;">🏅 Top 5 Übungen nach Volumen</div>
+            <div style="font-weight:600; margin-bottom:6px;">🏅 Alle Übungen nach Volumen</div>
             <ul class="stat-list">
               ${sortedVol.map((item, i) => `
                 <li><span class="name">${i+1}. ${item.name}</span><span class="value">${item.vol.toLocaleString()} kg</span></li>
@@ -2446,7 +2409,16 @@
         navigator.serviceWorker.register('sw.js').catch(() => {});
       }
     }
-    
+
+    // ========== HAPTISCHES FEEDBACK ==========
+    document.addEventListener('pointerdown', function(e) {
+      if (e.target.closest('button') || e.target.closest('.list-item') || e.target.closest('.day-cell.has-training')) {
+        if (navigator.vibrate) {
+          navigator.vibrate(15); 
+        }
+      }
+    }, { passive: true });
+
     // Start!
     initApp();
   </script>
