@@ -10,12 +10,7 @@
   <style>
     /* ===== Alle Styles wie gehabt ===== */
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
-    
-    /* Deaktiviert Pull-to-Refresh in modernen Browsern */
-    html, body {
-      overscroll-behavior-y: none;
-    }
-    
+    html, body { overscroll-behavior-y: none; }
     body { background: #0d0d1a; color: #e0e0e0; min-height: 100vh; padding: 0 12px 80px; font-size: 0.9rem; }
     .app-header {
       display: flex; justify-content: space-between; align-items: center;
@@ -69,27 +64,13 @@
     .list-item .info h4 { font-size: 0.95rem; font-weight: 500; }
     .list-item .info .sub { font-size: 0.75rem; color: #aaa; margin-top: 2px; }
     .list-item .thumbnail {
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      object-fit: cover;
-      background: #2a2a44;
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.5rem;
-      color: #f39c12;
-      overflow: hidden;
+      width: 44px; height: 44px; border-radius: 50%;
+      object-fit: cover; background: #2a2a44;
+      flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem; color: #f39c12; overflow: hidden;
     }
-    .list-item .thumbnail img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-    .list-item .actions {
-      display: flex; gap: 6px;
-    }
+    .list-item .thumbnail img { width: 100%; height: 100%; object-fit: cover; }
+    .list-item .actions { display: flex; gap: 6px; }
     .list-item .actions button {
       background: none; border: none; color: #aaa; font-size: 1.1rem;
       cursor: pointer; padding: 0 4px;
@@ -170,92 +151,49 @@
     }
 
     .exercise-entry .sets-table input[type="number"] {
-      width: 60px;
-      font-size: 1.0rem;
-      padding: 6px 4px;
-      background: #2a2a44;
-      border: 1px solid #444;
-      border-radius: 6px;
-      color: #fff;
-      text-align: center;
-      -moz-appearance: textfield;
+      width: 60px; font-size: 1.0rem; padding: 6px 4px;
+      background: #2a2a44; border: 1px solid #444; border-radius: 6px;
+      color: #fff; text-align: center; -moz-appearance: textfield;
     }
     .exercise-entry .sets-table input[type="number"]::-webkit-outer-spin-button,
     .exercise-entry .sets-table input[type="number"]::-webkit-inner-spin-button {
-      -webkit-appearance: none;
-      margin: 0;
+      -webkit-appearance: none; margin: 0;
     }
     .exercise-entry .sets-table .set-controls {
-      display: flex;
-      align-items: center;
-      gap: 3px;
+      display: flex; align-items: center; gap: 3px;
     }
     .exercise-entry .sets-table .set-controls button {
-      background: #2a2a44;
-      border: none;
-      color: #ddd;
-      font-size: 1.0rem;
-      width: 28px;
-      height: 28px;
-      border-radius: 6px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background 0.2s;
-      touch-action: manipulation;
-      font-weight: 700;
+      background: #2a2a44; border: none; color: #ddd; font-size: 1.0rem;
+      width: 28px; height: 28px; border-radius: 6px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s; touch-action: manipulation; font-weight: 700;
     }
     .exercise-entry .sets-table .set-controls button:active {
-      background: #3a3a5a;
-      transform: scale(0.94);
+      background: #3a3a5a; transform: scale(0.94);
     }
-    .exercise-entry .sets-table .set-controls button.inc {
-      color: #2ecc71;
-    }
-    .exercise-entry .sets-table .set-controls button.dec {
-      color: #e74c3c;
-    }
+    .exercise-entry .sets-table .set-controls button.inc { color: #2ecc71; }
+    .exercise-entry .sets-table .set-controls button.dec { color: #e74c3c; }
 
     .exercise-entry .sets-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 4px 0;
+      width: 100%; border-collapse: collapse; margin: 4px 0;
     }
     .exercise-entry .sets-table th {
-      text-align: left;
-      padding: 4px 4px;
-      color: #aaa;
-      font-weight: 400;
-      font-size: 0.7rem;
-      border-bottom: 1px solid #333;
+      text-align: left; padding: 4px 4px; color: #aaa;
+      font-weight: 400; font-size: 0.7rem; border-bottom: 1px solid #333;
     }
     .exercise-entry .sets-table td {
-      padding: 3px 3px;
-      border-bottom: 1px solid #2a2a44;
+      padding: 3px 3px; border-bottom: 1px solid #2a2a44;
       vertical-align: middle;
     }
     .exercise-entry .sets-table .btn-remove-set {
-      background: none;
-      border: none;
-      color: #e74c3c;
-      font-size: 1.0rem;
-      cursor: pointer;
-      padding: 0 4px;
+      background: none; border: none; color: #e74c3c;
+      font-size: 1.0rem; cursor: pointer; padding: 0 4px;
     }
-    .exercise-entry .sets-table tr.active-set {
-      background: #2a4a3a;
-      border-left: 3px solid #2ecc71;
+    .exercise-entry .sets-table .set-number.active {
+      color: #2ecc71; font-weight: 700;
     }
-    .exercise-entry .sets-table tr.active-set td {
-      border-bottom-color: #2ecc71;
-    }
-    .exercise-entry .sets-table .set-number {
-      color: #888;
-      width: 28px;
-      text-align: center;
-      font-weight: 600;
-      font-size: 0.8rem;
+    .exercise-entry .sets-table .set-number.active::before {
+      content: "● "; color: #2ecc71;
     }
 
     .exercise-entry .set-progress {
@@ -267,59 +205,27 @@
     }
 
     .exercise-entry .ex-actions-row {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-      margin-top: 4px;
+      display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px;
     }
     .exercise-entry .ex-actions-row button {
-      padding: 6px 12px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      min-height: 38px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      background: #2a2a44;
-      color: #ddd;
-      flex: 1;
-      min-width: 80px;
-      transition: background 0.2s;
-      touch-action: manipulation;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
+      padding: 6px 12px; font-size: 0.85rem; font-weight: 600;
+      min-height: 38px; border: none; border-radius: 8px; cursor: pointer;
+      background: #2a2a44; color: #ddd; flex: 1; min-width: 80px;
+      transition: background 0.2s; touch-action: manipulation;
+      display: flex; align-items: center; justify-content: center; gap: 4px;
     }
-    .exercise-entry .ex-actions-row button:active {
-      transform: scale(0.96);
-    }
-    .exercise-entry .ex-actions-row .btn-timer {
-      background: #3498db;
-      color: #fff;
-    }
-    .exercise-entry .ex-actions-row .btn-timer.active {
-      background: #e74c3c;
-    }
-    .exercise-entry .ex-actions-row .btn-add-set {
-      background: #2ecc71;
-      color: #fff;
-    }
+    .exercise-entry .ex-actions-row button:active { transform: scale(0.96); }
+    .exercise-entry .ex-actions-row .btn-timer { background: #3498db; color: #fff; }
+    .exercise-entry .ex-actions-row .btn-timer.active { background: #e74c3c; }
+    .exercise-entry .ex-actions-row .btn-add-set { background: #2ecc71; color: #fff; }
 
     .exercise-entry .timer-display {
-      font-size: 1.4rem;
-      font-weight: 700;
-      text-align: center;
-      background: #0d0d1a;
-      border-radius: 8px;
-      padding: 4px 0;
-      margin: 4px 0;
-      border: 1px solid #333;
-      transition: background 0.3s;
+      font-size: 1.4rem; font-weight: 700; text-align: center;
+      background: #0d0d1a; border-radius: 8px; padding: 4px 0;
+      margin: 4px 0; border: 1px solid #333; transition: background 0.3s;
     }
     .exercise-entry .timer-display.timer-alarm {
-      background: #8b0000;
-      animation: blink 0.5s infinite alternate;
+      background: #8b0000; animation: blink 0.5s infinite alternate;
     }
     @keyframes blink {
       0% { background: #8b0000; }
@@ -338,10 +244,8 @@
 
     .volume-summary {
       background: #1a1a2e; padding: 6px 10px; border-radius: 8px;
-      margin: 4px 0 8px;
-      display: flex; flex-wrap: wrap; gap: 12px;
-      justify-content: space-around;
-      border: 1px solid #2a2a44;
+      margin: 4px 0 8px; display: flex; flex-wrap: wrap; gap: 12px;
+      justify-content: space-around; border: 1px solid #2a2a44;
     }
     .volume-summary .item { text-align: center; }
     .volume-summary .item .label { font-size: 0.65rem; color: #888; }
@@ -349,8 +253,7 @@
 
     .chart-container {
       background: #111122; border-radius: 8px; padding: 8px;
-      margin: 4px 0; border: 1px solid #2a2a44;
-      overflow-x: auto;
+      margin: 4px 0; border: 1px solid #2a2a44; overflow-x: auto;
     }
     .chart-container canvas { width: 100%; height: 100px; }
 
@@ -361,181 +264,105 @@
     .cardio-row label { font-size: 0.75rem; color: #aaa; }
     .cardio-row input {
       width: 60px; background: #2a2a44; border: 1px solid #444;
-      border-radius: 6px; color: #fff; padding: 4px 6px;
-      font-size: 0.85rem;
+      border-radius: 6px; color: #fff; padding: 4px 6px; font-size: 0.85rem;
     }
 
     .calendar-container {
-      background: #1a1a2e;
-      border-radius: 12px;
-      padding: 12px;
+      background: #1a1a2e; border-radius: 12px; padding: 12px;
       border: 1px solid #2a2a44;
     }
     .calendar-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      display: flex; justify-content: space-between; align-items: center;
       margin-bottom: 10px;
     }
-    .calendar-header .month-year {
-      font-size: 1.1rem;
-      font-weight: 600;
-    }
+    .calendar-header .month-year { font-size: 1.1rem; font-weight: 600; }
     .calendar-header .nav-btn {
-      background: #2a2a44;
-      border: none;
-      color: #ddd;
-      font-size: 1.2rem;
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      background: #2a2a44; border: none; color: #ddd; font-size: 1.2rem;
+      width: 32px; height: 32px; border-radius: 50%; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
     }
     .calendar-header .nav-btn:active { background: #3a3a5a; }
     .calendar-grid {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 4px;
-      text-align: center;
+      display: grid; grid-template-columns: repeat(7, 1fr);
+      gap: 4px; text-align: center;
     }
     .calendar-grid .day-name {
-      font-size: 0.7rem;
-      color: #888;
-      padding: 4px 0;
+      font-size: 0.7rem; color: #888; padding: 4px 0;
     }
     .calendar-grid .day-cell {
-      background: #111122;
-      border-radius: 6px;
-      padding: 6px 0;
-      font-size: 0.85rem;
-      cursor: default;
-      transition: background 0.2s;
+      background: #111122; border-radius: 6px; padding: 6px 0;
+      font-size: 0.85rem; cursor: default; transition: background 0.2s;
       position: relative;
     }
-    .calendar-grid .day-cell.other-month {
-      color: #555;
-    }
+    .calendar-grid .day-cell.other-month { color: #555; }
     .calendar-grid .day-cell.has-training {
-      background: #1a3a2a;
-      cursor: pointer;
+      background: #1a3a2a; cursor: pointer;
     }
     .calendar-grid .day-cell.has-training::after {
-      content: '';
-      position: absolute;
-      bottom: 2px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 4px;
-      height: 4px;
-      border-radius: 50%;
-      background: #2ecc71;
+      content: ''; position: absolute; bottom: 2px; left: 50%;
+      transform: translateX(-50%); width: 4px; height: 4px;
+      border-radius: 50%; background: #2ecc71;
     }
-    .calendar-grid .day-cell.today {
-      border: 1px solid #f39c12;
-    }
+    .calendar-grid .day-cell.today { border: 1px solid #f39c12; }
     .calendar-grid .day-cell:active { background: #2a2a44; }
 
     .calendar-year-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      margin: 10px 0;
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 12px; margin: 10px 0;
     }
     .calendar-year-grid .month-card {
-      background: #111122;
-      border-radius: 8px;
-      padding: 6px 4px;
-      text-align: center;
-      border: 1px solid #2a2a44;
+      background: #111122; border-radius: 8px; padding: 6px 4px;
+      text-align: center; border: 1px solid #2a2a44;
     }
     .calendar-year-grid .month-card .month-name {
-      font-size: 0.7rem;
-      color: #aaa;
-      margin-bottom: 4px;
+      font-size: 0.7rem; color: #aaa; margin-bottom: 4px;
     }
     .calendar-year-grid .month-card .mini-days {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 1px;
+      display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px;
     }
     .calendar-year-grid .month-card .mini-day {
-      width: 100%;
-      aspect-ratio: 1;
-      border-radius: 2px;
-      background: #1a1a2e;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.45rem;
-      color: #555;
+      width: 100%; aspect-ratio: 1; border-radius: 2px;
+      background: #1a1a2e; display: flex; align-items: center;
+      justify-content: center; font-size: 0.45rem; color: #555;
       cursor: default;
     }
     .calendar-year-grid .month-card .mini-day.has-training {
-      background: #2ecc71;
-      color: #0d0d1a;
-      font-weight: 700;
-      cursor: pointer;
+      background: #2ecc71; color: #0d0d1a; font-weight: 700; cursor: pointer;
     }
-    .calendar-year-grid .month-card .mini-day.other-month {
-      opacity: 0.3;
-    }
+    .calendar-year-grid .month-card .mini-day.other-month { opacity: 0.3; }
 
     .calendar-stats {
-      display: flex;
-      gap: 16px;
-      justify-content: center;
-      flex-wrap: wrap;
-      margin-top: 10px;
-      font-size: 0.85rem;
-      color: #aaa;
+      display: flex; gap: 16px; justify-content: center;
+      flex-wrap: wrap; margin-top: 10px; font-size: 0.85rem; color: #aaa;
     }
     .calendar-stats span { background: #111122; padding: 4px 12px; border-radius: 20px; }
     .calendar-stats .count { color: #2ecc71; font-weight: 700; }
 
     .stat-card {
-      background: #1a1a2e;
-      border-radius: 12px;
-      padding: 12px 14px;
+      background: #1a1a2e; border-radius: 12px; padding: 12px 14px;
       border: 1px solid #2a2a44;
     }
     .stat-card .stat-value {
-      font-size: 1.6rem;
-      font-weight: 700;
-      color: #2ecc71;
+      font-size: 1.6rem; font-weight: 700; color: #2ecc71;
     }
-    .stat-card .stat-label {
-      font-size: 0.8rem;
-      color: #aaa;
-    }
-    .stat-row {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-    .stat-row .stat-card {
-      flex: 1;
-      min-width: 100px;
-      text-align: center;
-    }
+    .stat-card .stat-label { font-size: 0.8rem; color: #aaa; }
+    .stat-row { display: flex; gap: 12px; flex-wrap: wrap; }
+    .stat-row .stat-card { flex: 1; min-width: 100px; text-align: center; }
     .stat-list {
-      list-style: none;
-      padding: 0;
+      list-style: none; padding: 0;
     }
     .stat-list li {
-      display: flex;
-      justify-content: space-between;
-      padding: 6px 0;
+      display: flex; justify-content: space-between; padding: 6px 0;
       border-bottom: 1px solid #2a2a44;
     }
     .stat-list li .name { color: #ddd; }
     .stat-list li .value { color: #2ecc71; font-weight: 600; }
+    .stat-list li .change-up { color: #2ecc71; }
+    .stat-list li .change-down { color: #e74c3c; }
+    .stat-list li .change-neutral { color: #888; }
 
     .backup-overlay {
-      display: none;
-      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(0,0,0,0.7); justify-content: center; align-items: center;
       z-index: 1000;
     }
@@ -546,38 +373,22 @@
     }
     .backup-modal h3 { margin-bottom: 12px; }
     .backup-modal .btn-row {
-      display: flex;
-      gap: 12px;
-      justify-content: center;
-      flex-wrap: wrap;
-      margin-top: 16px;
+      display: flex; gap: 12px; justify-content: center;
+      flex-wrap: wrap; margin-top: 16px;
     }
     .backup-modal .btn-row button {
-      padding: 10px 20px;
-      border: none;
-      border-radius: 10px;
-      font-weight: 600;
-      cursor: pointer;
+      padding: 10px 20px; border: none; border-radius: 10px;
+      font-weight: 600; cursor: pointer;
     }
     .backup-modal .btn-row button:active { transform: scale(0.96); }
 
     .wake-toggle {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: #2a2a44;
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 0.8rem;
-      cursor: pointer;
-      transition: background 0.3s;
-      border: 1px solid #444;
-      user-select: none;
+      display: inline-flex; align-items: center; gap: 6px;
+      background: #2a2a44; padding: 4px 12px; border-radius: 20px;
+      font-size: 0.8rem; cursor: pointer; transition: background 0.3s;
+      border: 1px solid #444; user-select: none;
     }
-    .wake-toggle.active {
-      background: #1a4a3a;
-      border-color: #2ecc71;
-    }
+    .wake-toggle.active { background: #1a4a3a; border-color: #2ecc71; }
     .wake-toggle:active { transform: scale(0.96); }
 
     @media (min-width: 600px) {
@@ -722,7 +533,6 @@
       return `${m}m ${s}s`;
     }
     
-    // 🔥 ZEITZONEN-BUG GEFIXT: Baut das Datum streng lokal in YYYY-MM-DD
     function getToday() {
       const d = new Date();
       return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -837,7 +647,6 @@
 
     // ========== SPEICHERN & LADEN (INDEXED-DB) ==========
     function saveData() {
-      // Speichern blockiert nicht die UI
       idbSet('bb_exercises', exercises).catch(console.warn);
       idbSet('bb_plans', plans).catch(console.warn);
       idbSet('bb_logs', logs).catch(console.warn);
@@ -861,9 +670,7 @@
         if (act !== undefined) activePlanId = act;
       } catch(err) { console.warn('Laden fehlgeschlagen:', err); }
 
-      // ==========================================
-      // AUTOMATISCHE MIGRATION VON LOCALSTORAGE
-      // ==========================================
+      // Migration von LocalStorage
       if (exercises.length === 0 && plans.length === 0 && logs.length === 0) {
         const oldEx = localStorage.getItem('bb_exercises');
         if (oldEx) {
@@ -873,27 +680,22 @@
             plans = JSON.parse(localStorage.getItem('bb_plans') || '[]');
             logs = JSON.parse(localStorage.getItem('bb_logs') || '[]');
             activePlanId = localStorage.getItem('bb_activePlan') || null;
-            
-            // Nach erfolgreicher Migration den alten Speicher leeren
             localStorage.removeItem('bb_exercises');
             localStorage.removeItem('bb_plans');
             localStorage.removeItem('bb_logs');
             localStorage.removeItem('bb_activePlan');
             localStorage.removeItem('bb_auto_backup');
-            
             saveData();
           } catch(err) { console.warn('Migrationsfehler:', err); }
         }
       }
 
-      // Format-Sicherstellung
       exercises.forEach(ex => { if (!ex.type) ex.type = 'strength'; });
       logs.forEach(log => {
         log.entries.forEach(entry => { if (!entry.cardioData) entry.cardioData = { time: 0, distance: 0 }; });
         if (log.duration === undefined) log.duration = 0;
       });
 
-      // Wenn absolut leer -> Backup prüfen oder Dummy Daten anlegen
       if (exercises.length === 0 && plans.length === 0 && logs.length === 0) {
         const autoBackup = await idbGet('bb_auto_backup');
         if (autoBackup && autoBackup.exercises && autoBackup.plans && autoBackup.logs) {
@@ -904,7 +706,6 @@
             saveData();
             console.log('✅ Auto-Backup wiederhergestellt');
         } else {
-            // Standard-Dummy-Daten für Erstanwender
             const ex1 = { id: generateId(), name: 'Schulterpresse (Maschine)', image: '', pause: 90, type: 'strength' };
             const ex2 = { id: generateId(), name: 'Rudermaschine sitzend', image: '', pause: 90, type: 'strength' };
             const ex3 = { id: generateId(), name: 'Laufband', image: '', pause: 60, type: 'cardio' };
@@ -925,17 +726,17 @@
       }
     }
 
-    // ========== Letzte Werte pro Übung holen ==========
-    function getLastSetForExercise(exerciseId) {
+    // ========== Letzte Daten (KG, WDH, Notiz) für eine Übung holen ==========
+    function getLastTrainingDataForExercise(exerciseId) {
       const sortedLogs = [...logs].sort((a, b) => (a.date || '').localeCompare(b.date || '') * -1);
       for (const log of sortedLogs) {
         const entry = log.entries.find(e => e.exerciseId === exerciseId);
-        if (entry && entry.sets && entry.sets.length > 0) {
-          const lastSet = entry.sets[entry.sets.length - 1];
-          return { kg: lastSet.kg || 0, wdh: lastSet.wdh || 0 };
+        if (entry) {
+          const lastSet = entry.sets && entry.sets.length > 0 ? entry.sets[entry.sets.length - 1] : { kg: 0, wdh: 0 };
+          return { kg: lastSet.kg || 0, wdh: lastSet.wdh || 0, notiz: entry.notiz || '' };
         }
       }
-      return { kg: 0, wdh: 0 };
+      return { kg: 0, wdh: 0, notiz: '' };
     }
 
     // ========== VOLUMEN & DIAGRAMM ==========
@@ -1060,7 +861,6 @@
         html += `<div class="day-cell other-month">${prevDate.getDate()}</div>`;
       }
       
-      // 🔥 ZEITZONEN-BUG GEFIXT: Baut das Datum manuell (ohne toISOString())
       for (let d = 1; d <= daysInMonth; d++) {
         const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
         const isToday = dateStr === todayStr;
@@ -1162,7 +962,6 @@
           miniDaysHtml += `<div class="mini-day other-month"></div>`;
         }
         
-        // 🔥 ZEITZONEN-BUG GEFIXT: Baut das Datum manuell (ohne toISOString())
         for (let d = 1; d <= daysInMonth; d++) {
           const dateStr = `${year}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
           const hasTraining = !!logMap[dateStr];
@@ -1222,7 +1021,7 @@
       });
     }
 
-   // ========== STATISTIK ==========
+    // ========== NEUE STATISTIK-FUNKTION mit Fortschrittsvergleich ==========
     function renderStats() {
       if (!statsContainer) return;
       const totalLogs = logs.length;
@@ -1242,7 +1041,6 @@
         return logD.getMonth() === currentMonth && logD.getFullYear() === currentYear;
       }).length;
 
-      // Volumen des letzten Trainings berechnen
       let lastTrainingVolume = 0;
       if (logs.length > 0) {
         const sortedLogs = [...logs].sort((a, b) => (b.date || '').localeCompare(a.date || ''));
@@ -1252,18 +1050,44 @@
         });
       }
 
-      // Gesamtvolumen pro Übung für die Liste unten sammeln
-      const volumePerExercise = {};
+      // Fortschritt pro Übung (letztes vs. vorletztes Training)
+      const exerciseProgress = {};
+      const exerciseLogs = {};
       logs.forEach(log => {
+        if (!log.date) return;
         log.entries.forEach(entry => {
           const exId = entry.exerciseId;
-          if (exId) {
-            volumePerExercise[exId] = (volumePerExercise[exId] || 0) + calcVolume(entry);
-          }
+          if (!exId) return;
+          const vol = calcVolume(entry);
+          if (!exerciseLogs[exId]) exerciseLogs[exId] = [];
+          exerciseLogs[exId].push({ date: log.date, volume: vol });
         });
       });
 
-      // Tägliches Volumen (Letzte 7 Tage)
+      Object.keys(exerciseLogs).forEach(exId => {
+        const entries = exerciseLogs[exId];
+        if (entries.length < 2) return;
+        entries.sort((a, b) => a.date.localeCompare(b.date));
+        const last = entries[entries.length - 1];
+        const prev = entries[entries.length - 2];
+        const diff = last.volume - prev.volume;
+        const percent = prev.volume > 0 ? (diff / prev.volume) * 100 : 0;
+        const ex = exercises.find(e => e.id === exId);
+        if (ex) {
+          exerciseProgress[exId] = {
+            name: ex.name,
+            lastVolume: last.volume,
+            prevVolume: prev.volume,
+            diff: diff,
+            percent: percent
+          };
+        }
+      });
+
+      const sortedProgress = Object.values(exerciseProgress)
+        .sort((a, b) => Math.abs(b.diff) - Math.abs(a.diff));
+
+      // Tägliches Volumen (letzte 7 Tage)
       const days = [];
       const todayMidnight = new Date();
       todayMidnight.setHours(0,0,0,0);
@@ -1271,22 +1095,16 @@
       for (let i = 6; i >= 0; i--) {
         const targetDate = new Date(todayMidnight);
         targetDate.setDate(targetDate.getDate() - i);
-        
         const dayName = targetDate.toLocaleDateString('de-DE', { weekday: 'short' });
         const dayLabel = `${dayName} ${targetDate.getDate()}.`;
-        
         let dayVol = 0;
-        
         logs.forEach(log => {
           if (!log.date) return;
           const [y, m, d] = log.date.split('-');
           const logDate = new Date(y, m - 1, d);
           logDate.setHours(0,0,0,0);
-          
           if (logDate.getTime() === targetDate.getTime()) {
-            log.entries.forEach(entry => {
-              dayVol += calcVolume(entry);
-            });
+            log.entries.forEach(entry => { dayVol += calcVolume(entry); });
           }
         });
         days.push({ label: dayLabel, vol: dayVol });
@@ -1318,23 +1136,35 @@
       });
       html += `</div></div>`;
 
-      // Alle Übungen nach Volumen sortieren
-      const sortedVol = Object.entries(volumePerExercise)
-        .sort((a, b) => b[1] - a[1])
-        .map(([id, vol]) => {
-          const ex = exercises.find(e => e.id === id);
-          return { name: ex ? ex.name : 'unbekannt', vol };
-        });
-
-      if (sortedVol.length) {
+      // Fortschritt pro Übung
+      if (sortedProgress.length > 0) {
         html += `
           <div class="stat-card">
-            <div style="font-weight:600; margin-bottom:6px;">🏅 Alle Übungen nach Volumen</div>
+            <div style="font-weight:600; margin-bottom:6px;">📈 Fortschritt pro Übung (letztes vs. vorletztes Training)</div>
             <ul class="stat-list">
-              ${sortedVol.map((item, i) => `
-                <li><span class="name">${i+1}. ${item.name}</span><span class="value">${item.vol.toLocaleString()} kg</span></li>
-              `).join('')}
+              ${sortedProgress.map(item => {
+                const diffClass = item.diff > 0 ? 'change-up' : (item.diff < 0 ? 'change-down' : 'change-neutral');
+                const sign = item.diff > 0 ? '▲' : (item.diff < 0 ? '▼' : '●');
+                return `
+                  <li>
+                    <span class="name">${item.name}</span>
+                    <span class="value">
+                      ${item.lastVolume.toLocaleString()} kg
+                      <span class="${diffClass}">
+                        (${sign} ${Math.abs(item.diff).toLocaleString()} kg, ${item.percent > 0 ? '+' : ''}${item.percent.toFixed(1)}%)
+                      </span>
+                    </span>
+                  </li>
+                `;
+              }).join('')}
             </ul>
+          </div>
+        `;
+      } else {
+        html += `
+          <div class="stat-card">
+            <div style="font-weight:600; margin-bottom:6px;">📈 Fortschritt pro Übung</div>
+            <div class="empty-state" style="padding:10px 0;">Für einen Fortschrittsvergleich benötigt jede Übung mindestens zwei Trainings.</div>
           </div>
         `;
       }
@@ -1644,7 +1474,7 @@
       saveData(); renderAll();
     }
 
-    // -------- QuickStart (mit Übernahme der letzten Werte) --------
+    // -------- QuickStart (mit Übernahme der letzten Werte + Notizen) --------
     function quickStart() {
       if (!activePlanId) {
         alert('Kein aktiver Plan ausgewählt. Markiere einen Plan mit ⭐ als aktiv.');
@@ -1660,19 +1490,18 @@
         return;
       }
 
-      // Neues Log mit übernommenen Werten
       const newLog = {
         id: generateId(),
         planId: activePlanId,
         date: getToday(),
         duration: 0,
         entries: plan.exerciseIds.map(exId => {
-          const last = getLastSetForExercise(exId);
+          const data = getLastTrainingDataForExercise(exId);
           return {
             exerciseId: exId,
-            sets: [{ kg: last.kg, wdh: last.wdh }],
+            sets: [{ kg: data.kg, wdh: data.wdh }],
             cardioData: { time: 0, distance: 0 },
-            notiz: ''
+            notiz: data.notiz
           };
         })
       };
@@ -1705,7 +1534,7 @@
       wakeLockManual = false;
     }
 
-    // -------- Log CRUD (mit Übernahme der letzten Werte bei neuem Log) --------
+    // -------- Log CRUD (mit Übernahme der letzten Werte + Notizen) --------
     function openLogForm(id = null, startTimer = false) {
       const isEdit = !!id;
       let log = isEdit ? logs.find(l => l.id === id) : null;
@@ -1746,12 +1575,12 @@
       if (plan && exerciseIds.length > 0 && entries.length === 0) {
         if (!isEdit || log.entries.length === 0) {
           log.entries = exerciseIds.map(exId => {
-            const last = getLastSetForExercise(exId);
+            const data = getLastTrainingDataForExercise(exId);
             return {
               exerciseId: exId,
-              sets: [{ kg: last.kg, wdh: last.wdh }],
+              sets: [{ kg: data.kg, wdh: data.wdh }],
               cardioData: { time: 0, distance: 0 },
-              notiz: ''
+              notiz: data.notiz
             };
           });
           saveData();
@@ -1790,9 +1619,10 @@
             totalVolume += exVolume;
             let setRows = sets.map((set, si) => {
               const isActive = si === activeIdx;
+              const activeClass = isActive ? 'active' : '';
               return `
-                <tr class="${isActive ? 'active-set' : ''}" data-setidx="${si}">
-                  <td class="set-number">${si+1}</td>
+                <tr data-setidx="${si}">
+                  <td class="set-number ${activeClass}">${si+1}</td>
                   <td>
                     <div class="set-controls">
                       <button class="dec" data-logid="${log.id}" data-exid="${exId}" data-idx="${si}" data-field="kg" data-step="0.5">−</button>
@@ -1949,8 +1779,8 @@
           const planObj = plans.find(p => p.id === newPlanId);
           if (planObj && planObj.exerciseIds) {
             logObj.entries = planObj.exerciseIds.map(exId => {
-              const last = getLastSetForExercise(exId);
-              return { exerciseId: exId, sets: [{ kg: last.kg, wdh: last.wdh }], cardioData: { time: 0, distance: 0 }, notiz: '' };
+              const data = getLastTrainingDataForExercise(exId);
+              return { exerciseId: exId, sets: [{ kg: data.kg, wdh: data.wdh }], cardioData: { time: 0, distance: 0 }, notiz: data.notiz };
             });
           } else {
             logObj.entries = [];
