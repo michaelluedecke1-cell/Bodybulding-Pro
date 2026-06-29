@@ -203,16 +203,19 @@
       -webkit-appearance: none; margin: 0;
     }
     .exercise-entry .sets-table .set-controls {
-      display: flex; align-items: center; gap: 3px;
+      display: flex; align-items: center; gap: 4px;
     }
+    /* ===== GRÖSSERE PLUS/MINUS BUTTONS ===== */
     .exercise-entry .sets-table .set-controls button {
       background: rgba(255,255,255,0.06);
-      border: none; color: #ddd; font-size: 0.9rem;
-      width: 24px; height: 24px; border-radius: 6px; cursor: pointer;
+      border: none; color: #ddd;
+      font-size: 1.2rem;
+      width: 30px; height: 30px;
+      border-radius: 8px; cursor: pointer;
       display: flex; align-items: center; justify-content: center;
       font-weight: 700;
     }
-    .exercise-entry .sets-table .set-controls button:active { background: rgba(255,255,255,0.12); }
+    .exercise-entry .sets-table .set-controls button:active { background: rgba(255,255,255,0.15); transform: scale(0.95); }
     .exercise-entry .sets-table .set-controls button.inc { color: #2ecc71; }
     .exercise-entry .sets-table .set-controls button.dec { color: #e74c3c; }
 
@@ -229,21 +232,30 @@
     }
     .exercise-entry .sets-table .btn-remove-set {
       background: none; border: none; color: #e74c3c;
-      font-size: 0.9rem; cursor: pointer; padding: 0 4px;
+      font-size: 1rem; cursor: pointer; padding: 0 4px;
     }
 
-    .exercise-entry .sets-table .set-number.active {
-      color: #2ecc71; font-weight: 700;
-    }
-    .exercise-entry .sets-table .set-number.active::before {
-      content: "✓ "; color: #2ecc71;
-    }
+    /* ===== NEUE LOGIK: DONE = permanente Häkchen für erledigte Sätze ===== */
     .exercise-entry .sets-table .set-number.done {
       color: #2ecc71;
-      animation: setDone 0.4s ease;
+      font-weight: 700;
     }
     .exercise-entry .sets-table .set-number.done::before {
-      content: "✓ "; color: #2ecc71;
+      content: "✓ ";
+      color: #2ecc71;
+    }
+    .exercise-entry .sets-table .set-number.active {
+      color: #2ecc71;
+      font-weight: 700;
+    }
+    .exercise-entry .sets-table .set-number.active::before {
+      content: "✓ ";
+      color: #2ecc71;
+    }
+
+    /* Kurze Animation beim Abschluss eines Satzes (optional) */
+    .exercise-entry .sets-table .set-number.just-done {
+      animation: setDone 0.4s ease;
     }
     @keyframes setDone {
       0% { transform: scale(1.2); opacity: 0.6; }
@@ -1275,7 +1287,7 @@
       if (display) display.textContent = formatTime(elapsed);
     }
 
-    // ========== LOG-FORMS ==========
+    // ========== LOG-FORMS (HIER WIRD DIE NEUE LOGIK UMGESETZT) ==========
     function openLogForm(id = null, startTimer = false) {
       const isEdit = !!id;
       let log = isEdit ? logs.find(l => l.id === id) : null;
@@ -1336,6 +1348,7 @@
           const entry = currentEntries.find(e => e.exerciseId === exId) || { exerciseId: exId, sets: [{ kg: 0, wdh: 0 }], cardioData: { time: 0, distance: 0 }, notiz: '' };
           const sets = entry.sets || [{ kg: 0, wdh: 0 }];
           const mapKey = `${log.id}_${exId}`;
+          // activeIdx ist der Index des aktuell aktiven Satzes (der als nächstes dran ist)
           const activeIdx = activeSetMap[mapKey] !== undefined ? activeSetMap[mapKey] : 0;
 
           let setHtml = '';
@@ -1356,11 +1369,16 @@
             exVolume = calcVolume(entry);
             totalVolume += exVolume;
             let setRows = sets.map((set, si) => {
+              // NEUE LOGIK: ist der Satz erledigt? (si < activeIdx) oder aktiv (si === activeIdx)?
+              const isDone = si < activeIdx;
               const isActive = si === activeIdx;
-              const activeClass = isActive ? 'active' : '';
+              let classes = '';
+              if (isDone) classes += ' done';      // dauerhaftes Häkchen
+              else if (isActive) classes += ' active'; // aktueller Satz (auch Häkchen)
+              // zusätzlich: wenn der Satz gerade eben durch Timer abgeschlossen wurde, könnte man 'just-done' setzen – aber das machen wir im Timer-Callback
               return `
                 <tr data-setidx="${si}">
-                  <td class="set-number ${activeClass}">${si+1}</td>
+                  <td class="set-number ${classes}">${si+1}</td>
                   <td>
                     <div class="set-controls">
                       <button class="dec" data-logid="${log.id}" data-exid="${exId}" data-idx="${si}" data-field="kg" data-step="0.5">−</button>
@@ -1475,9 +1493,8 @@
         </div>
       `;
 
-      // ===== TIMER-EVENT MIT DELEGATION (wichtig!) =====
-      // Entferne alte direkte Listener, wir nutzen nur Delegation
-      // (Die Delegation wird global über detailContainer abgewickelt)
+      // ===== TIMER-EVENT MIT DELEGATION (wie gehabt) =====
+      // (wird global behandelt)
 
       // WakeToggle
       document.getElementById('wakeToggleBtn')?.addEventListener('click', function(e) {
@@ -1730,7 +1747,7 @@
       ctx.fillText(Math.round(minKg) + 'kg', padding.left - 2, height - padding.bottom - 2);
     }
 
-    // ========== PAUSENTIMER (NEU ÜBERARBEITET) ==========
+    // ========== PAUSENTIMER (mit neuer done-Logik) ==========
     function updateTimerDisplay() {
       if (!timerRunning) return;
       const now = Date.now();
@@ -1758,16 +1775,25 @@
           }
         });
 
-        // Satz-Animation: Häkchen
+        // Satz als erledigt markieren: activeIdx erhöhen
         const mapKey = `${currentTimerLogId}_${currentTimerExId}`;
         const currentIdx = activeSetMap[mapKey] !== undefined ? activeSetMap[mapKey] : 0;
-        const activeRow = document.querySelector(`.exercise-entry[data-logid="${currentTimerLogId}"][data-exid="${currentTimerExId}"] .sets-table tbody tr[data-setidx="${currentIdx}"]`);
-        if (activeRow) {
-          const setNumber = activeRow.querySelector('.set-number');
+        // Der aktuelle Satz wird erledigt – erhöhe den Index auf den nächsten Satz
+        const newIdx = currentIdx + 1;
+        activeSetMap[mapKey] = newIdx; // jetzt ist der nächste Satz aktiv
+
+        // Hole die Zeile des gerade erledigten Satzes (vor der Erhöhung)
+        const rowSelector = `.exercise-entry[data-logid="${currentTimerLogId}"][data-exid="${currentTimerExId}"] .sets-table tbody tr[data-setidx="${currentIdx}"]`;
+        const doneRow = document.querySelector(rowSelector);
+        if (doneRow) {
+          const setNumber = doneRow.querySelector('.set-number');
           if (setNumber) {
+            // Entferne active, setze done (wird durch isDone-Logik beim nächsten Rendern ohnehin gesetzt)
             setNumber.classList.remove('active');
             setNumber.classList.add('done');
-            setTimeout(() => setNumber.classList.remove('done'), 500);
+            // Kurze Animation
+            setNumber.classList.add('just-done');
+            setTimeout(() => setNumber.classList.remove('just-done'), 500);
           }
         }
 
@@ -1783,8 +1809,9 @@
             const entry = log.entries.find(e => e.exerciseId === currentTimerExId);
             if (entry) {
               const totalSets = entry.sets.length;
-              if (totalSets > 0 && currentIdx < totalSets - 1) {
-                activeSetMap[mapKey] = currentIdx + 1;
+              // Prüfen, ob es noch einen weiteren Satz gibt (neuer activeIdx < totalSets)
+              if (newIdx < totalSets) {
+                // Es gibt noch einen nächsten Satz – Formular neu laden, damit die Anzeige aktualisiert wird
                 collectLogEntries(currentTimerLogId);
                 const oldLogId = currentTimerLogId;
                 currentTimerLogId = null;
@@ -1792,7 +1819,8 @@
                 openLogForm(oldLogId, overallTimerRunning);
                 return;
               } else {
-                alert('🏁 Letzter Satz erreicht!');
+                // Alle Sätze erledigt
+                alert('🏁 Alle Sätze dieser Übung abgeschlossen!');
                 if (display && ex) {
                   const pauseSec = ex.pause || 90;
                   display.textContent = formatTime(pauseSec);
@@ -1804,6 +1832,7 @@
             }
           }
         } else {
+          // Cardio – Timer einfach zurücksetzen
           if (display && ex) {
             const pauseSec = ex.pause || 90;
             display.textContent = formatTime(pauseSec);
@@ -2287,7 +2316,6 @@
       if (editingType !== 'log') return;
       const target = e.target;
 
-      // Timer-Button: Delegation (wichtig!)
       const btnTimer = target.closest('.btn-timer');
       if (btnTimer) {
         e.preventDefault();
@@ -2329,6 +2357,7 @@
         return;
       }
 
+      // Klick auf Satzzeile: aktiven Satz setzen
       const trActiveSet = target.closest('.exercise-entry .sets-table tbody tr');
       if (trActiveSet) {
         if (target.tagName === 'INPUT' || target.tagName === 'BUTTON' || target.closest('button')) return;
@@ -2338,7 +2367,7 @@
         const idx = parseInt(trActiveSet.dataset.setidx);
         if (isNaN(idx)) return;
         const mapKey = `${logId}_${exId}`;
-        activeSetMap[mapKey] = idx;
+        activeSetMap[mapKey] = idx; // setze aktiven Satz auf den geklickten
         collectLogEntries(logId);
         openLogForm(logId, overallTimerRunning);
         return;
