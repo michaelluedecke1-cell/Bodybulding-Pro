@@ -338,6 +338,7 @@
     .calendar-stats span { background: #111122; padding: 4px 12px; border-radius: 20px; }
     .calendar-stats .count { color: #2ecc71; font-weight: 700; }
 
+    /* ===== NEUE STATISTIK-STYLES ===== */
     .stat-card {
       background: #1a1a2e; border-radius: 12px; padding: 12px 14px;
       border: 1px solid #2a2a44;
@@ -346,20 +347,42 @@
       font-size: 1.6rem; font-weight: 700; color: #2ecc71;
     }
     .stat-card .stat-label { font-size: 0.8rem; color: #aaa; }
-    .stat-row { display: flex; gap: 12px; flex-wrap: wrap; }
-    .stat-row .stat-card { flex: 1; min-width: 100px; text-align: center; }
-    .stat-list {
-      list-style: none; padding: 0;
+
+    .stat-progress-list {
+      list-style: none; padding: 0; margin: 0;
     }
-    .stat-list li {
-      display: flex; justify-content: space-between; padding: 6px 0;
-      border-bottom: 1px solid #2a2a44;
+    .stat-progress-list li {
+      background: #111122; border-radius: 10px; padding: 10px 12px;
+      margin-bottom: 6px; border: 1px solid #2a2a44;
+      display: flex; flex-direction: column;
     }
-    .stat-list li .name { color: #ddd; }
-    .stat-list li .value { color: #2ecc71; font-weight: 600; }
-    .stat-list li .change-up { color: #2ecc71; }
-    .stat-list li .change-down { color: #e74c3c; }
-    .stat-list li .change-neutral { color: #888; }
+    .stat-progress-list .ex-name {
+      font-weight: 600; font-size: 0.95rem; color: #ddd;
+    }
+    .stat-progress-list .ex-stats {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-top: 4px;
+    }
+    .stat-progress-list .ex-current {
+      font-size: 1.2rem; font-weight: 700; color: #2ecc71;
+    }
+    .stat-progress-list .ex-change {
+      font-size: 0.9rem; font-weight: 600;
+    }
+    .stat-progress-list .ex-change.up { color: #2ecc71; }
+    .stat-progress-list .ex-change.down { color: #e74c3c; }
+    .stat-progress-list .ex-change.neutral { color: #888; }
+    .stat-progress-list .ex-previous {
+      font-size: 0.7rem; color: #888; margin-top: 2px;
+    }
+    .stat-toggle {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: #2a2a44; padding: 6px 12px; border-radius: 20px;
+      font-size: 0.8rem; cursor: pointer; border: 1px solid #444;
+      user-select: none; transition: background 0.2s;
+    }
+    .stat-toggle.active { background: #1a4a3a; border-color: #2ecc71; }
+    .stat-toggle:active { transform: scale(0.96); }
 
     .backup-overlay {
       display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
@@ -441,6 +464,7 @@
   </div>
 
   <script>
+    // ===== Kompletter JS-Code (wie gehabt, aber mit neuer renderStats) =====
     // JS-Fallback für ältere iOS Safari Versionen gegen Pull-to-Refresh
     let _startY = 0;
     document.addEventListener('touchstart', e => { _startY = e.touches[0].pageY; }, { passive: true });
@@ -1021,7 +1045,9 @@
       });
     }
 
-    // ========== NEUE STATISTIK-FUNKTION mit Fortschrittsvergleich ==========
+    // ========== NEUE STATISTIK-FUNKTION mit Karten und Toggle ==========
+    let showAllStats = false; // globaler State für den Toggle
+
     function renderStats() {
       if (!statsContainer) return;
       const totalLogs = logs.length;
@@ -1051,7 +1077,7 @@
       }
 
       // Fortschritt pro Übung (letztes vs. vorletztes Training)
-      const exerciseProgress = {};
+      const exerciseProgress = [];
       const exerciseLogs = {};
       logs.forEach(log => {
         if (!log.date) return;
@@ -1074,18 +1100,21 @@
         const percent = prev.volume > 0 ? (diff / prev.volume) * 100 : 0;
         const ex = exercises.find(e => e.id === exId);
         if (ex) {
-          exerciseProgress[exId] = {
+          exerciseProgress.push({
             name: ex.name,
             lastVolume: last.volume,
             prevVolume: prev.volume,
             diff: diff,
             percent: percent
-          };
+          });
         }
       });
 
-      const sortedProgress = Object.values(exerciseProgress)
-        .sort((a, b) => Math.abs(b.diff) - Math.abs(a.diff));
+      // Sortieren nach absoluter Veränderung (größte zuerst)
+      exerciseProgress.sort((a, b) => Math.abs(b.diff) - Math.abs(a.diff));
+
+      // Filtern je nach showAllStats
+      let filtered = showAllStats ? exerciseProgress : exerciseProgress.filter(p => p.diff !== 0);
 
       // Tägliches Volumen (letzte 7 Tage)
       const days = [];
@@ -1110,6 +1139,7 @@
         days.push({ label: dayLabel, vol: dayVol });
       }
 
+      // ===== HTML zusammenbauen =====
       let html = `
         <div class="stat-card">
           <div style="display:flex; gap:12px; flex-wrap:wrap; justify-content:space-around;">
@@ -1136,40 +1166,51 @@
       });
       html += `</div></div>`;
 
-      // Fortschritt pro Übung
-      if (sortedProgress.length > 0) {
-        html += `
-          <div class="stat-card">
-            <div style="font-weight:600; margin-bottom:6px;">📈 Fortschritt pro Übung (letztes vs. vorletztes Training)</div>
-            <ul class="stat-list">
-              ${sortedProgress.map(item => {
-                const diffClass = item.diff > 0 ? 'change-up' : (item.diff < 0 ? 'change-down' : 'change-neutral');
-                const sign = item.diff > 0 ? '▲' : (item.diff < 0 ? '▼' : '●');
-                return `
-                  <li>
-                    <span class="name">${item.name}</span>
-                    <span class="value">
-                      ${item.lastVolume.toLocaleString()} kg
-                      <span class="${diffClass}">
-                        (${sign} ${Math.abs(item.diff).toLocaleString()} kg, ${item.percent > 0 ? '+' : ''}${item.percent.toFixed(1)}%)
-                      </span>
-                    </span>
-                  </li>
-                `;
-              }).join('')}
-            </ul>
+      // Fortschrittskarten mit Toggle
+      html += `
+        <div class="stat-card">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap; gap:6px;">
+            <span style="font-weight:600;">📈 Fortschritt pro Übung</span>
+            <div class="stat-toggle ${showAllStats ? 'active' : ''}" id="statToggle">
+              <i class="fas ${showAllStats ? 'fa-eye' : 'fa-eye-slash'}"></i>
+              ${showAllStats ? 'Alle anzeigen' : 'Nur Veränderung'}
+            </div>
           </div>
-        `;
+          <ul class="stat-progress-list">
+      `;
+
+      if (filtered.length === 0) {
+        html += `<li class="empty-state" style="padding:10px 0;">Keine Übungen mit Veränderung gefunden.</li>`;
       } else {
-        html += `
-          <div class="stat-card">
-            <div style="font-weight:600; margin-bottom:6px;">📈 Fortschritt pro Übung</div>
-            <div class="empty-state" style="padding:10px 0;">Für einen Fortschrittsvergleich benötigt jede Übung mindestens zwei Trainings.</div>
-          </div>
-        `;
+        filtered.forEach(item => {
+          const diffClass = item.diff > 0 ? 'up' : (item.diff < 0 ? 'down' : 'neutral');
+          const sign = item.diff > 0 ? '▲' : (item.diff < 0 ? '▼' : '●');
+          const percentStr = item.percent !== 0 ? (item.percent > 0 ? '+' : '') + item.percent.toFixed(1) + '%' : '±0%';
+          html += `
+            <li>
+              <div class="ex-name">${item.name}</div>
+              <div class="ex-stats">
+                <span class="ex-current">${item.lastVolume.toLocaleString()} kg</span>
+                <span class="ex-change ${diffClass}">${sign} ${Math.abs(item.diff).toLocaleString()} kg (${percentStr})</span>
+              </div>
+              <div class="ex-previous">vorher: ${item.prevVolume.toLocaleString()} kg</div>
+            </li>
+          `;
+        });
       }
 
+      html += `
+          </ul>
+        </div>
+      `;
+
       statsContainer.innerHTML = html;
+
+      // Toggle-Event
+      document.getElementById('statToggle')?.addEventListener('click', function() {
+        showAllStats = !showAllStats;
+        renderStats();
+      });
     }
 
     // ========== RENDERN ==========
@@ -2040,7 +2081,7 @@
       timerInterval = setInterval(updateTimerDisplay, 1000);
     }
 
-    // ========== BACKUP (asynchron) ==========
+    // ========== BACKUP ==========
     function exportData() {
       const data = { exercises, plans, logs };
       const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -2229,7 +2270,7 @@
     });
     backupOverlay.addEventListener('click', function(e) { if (e.target === this) this.classList.remove('active'); });
 
-    // ======== INITIALISIERUNG (Asynchron wegen IndexedDB) ========
+    // ======== INITIALISIERUNG ========
     async function initApp() {
       await loadData();
       enablePersistentStorage();
@@ -2240,16 +2281,13 @@
       }
     }
 
-    // ========== HAPTISCHES FEEDBACK ==========
+    // Haptisches Feedback
     document.addEventListener('pointerdown', function(e) {
       if (e.target.closest('button') || e.target.closest('.list-item') || e.target.closest('.day-cell.has-training')) {
-        if (navigator.vibrate) {
-          navigator.vibrate(15); 
-        }
+        if (navigator.vibrate) navigator.vibrate(15);
       }
     }, { passive: true });
 
-    // Start!
     initApp();
   </script>
 </body>
