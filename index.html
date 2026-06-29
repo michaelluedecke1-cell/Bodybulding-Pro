@@ -6,220 +6,193 @@
   <title>Bodybuilding Pro</title>
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#0d0d1a" />
-  <!-- Google Font: Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <style>
-    /* ===== GLOBALE STYLES ===== */
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    /* ===== GLOBALE STYLES (kompakt für Handy) ===== */
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', -apple-system, sans-serif; }
     html, body { overscroll-behavior-y: none; }
     body {
       background: #0d0d1a;
       color: #e0e0e0;
       min-height: 100vh;
-      padding: 0 16px 80px;
-      font-size: 0.95rem;
-      line-height: 1.5;
+      padding: 0 12px 80px;
+      font-size: 0.82rem;
+      line-height: 1.4;
     }
 
-    /* ===== KOPFZEILE MIT GRADIENT ===== */
     .app-header {
       display: flex; justify-content: space-between; align-items: center;
-      padding: 16px 0 14px;
+      padding: 12px 0 10px;
       border-bottom: 1px solid rgba(255,255,255,0.06);
-      margin-bottom: 18px;
+      margin-bottom: 14px;
     }
     .app-header h1 {
-      font-size: 1.5rem; font-weight: 700;
+      font-size: 1.3rem; font-weight: 700;
       background: linear-gradient(135deg, #f39c12, #e74c3c);
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
       background-clip: text;
-      letter-spacing: -0.5px;
+      letter-spacing: -0.3px;
     }
-    .header-actions { display: flex; gap: 10px; align-items: center; }
+    .header-actions { display: flex; gap: 8px; align-items: center; }
     .btn-icon {
       background: rgba(255,255,255,0.06);
-      border: none;
-      color: #ddd;
-      font-size: 1.2rem;
-      width: 42px; height: 42px;
-      border-radius: 50%;
+      border: none; color: #ddd; font-size: 1rem;
+      width: 36px; height: 36px; border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
       cursor: pointer; transition: background 0.2s, transform 0.1s;
     }
     .btn-icon:active { transform: scale(0.94); background: rgba(255,255,255,0.12); }
     .btn-icon.primary {
       background: linear-gradient(135deg, #2ecc71, #27ae60);
-      color: #fff;
-      box-shadow: 0 4px 15px rgba(46,204,113,0.4);
+      color: #fff; box-shadow: 0 4px 12px rgba(46,204,113,0.3);
     }
     .btn-icon.backup {
       background: linear-gradient(135deg, #3498db, #2980b9);
-      color: #fff;
-      box-shadow: 0 4px 15px rgba(52,152,219,0.3);
+      color: #fff; box-shadow: 0 4px 12px rgba(52,152,219,0.3);
     }
     .btn-icon.quickstart {
       background: linear-gradient(135deg, #f39c12, #e67e22);
-      color: #fff;
-      box-shadow: 0 4px 15px rgba(243,156,18,0.4);
+      color: #fff; box-shadow: 0 4px 12px rgba(243,156,18,0.3);
     }
 
-    /* ===== TAB-LEISTE ===== */
     .tab-bar {
-      display: flex; gap: 6px; background: rgba(255,255,255,0.04);
-      border-radius: 16px; padding: 6px; margin-bottom: 18px; flex-wrap: wrap;
-      backdrop-filter: blur(4px);
+      display: flex; gap: 4px; background: rgba(255,255,255,0.04);
+      border-radius: 14px; padding: 4px; margin-bottom: 14px; flex-wrap: wrap;
     }
     .tab-btn {
       flex: 1; background: transparent; border: none; color: #888;
-      padding: 10px 0; font-weight: 600; font-size: 0.7rem;
-      border-radius: 12px; cursor: pointer; transition: all 0.2s;
-      min-width: 50px;
+      padding: 8px 0; font-weight: 600; font-size: 0.65rem;
+      border-radius: 10px; cursor: pointer; transition: all 0.2s;
+      min-width: 44px;
     }
     .tab-btn.active { background: rgba(255,255,255,0.08); color: #fff; }
     .tab-btn:active { transform: scale(0.96); }
 
-    /* ===== PAGES ===== */
-    .page { display: none; flex-direction: column; gap: 14px; }
+    .page { display: none; flex-direction: column; gap: 12px; }
     .page.active { display: flex; }
 
-    /* ===== LISTEN-ELEMENTE (KARTEN) ===== */
     .list-item {
       background: rgba(255,255,255,0.04);
-      border-radius: 16px;
-      padding: 16px 18px;
-      display: flex; align-items: center; gap: 14px;
+      border-radius: 14px;
+      padding: 12px 14px;
+      display: flex; align-items: center; gap: 12px;
       border-left: 4px solid #f39c12;
       cursor: pointer;
       transition: background 0.15s, transform 0.1s;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.3);
-      backdrop-filter: blur(2px);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
     }
     .list-item:active { background: rgba(255,255,255,0.08); transform: scale(0.98); }
     .list-item .info { flex: 1; }
-    .list-item .info h4 { font-size: 1rem; font-weight: 600; margin-bottom: 2px; }
-    .list-item .info .sub { font-size: 0.75rem; color: #aaa; }
+    .list-item .info h4 { font-size: 0.9rem; font-weight: 600; margin-bottom: 1px; }
+    .list-item .info .sub { font-size: 0.7rem; color: #aaa; }
     .list-item .thumbnail {
-      width: 48px; height: 48px; border-radius: 50%;
+      width: 40px; height: 40px; border-radius: 50%;
       background: rgba(255,255,255,0.06);
       flex-shrink: 0; display: flex; align-items: center; justify-content: center;
-      font-size: 1.6rem; color: #f39c12; overflow: hidden;
+      font-size: 1.3rem; color: #f39c12; overflow: hidden;
     }
     .list-item .thumbnail img { width: 100%; height: 100%; object-fit: cover; }
-    .list-item .actions { display: flex; gap: 8px; }
+    .list-item .actions { display: flex; gap: 6px; }
     .list-item .actions button {
-      background: none; border: none; color: #aaa; font-size: 1.1rem;
-      cursor: pointer; padding: 0 6px; transition: color 0.2s;
+      background: none; border: none; color: #aaa; font-size: 1rem;
+      cursor: pointer; padding: 0 4px; transition: color 0.2s;
     }
     .list-item .actions .del { color: #e74c3c; }
     .list-item .actions .star { color: #f39c12; }
     .list-item .actions .star.active { color: #2ecc71; }
 
-    /* ===== EMPTY STATE ===== */
     .empty-state {
-      text-align: center; color: #666; padding: 40px 0;
-      font-size: 0.9rem;
+      text-align: center; color: #666; padding: 30px 0; font-size: 0.85rem;
     }
 
-    /* ===== DETAIL-KARTEN ===== */
     .detail-card {
       background: rgba(255,255,255,0.04);
-      border-radius: 16px;
-      padding: 18px;
+      border-radius: 14px;
+      padding: 14px;
       border: 1px solid rgba(255,255,255,0.06);
-      backdrop-filter: blur(2px);
     }
     .detail-card .row {
-      display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 10px;
+      display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 8px;
     }
-    .detail-card .row label { flex: 1; min-width: 100px; font-size: 0.85rem; color: #aaa; }
+    .detail-card .row label { flex: 1; min-width: 80px; font-size: 0.75rem; color: #aaa; }
     .detail-card input, .detail-card textarea, .detail-card select {
       width: 100%; background: rgba(255,255,255,0.06);
       border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 12px; padding: 10px 12px; color: #fff;
-      font-size: 0.95rem; transition: border 0.2s;
+      border-radius: 10px; padding: 8px 10px; color: #fff;
+      font-size: 0.85rem; transition: border 0.2s;
     }
     .detail-card input:focus, .detail-card textarea:focus, .detail-card select:focus {
       border-color: #2ecc71; outline: none;
     }
-    .detail-card input::placeholder, .detail-card textarea::placeholder { color: #666; }
 
     .btn-row {
-      display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap;
+      display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap;
     }
     .btn-row button {
-      flex: 1; padding: 12px; border: none; border-radius: 12px;
-      font-weight: 700; font-size: 0.95rem; cursor: pointer;
-      transition: transform 0.1s, box-shadow 0.2s;
+      flex: 1; padding: 10px; border: none; border-radius: 12px;
+      font-weight: 700; font-size: 0.85rem; cursor: pointer;
+      transition: transform 0.1s;
     }
     .btn-row button:active { transform: scale(0.96); }
     .btn-save {
       background: linear-gradient(135deg, #2ecc71, #27ae60);
-      color: #fff; box-shadow: 0 4px 15px rgba(46,204,113,0.3);
+      color: #fff; box-shadow: 0 4px 12px rgba(46,204,113,0.3);
     }
-    .btn-cancel {
-      background: rgba(255,255,255,0.08);
-      color: #fff;
-    }
+    .btn-cancel { background: rgba(255,255,255,0.08); color: #fff; }
     .btn-danger {
       background: linear-gradient(135deg, #e74c3c, #c0392b);
-      color: #fff; box-shadow: 0 4px 15px rgba(231,76,60,0.3);
+      color: #fff; box-shadow: 0 4px 12px rgba(231,76,60,0.3);
     }
 
-    /* ===== PLAN-ÜBUNGSLISTE ===== */
     .plan-exercise-list {
-      list-style: none; padding: 0; margin: 6px 0;
+      list-style: none; padding: 0; margin: 4px 0;
     }
     .plan-exercise-list li {
-      display: flex; align-items: center; gap: 12px;
+      display: flex; align-items: center; gap: 10px;
       background: rgba(255,255,255,0.04);
-      padding: 10px 12px; border-radius: 12px;
-      margin-bottom: 6px; border: 1px solid rgba(255,255,255,0.06);
+      padding: 8px 10px; border-radius: 10px;
+      margin-bottom: 4px; border: 1px solid rgba(255,255,255,0.06);
     }
     .plan-exercise-list li input[type="checkbox"] {
-      width: 20px; height: 20px; accent-color: #2ecc71; flex-shrink: 0;
+      width: 18px; height: 18px; accent-color: #2ecc71; flex-shrink: 0;
     }
-    .plan-exercise-list li .ex-name { flex: 1; font-size: 0.9rem; }
-    .plan-exercise-list li .ex-type { font-size: 0.7rem; color: #888; }
+    .plan-exercise-list li .ex-name { flex: 1; font-size: 0.8rem; }
+    .plan-exercise-list li .ex-type { font-size: 0.65rem; color: #888; }
     .plan-exercise-list li .move-buttons { display: flex; gap: 4px; }
     .plan-exercise-list li .move-buttons button {
       background: rgba(255,255,255,0.06);
-      border: none; color: #ddd; font-size: 1.1rem;
-      width: 30px; height: 30px; border-radius: 8px; cursor: pointer;
+      border: none; color: #ddd; font-size: 1rem;
+      width: 26px; height: 26px; border-radius: 6px; cursor: pointer;
       display: flex; align-items: center; justify-content: center;
-      transition: background 0.2s;
     }
     .plan-exercise-list li .move-buttons button:active { background: rgba(255,255,255,0.12); }
 
-    /* ===== TRAININGS-LOG ===== */
     .exercise-entry {
       background: rgba(255,255,255,0.04);
-      border-radius: 16px;
-      padding: 12px 14px;
-      margin-bottom: 12px;
+      border-radius: 14px;
+      padding: 10px 12px;
+      margin-bottom: 10px;
       border: 1px solid rgba(255,255,255,0.06);
-      position: relative;
-      transition: border 0.3s;
     }
     .exercise-entry .ex-header {
       display: flex; justify-content: space-between; align-items: center;
     }
-    .exercise-entry .ex-header .ex-name { font-weight: 600; font-size: 0.95rem; }
+    .exercise-entry .ex-header .ex-name { font-weight: 600; font-size: 0.85rem; }
     .exercise-entry .ex-header .ex-actions button {
-      background: none; border: none; color: #aaa; font-size: 1rem;
-      cursor: pointer; padding: 0 4px; transition: color 0.2s;
+      background: none; border: none; color: #aaa; font-size: 0.9rem;
+      cursor: pointer; padding: 0 4px;
     }
     .exercise-entry .ex-header .ex-actions .del { color: #e74c3c; }
     .exercise-entry img {
-      max-width: 100%; max-height: 80px; object-fit: contain;
-      border-radius: 10px; margin: 6px 0; background: rgba(0,0,0,0.3);
+      max-width: 100%; max-height: 60px; object-fit: contain;
+      border-radius: 8px; margin: 4px 0; background: rgba(0,0,0,0.3);
     }
 
-    /* ----- TABELLE (SÄTZE) ----- */
     .exercise-entry .sets-table input[type="number"] {
-      width: 58px; font-size: 1rem; padding: 6px 4px;
+      width: 48px; font-size: 0.85rem; padding: 4px 2px;
       background: rgba(255,255,255,0.06);
       border: 1px solid rgba(255,255,255,0.1);
       border-radius: 8px; color: #fff; text-align: center;
@@ -230,43 +203,43 @@
       -webkit-appearance: none; margin: 0;
     }
     .exercise-entry .sets-table .set-controls {
-      display: flex; align-items: center; gap: 4px;
+      display: flex; align-items: center; gap: 3px;
     }
     .exercise-entry .sets-table .set-controls button {
       background: rgba(255,255,255,0.06);
-      border: none; color: #ddd; font-size: 1rem;
-      width: 28px; height: 28px; border-radius: 8px; cursor: pointer;
+      border: none; color: #ddd; font-size: 0.9rem;
+      width: 24px; height: 24px; border-radius: 6px; cursor: pointer;
       display: flex; align-items: center; justify-content: center;
-      transition: background 0.2s; font-weight: 700;
+      font-weight: 700;
     }
     .exercise-entry .sets-table .set-controls button:active { background: rgba(255,255,255,0.12); }
     .exercise-entry .sets-table .set-controls button.inc { color: #2ecc71; }
     .exercise-entry .sets-table .set-controls button.dec { color: #e74c3c; }
 
     .exercise-entry .sets-table {
-      width: 100%; border-collapse: collapse; margin: 6px 0;
+      width: 100%; border-collapse: collapse; margin: 4px 0;
     }
     .exercise-entry .sets-table th {
-      text-align: left; padding: 6px 4px; color: #888;
-      font-weight: 400; font-size: 0.7rem; border-bottom: 1px solid rgba(255,255,255,0.06);
+      text-align: left; padding: 4px 4px; color: #888;
+      font-weight: 400; font-size: 0.65rem; border-bottom: 1px solid rgba(255,255,255,0.06);
     }
     .exercise-entry .sets-table td {
-      padding: 4px 4px; border-bottom: 1px solid rgba(255,255,255,0.04);
+      padding: 3px 3px; border-bottom: 1px solid rgba(255,255,255,0.04);
       vertical-align: middle;
     }
     .exercise-entry .sets-table .btn-remove-set {
       background: none; border: none; color: #e74c3c;
-      font-size: 1rem; cursor: pointer; padding: 0 4px;
+      font-size: 0.9rem; cursor: pointer; padding: 0 4px;
     }
 
-    /* Aktiver Satz mit grünem Punkt */
+    /* Aktiver Satz: grünes Häkchen statt Punkt */
     .exercise-entry .sets-table .set-number.active {
       color: #2ecc71; font-weight: 700;
     }
     .exercise-entry .sets-table .set-number.active::before {
-      content: "● "; color: #2ecc71;
+      content: "✓ "; color: #2ecc71;
     }
-    /* Satz-abgeschlossen-Animation */
+    /* Satz-abgeschlossen-Animation (Häkchen) */
     .exercise-entry .sets-table .set-number.done {
       color: #2ecc71;
       animation: setDone 0.4s ease;
@@ -280,57 +253,56 @@
     }
 
     .exercise-entry .set-progress {
-      font-size: 0.7rem; color: #aaa; margin: 4px 0;
+      font-size: 0.65rem; color: #aaa; margin: 3px 0;
       display: flex; justify-content: space-between;
     }
     .exercise-entry .set-progress .current-set-label {
       color: #2ecc71; font-weight: 600;
     }
 
-    /* ----- AKTIONS-LEISTE ----- */
     .exercise-entry .ex-actions-row {
-      display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px;
+      display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px;
     }
     .exercise-entry .ex-actions-row button {
-      padding: 8px 14px; font-size: 0.85rem; font-weight: 600;
-      min-height: 40px; border: none; border-radius: 12px; cursor: pointer;
+      padding: 6px 10px; font-size: 0.75rem; font-weight: 600;
+      min-height: 34px; border: none; border-radius: 10px; cursor: pointer;
       background: rgba(255,255,255,0.06); color: #ddd;
-      flex: 1; min-width: 80px; transition: background 0.2s, transform 0.1s;
-      display: flex; align-items: center; justify-content: center; gap: 6px;
+      flex: 1; min-width: 70px; transition: background 0.2s, transform 0.1s;
+      display: flex; align-items: center; justify-content: center; gap: 4px;
     }
     .exercise-entry .ex-actions-row button:active { transform: scale(0.96); }
     .exercise-entry .ex-actions-row .btn-timer {
       background: linear-gradient(135deg, #3498db, #2980b9);
-      color: #fff; box-shadow: 0 4px 12px rgba(52,152,219,0.3);
+      color: #fff; box-shadow: 0 4px 10px rgba(52,152,219,0.3);
     }
     .exercise-entry .ex-actions-row .btn-timer.active {
       background: linear-gradient(135deg, #e74c3c, #c0392b);
-      box-shadow: 0 4px 12px rgba(231,76,60,0.3);
+      box-shadow: 0 4px 10px rgba(231,76,60,0.3);
     }
     .exercise-entry .ex-actions-row .btn-add-set {
       background: linear-gradient(135deg, #2ecc71, #27ae60);
-      color: #fff; box-shadow: 0 4px 12px rgba(46,204,113,0.3);
+      color: #fff; box-shadow: 0 4px 10px rgba(46,204,113,0.3);
     }
 
-    /* ===== KREISFÖRMIGER PAUSENTIMER ===== */
+    /* Timer-Kreis kleiner für Handy */
     .exercise-entry .timer-wrapper {
       position: relative;
-      width: 80px;
-      height: 80px;
-      margin: 6px auto 8px;
+      width: 64px;
+      height: 64px;
+      margin: 4px auto 6px;
       display: flex;
       align-items: center;
       justify-content: center;
     }
     .exercise-entry .timer-wrapper canvas {
-      width: 80px;
-      height: 80px;
+      width: 64px;
+      height: 64px;
       border-radius: 50%;
       display: block;
     }
     .exercise-entry .timer-wrapper .timer-text {
       position: absolute;
-      font-size: 1.2rem;
+      font-size: 1rem;
       font-weight: 700;
       color: #fff;
       text-align: center;
@@ -338,7 +310,7 @@
       pointer-events: none;
     }
     .exercise-entry .timer-wrapper .timer-text .sub {
-      font-size: 0.6rem;
+      font-size: 0.5rem;
       font-weight: 400;
       color: #888;
       display: block;
@@ -352,108 +324,70 @@
       100% { opacity: 0.3; }
     }
 
-    /* ===== NOTIZ ===== */
     .exercise-entry .ex-notiz {
       background: rgba(255,255,255,0.04);
-      padding: 6px 10px; border-radius: 10px; margin-top: 6px;
+      padding: 4px 8px; border-radius: 8px; margin-top: 4px;
     }
     .exercise-entry .ex-notiz textarea {
       width: 100%; background: transparent; border: none;
-      color: #ddd; resize: vertical; font-size: 0.8rem;
-      outline: none; min-height: 28px;
+      color: #ddd; resize: vertical; font-size: 0.75rem;
+      outline: none; min-height: 24px;
     }
 
-    /* ===== VOLUMEN-SUMMARY ===== */
     .volume-summary {
       background: rgba(255,255,255,0.04);
-      padding: 8px 12px; border-radius: 12px;
-      margin: 6px 0 10px;
-      display: flex; flex-wrap: wrap; gap: 16px;
+      padding: 6px 10px; border-radius: 10px;
+      margin: 4px 0 8px;
+      display: flex; flex-wrap: wrap; gap: 12px;
       justify-content: space-around;
       border: 1px solid rgba(255,255,255,0.06);
     }
     .volume-summary .item { text-align: center; }
-    .volume-summary .item .label { font-size: 0.65rem; color: #888; }
-    .volume-summary .item .value { font-size: 1.1rem; font-weight: 700; color: #2ecc71; }
+    .volume-summary .item .label { font-size: 0.6rem; color: #888; }
+    .volume-summary .item .value { font-size: 0.95rem; font-weight: 700; color: #2ecc71; }
 
-    /* ===== FORTSCHRITTSBALKEN ===== */
-    .training-progress {
-      background: rgba(255,255,255,0.04);
-      border-radius: 12px;
-      padding: 8px 12px;
-      margin-bottom: 8px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      border: 1px solid rgba(255,255,255,0.06);
-    }
-    .training-progress .progress-bar {
-      flex: 1;
-      height: 6px;
-      background: rgba(255,255,255,0.08);
-      border-radius: 6px;
-      overflow: hidden;
-    }
-    .training-progress .progress-bar .fill {
-      height: 100%;
-      background: linear-gradient(90deg, #2ecc71, #27ae60);
-      border-radius: 6px;
-      transition: width 0.4s ease;
-    }
-    .training-progress .progress-text {
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: #aaa;
-      white-space: nowrap;
-    }
-    .training-progress .progress-text span {
-      color: #2ecc71;
-    }
-
-    /* ===== CARDIO-ROW ===== */
     .cardio-row {
-      display: flex; gap: 12px; margin: 6px 0; align-items: center;
+      display: flex; gap: 10px; margin: 4px 0; align-items: center;
       background: rgba(255,255,255,0.04);
-      padding: 6px 12px; border-radius: 12px;
+      padding: 4px 10px; border-radius: 10px;
     }
-    .cardio-row label { font-size: 0.75rem; color: #aaa; }
+    .cardio-row label { font-size: 0.7rem; color: #aaa; }
     .cardio-row input {
-      width: 64px; background: rgba(255,255,255,0.06);
+      width: 56px; background: rgba(255,255,255,0.06);
       border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 8px; color: #fff; padding: 4px 6px; font-size: 0.85rem;
+      border-radius: 8px; color: #fff; padding: 4px 6px; font-size: 0.8rem;
     }
 
-    /* ===== KALENDER ===== */
     .calendar-container {
       background: rgba(255,255,255,0.04);
-      border-radius: 16px;
-      padding: 16px;
+      border-radius: 14px;
+      padding: 14px;
       border: 1px solid rgba(255,255,255,0.06);
     }
     .calendar-header {
       display: flex; justify-content: space-between; align-items: center;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
     }
-    .calendar-header .month-year { font-size: 1.1rem; font-weight: 600; }
+    .calendar-header .month-year { font-size: 1rem; font-weight: 600; }
     .calendar-header .nav-btn {
       background: rgba(255,255,255,0.06);
-      border: none; color: #ddd; font-size: 1.2rem;
-      width: 34px; height: 34px; border-radius: 50%; cursor: pointer;
+      border: none; color: #ddd; font-size: 1.1rem;
+      width: 32px; height: 32px; border-radius: 50%; cursor: pointer;
       display: flex; align-items: center; justify-content: center;
       transition: background 0.2s;
     }
     .calendar-header .nav-btn:active { background: rgba(255,255,255,0.12); }
     .calendar-grid {
       display: grid; grid-template-columns: repeat(7, 1fr);
-      gap: 4px; text-align: center;
+      gap: 3px; text-align: center;
     }
     .calendar-grid .day-name {
-      font-size: 0.7rem; color: #666; padding: 6px 0;
+      font-size: 0.6rem; color: #666; padding: 4px 0;
     }
     .calendar-grid .day-cell {
       background: rgba(255,255,255,0.04);
-      border-radius: 8px; padding: 8px 0;
-      font-size: 0.85rem; cursor: default; transition: background 0.2s;
+      border-radius: 6px; padding: 6px 0;
+      font-size: 0.75rem; cursor: default; transition: background 0.2s;
       position: relative;
     }
     .calendar-grid .day-cell.other-month { color: #444; }
@@ -462,7 +396,7 @@
       cursor: pointer;
     }
     .calendar-grid .day-cell.has-training::after {
-      content: ''; position: absolute; bottom: 4px; left: 50%;
+      content: ''; position: absolute; bottom: 2px; left: 50%;
       transform: translateX(-50%); width: 4px; height: 4px;
       border-radius: 50%; background: #2ecc71;
     }
@@ -471,15 +405,15 @@
 
     .calendar-year-grid {
       display: grid; grid-template-columns: repeat(3, 1fr);
-      gap: 12px; margin: 10px 0;
+      gap: 10px; margin: 8px 0;
     }
     .calendar-year-grid .month-card {
       background: rgba(255,255,255,0.04);
-      border-radius: 12px; padding: 8px 4px;
+      border-radius: 10px; padding: 6px 4px;
       text-align: center; border: 1px solid rgba(255,255,255,0.06);
     }
     .calendar-year-grid .month-card .month-name {
-      font-size: 0.7rem; color: #aaa; margin-bottom: 4px;
+      font-size: 0.6rem; color: #aaa; margin-bottom: 2px;
     }
     .calendar-year-grid .month-card .mini-days {
       display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px;
@@ -488,7 +422,7 @@
       aspect-ratio: 1; border-radius: 2px;
       background: rgba(255,255,255,0.04);
       display: flex; align-items: center; justify-content: center;
-      font-size: 0.4rem; color: #555; cursor: default;
+      font-size: 0.35rem; color: #555; cursor: default;
     }
     .calendar-year-grid .month-card .mini-day.has-training {
       background: #2ecc71; color: #0d0d1a; font-weight: 700; cursor: pointer;
@@ -496,63 +430,61 @@
     .calendar-year-grid .month-card .mini-day.other-month { opacity: 0.3; }
 
     .calendar-stats {
-      display: flex; gap: 16px; justify-content: center;
-      flex-wrap: wrap; margin-top: 12px; font-size: 0.85rem; color: #aaa;
+      display: flex; gap: 12px; justify-content: center;
+      flex-wrap: wrap; margin-top: 10px; font-size: 0.75rem; color: #aaa;
     }
-    .calendar-stats span { background: rgba(255,255,255,0.04); padding: 4px 14px; border-radius: 20px; }
+    .calendar-stats span { background: rgba(255,255,255,0.04); padding: 4px 12px; border-radius: 16px; }
     .calendar-stats .count { color: #2ecc71; font-weight: 700; }
 
-    /* ===== STATISTIK ===== */
     .stat-card {
       background: rgba(255,255,255,0.04);
-      border-radius: 16px;
-      padding: 16px;
+      border-radius: 14px;
+      padding: 14px;
       border: 1px solid rgba(255,255,255,0.06);
     }
     .stat-card .stat-value {
-      font-size: 1.8rem; font-weight: 700; color: #2ecc71;
+      font-size: 1.5rem; font-weight: 700; color: #2ecc71;
     }
-    .stat-card .stat-label { font-size: 0.8rem; color: #aaa; }
+    .stat-card .stat-label { font-size: 0.7rem; color: #aaa; }
 
     .stat-progress-list {
       list-style: none; padding: 0; margin: 0;
     }
     .stat-progress-list li {
       background: rgba(255,255,255,0.04);
-      border-radius: 12px; padding: 12px 14px;
-      margin-bottom: 8px; border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 10px; padding: 10px 12px;
+      margin-bottom: 6px; border: 1px solid rgba(255,255,255,0.06);
       display: flex; flex-direction: column;
     }
     .stat-progress-list .ex-name {
-      font-weight: 600; font-size: 0.95rem; color: #ddd;
+      font-weight: 600; font-size: 0.85rem; color: #ddd;
     }
     .stat-progress-list .ex-stats {
       display: flex; justify-content: space-between; align-items: center;
-      margin-top: 4px;
+      margin-top: 2px;
     }
     .stat-progress-list .ex-current {
-      font-size: 1.2rem; font-weight: 700; color: #2ecc71;
+      font-size: 1rem; font-weight: 700; color: #2ecc71;
     }
     .stat-progress-list .ex-change {
-      font-size: 0.9rem; font-weight: 600;
+      font-size: 0.8rem; font-weight: 600;
     }
     .stat-progress-list .ex-change.up { color: #2ecc71; }
     .stat-progress-list .ex-change.down { color: #e74c3c; }
     .stat-progress-list .ex-change.neutral { color: #888; }
     .stat-progress-list .ex-previous {
-      font-size: 0.7rem; color: #888; margin-top: 2px;
+      font-size: 0.65rem; color: #888; margin-top: 2px;
     }
     .stat-toggle {
-      display: inline-flex; align-items: center; gap: 8px;
+      display: inline-flex; align-items: center; gap: 6px;
       background: rgba(255,255,255,0.06);
-      padding: 6px 14px; border-radius: 20px;
-      font-size: 0.8rem; cursor: pointer; border: 1px solid rgba(255,255,255,0.08);
+      padding: 4px 12px; border-radius: 16px;
+      font-size: 0.7rem; cursor: pointer; border: 1px solid rgba(255,255,255,0.08);
       user-select: none; transition: background 0.2s;
     }
     .stat-toggle.active { background: rgba(46,204,113,0.15); border-color: #2ecc71; }
     .stat-toggle:active { transform: scale(0.96); }
 
-    /* ===== BACKUP OVERLAY ===== */
     .backup-overlay {
       display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(0,0,0,0.7);
@@ -562,50 +494,48 @@
     .backup-overlay.active { display: flex; }
     .backup-modal {
       background: #1a1a2e;
-      padding: 28px;
-      border-radius: 20px;
-      max-width: 90%; width: 400px;
+      padding: 24px;
+      border-radius: 18px;
+      max-width: 90%; width: 380px;
       text-align: center;
       border: 1px solid rgba(255,255,255,0.06);
       box-shadow: 0 20px 60px rgba(0,0,0,0.6);
     }
-    .backup-modal h3 { margin-bottom: 8px; font-size: 1.3rem; }
+    .backup-modal h3 { margin-bottom: 6px; font-size: 1.2rem; }
     .backup-modal .backup-info {
-      font-size: 0.8rem; color: #888; margin-bottom: 16px;
+      font-size: 0.75rem; color: #888; margin-bottom: 14px;
     }
     .backup-modal .backup-info span { color: #2ecc71; }
     .backup-modal .btn-row {
-      display: flex; gap: 12px; justify-content: center;
-      flex-wrap: wrap; margin-top: 16px;
+      display: flex; gap: 10px; justify-content: center;
+      flex-wrap: wrap; margin-top: 14px;
     }
     .backup-modal .btn-row button {
-      padding: 10px 20px; border: none; border-radius: 12px;
-      font-weight: 600; cursor: pointer; transition: transform 0.1s;
+      padding: 8px 16px; border: none; border-radius: 10px;
+      font-weight: 600; cursor: pointer; transition: transform 0.1s; font-size: 0.8rem;
     }
     .backup-modal .btn-row button:active { transform: scale(0.96); }
 
     .wake-toggle {
-      display: inline-flex; align-items: center; gap: 6px;
+      display: inline-flex; align-items: center; gap: 4px;
       background: rgba(255,255,255,0.06);
-      padding: 4px 14px; border-radius: 20px;
-      font-size: 0.8rem; cursor: pointer; transition: background 0.3s;
+      padding: 4px 12px; border-radius: 16px;
+      font-size: 0.7rem; cursor: pointer; transition: background 0.3s;
       border: 1px solid rgba(255,255,255,0.08); user-select: none;
     }
     .wake-toggle.active { background: rgba(46,204,113,0.15); border-color: #2ecc71; }
     .wake-toggle:active { transform: scale(0.96); }
 
-    /* ===== CHART ===== */
     .chart-container {
       background: rgba(255,255,255,0.04);
-      border-radius: 12px; padding: 10px;
-      margin: 6px 0; border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 10px; padding: 8px;
+      margin: 4px 0; border: 1px solid rgba(255,255,255,0.06);
       overflow-x: auto;
     }
-    .chart-container canvas { width: 100%; height: 100px; }
+    .chart-container canvas { width: 100%; height: 80px; }
 
-    /* ===== RESPONSIVE ===== */
     @media (min-width: 600px) {
-      body { max-width: 480px; margin: 0 auto; padding: 10px 20px 80px; }
+      body { max-width: 480px; margin: 0 auto; padding: 10px 16px 80px; }
     }
   </style>
 </head>
@@ -640,7 +570,7 @@
       <div class="backup-modal">
         <h3>💾 Backup & Wiederherstellung</h3>
         <p class="backup-info" id="backupInfo">Letztes Backup: <span id="lastBackupDate">–</span></p>
-        <p style="margin-bottom:12px; font-size:0.9rem; color:#aaa;">
+        <p style="margin-bottom:10px; font-size:0.8rem; color:#aaa;">
           Automatisches Backup wird bei jedem Speichern erstellt.
         </p>
         <div class="btn-row">
@@ -655,7 +585,7 @@
   </div>
 
   <script>
-    // ========== JS-FALLBACK FÜR IOS PULL-TO-REFRESH ==========
+    // ===== JS-FALLBACK FÜR IOS PULL-TO-REFRESH =====
     let _startY = 0;
     document.addEventListener('touchstart', e => { _startY = e.touches[0].pageY; }, { passive: true });
     document.addEventListener('touchmove', e => {
@@ -666,9 +596,7 @@
     // ========== INDEXED-DB WRAPPER ==========
     const dbPromise = new Promise((resolve, reject) => {
       const request = indexedDB.open('BodybuildingProDB', 1);
-      request.onupgradeneeded = (e) => {
-        e.target.result.createObjectStore('store');
-      };
+      request.onupgradeneeded = (e) => { e.target.result.createObjectStore('store'); };
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error);
     });
@@ -800,50 +728,27 @@
     async function requestWakeLock() {
       try {
         if ('wakeLock' in navigator) {
-          if (wakeLock) {
-            try { await wakeLock.release(); } catch(e) {}
-            wakeLock = null;
-          }
+          if (wakeLock) { try { await wakeLock.release(); } catch(e) {} wakeLock = null; }
           wakeLock = await navigator.wakeLock.request('screen');
           console.log('✅ WakeLock aktiviert');
           updateWakeToggleUI(true);
         }
-      } catch (err) {
-        console.warn('WakeLock nicht verfügbar:', err);
-        updateWakeToggleUI(false);
-      }
+      } catch (err) { console.warn('WakeLock nicht verfügbar:', err); updateWakeToggleUI(false); }
     }
     function releaseWakeLock() {
       if (wakeLock) {
-        try {
-          wakeLock.release();
-          wakeLock = null;
-          console.log('✅ WakeLock freigegeben');
-          updateWakeToggleUI(false);
-        } catch(e) { /* ignore */ }
-      } else {
-        updateWakeToggleUI(false);
-      }
+        try { wakeLock.release(); wakeLock = null; console.log('✅ WakeLock freigegeben'); updateWakeToggleUI(false); } catch(e) {}
+      } else { updateWakeToggleUI(false); }
     }
     function toggleWakeLock() {
-      if (wakeLock) {
-        wakeLockManual = true;
-        releaseWakeLock();
-      } else {
-        wakeLockManual = false;
-        requestWakeLock();
-      }
+      if (wakeLock) { wakeLockManual = true; releaseWakeLock(); }
+      else { wakeLockManual = false; requestWakeLock(); }
     }
     function updateWakeToggleUI(active) {
       const btn = document.getElementById('wakeToggleBtn');
       if (btn) {
-        if (active) {
-          btn.classList.add('active');
-          btn.innerHTML = '<i class="fas fa-desktop"></i> Bildschirm an';
-        } else {
-          btn.classList.remove('active');
-          btn.innerHTML = '<i class="fas fa-desktop"></i> Bildschirm aus';
-        }
+        if (active) { btn.classList.add('active'); btn.innerHTML = '<i class="fas fa-desktop"></i> Bildschirm an'; }
+        else { btn.classList.remove('active'); btn.innerHTML = '<i class="fas fa-desktop"></i> Bildschirm aus'; }
       }
     }
 
@@ -973,7 +878,7 @@
       ctx.beginPath();
       ctx.arc(cx, cy, r, 0, 2 * Math.PI);
       ctx.strokeStyle = 'rgba(255,255,255,0.08)';
-      ctx.lineWidth = 6;
+      ctx.lineWidth = 5;
       ctx.stroke();
 
       const grad = ctx.createConicGradient(startAngle, cx, cy);
@@ -983,28 +888,25 @@
       ctx.beginPath();
       ctx.arc(cx, cy, r, startAngle, endAngle);
       ctx.strokeStyle = grad;
-      ctx.lineWidth = 6;
+      ctx.lineWidth = 5;
       ctx.lineCap = 'round';
       ctx.stroke();
 
       if (remaining < 5 && remaining > 0) {
         ctx.shadowColor = '#e74c3c';
-        ctx.shadowBlur = 20;
+        ctx.shadowBlur = 16;
         ctx.beginPath();
         ctx.arc(cx, cy, r, startAngle, endAngle);
         ctx.strokeStyle = 'rgba(231,76,60,0.3)';
-        ctx.lineWidth = 10;
+        ctx.lineWidth = 8;
         ctx.stroke();
         ctx.shadowBlur = 0;
       }
     }
 
     // ========== RENDER-FUNKTIONEN ==========
-
     function renderAll() {
-      renderExercises();
-      renderPlans();
-      renderLogs();
+      renderExercises(); renderPlans(); renderLogs();
       if (currentTab === 'calendar') renderCalendar();
       if (currentTab === 'stats') renderStats();
     }
@@ -1124,343 +1026,8 @@
       });
     }
 
-    // ========== CRUD-FUNKTIONEN (EXERCISE, PLAN, LOG) ==========
-    // (hier alle unveränderten Funktionen aus der vorherigen Version,
-    //  siehe vollständiger Code weiter unten)
-
-    // ========== STATISTIK (mit Toggle) ==========
-    let showAllStats = false;
-    function renderStats() {
-      if (!statsContainer) return;
-      const totalLogs = logs.length;
-      if (totalLogs === 0) {
-        statsContainer.innerHTML = `<div class="empty-state">Noch keine Trainingsdaten für Statistiken.<br/>Mache dein erstes Training!</div>`;
-        return;
-      }
-
-      const now = new Date();
-      const currentMonth = now.getMonth();
-      const currentYear = now.getFullYear();
-      const daysThisMonth = logs.filter(log => {
-        if (!log.date) return false;
-        const [y, m, d] = log.date.split('-');
-        const logD = new Date(y, m - 1, d);
-        return logD.getMonth() === currentMonth && logD.getFullYear() === currentYear;
-      }).length;
-
-      let lastTrainingVolume = 0;
-      if (logs.length > 0) {
-        const sortedLogs = [...logs].sort((a, b) => (b.date || '').localeCompare(a.date || ''));
-        const lastLog = sortedLogs[0];
-        lastLog.entries.forEach(entry => { lastTrainingVolume += calcVolume(entry); });
-      }
-
-      const exerciseProgress = [];
-      const exerciseLogs = {};
-      logs.forEach(log => {
-        if (!log.date) return;
-        log.entries.forEach(entry => {
-          const exId = entry.exerciseId;
-          if (!exId) return;
-          const vol = calcVolume(entry);
-          if (!exerciseLogs[exId]) exerciseLogs[exId] = [];
-          exerciseLogs[exId].push({ date: log.date, volume: vol });
-        });
-      });
-
-      Object.keys(exerciseLogs).forEach(exId => {
-        const entries = exerciseLogs[exId];
-        if (entries.length < 2) return;
-        entries.sort((a, b) => a.date.localeCompare(b.date));
-        const last = entries[entries.length - 1];
-        const prev = entries[entries.length - 2];
-        const diff = last.volume - prev.volume;
-        const percent = prev.volume > 0 ? (diff / prev.volume) * 100 : 0;
-        const ex = exercises.find(e => e.id === exId);
-        if (ex) {
-          exerciseProgress.push({
-            name: ex.name,
-            lastVolume: last.volume,
-            prevVolume: prev.volume,
-            diff: diff,
-            percent: percent
-          });
-        }
-      });
-
-      exerciseProgress.sort((a, b) => Math.abs(b.diff) - Math.abs(a.diff));
-      let filtered = showAllStats ? exerciseProgress : exerciseProgress.filter(p => p.diff !== 0);
-
-      // Tägliches Volumen
-      const days = [];
-      const todayMidnight = new Date();
-      todayMidnight.setHours(0,0,0,0);
-      for (let i = 6; i >= 0; i--) {
-        const targetDate = new Date(todayMidnight);
-        targetDate.setDate(targetDate.getDate() - i);
-        const dayName = targetDate.toLocaleDateString('de-DE', { weekday: 'short' });
-        const dayLabel = `${dayName} ${targetDate.getDate()}.`;
-        let dayVol = 0;
-        logs.forEach(log => {
-          if (!log.date) return;
-          const [y, m, d] = log.date.split('-');
-          const logDate = new Date(y, m - 1, d);
-          logDate.setHours(0,0,0,0);
-          if (logDate.getTime() === targetDate.getTime()) {
-            log.entries.forEach(entry => { dayVol += calcVolume(entry); });
-          }
-        });
-        days.push({ label: dayLabel, vol: dayVol });
-      }
-
-      let html = `
-        <div class="stat-card">
-          <div style="display:flex; gap:12px; flex-wrap:wrap; justify-content:space-around;">
-            <div><span class="stat-value">${daysThisMonth}</span><div class="stat-label">Trainingstage diesen Monat</div></div>
-            <div><span class="stat-value">${totalLogs}</span><div class="stat-label">Trainings insgesamt</div></div>
-            <div><span class="stat-value">${lastTrainingVolume.toLocaleString()}</span><div class="stat-label">Letztes Training (kg)</div></div>
-          </div>
-        </div>
-        <div class="stat-card">
-          <div style="font-weight:600; margin-bottom:6px;">📊 Tägliches Volumen (letzte 7 Tage)</div>
-          <div style="display:flex; gap:4px; justify-content:space-around; align-items:flex-end; height:100px; padding-top:8px;">
-      `;
-      const maxDayVol = Math.max(...days.map(d => d.vol), 1);
-      days.forEach(d => {
-        const height = Math.max(5, (d.vol / maxDayVol) * 80);
-        html += `
-          <div style="display:flex; flex-direction:column; align-items:center; flex:1;">
-            <div style="background:#2ecc71; width:100%; max-width:25px; height:${height}px; border-radius:4px 4px 0 0;"></div>
-            <div style="font-size:0.6rem; color:#888; margin-top:4px; text-align:center;">${d.label}</div>
-            <div style="font-size:0.55rem; color:#aaa;">${d.vol > 0 ? d.vol.toLocaleString() : '-'}</div>
-          </div>
-        `;
-      });
-      html += `</div></div>`;
-
-      html += `
-        <div class="stat-card">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap; gap:6px;">
-            <span style="font-weight:600;">📈 Fortschritt pro Übung</span>
-            <div class="stat-toggle ${showAllStats ? 'active' : ''}" id="statToggle">
-              <i class="fas ${showAllStats ? 'fa-eye' : 'fa-eye-slash'}"></i>
-              ${showAllStats ? 'Alle anzeigen' : 'Nur Veränderung'}
-            </div>
-          </div>
-          <ul class="stat-progress-list">
-      `;
-      if (filtered.length === 0) {
-        html += `<li class="empty-state" style="padding:10px 0;">Keine Übungen mit Veränderung gefunden.</li>`;
-      } else {
-        filtered.forEach(item => {
-          const diffClass = item.diff > 0 ? 'up' : (item.diff < 0 ? 'down' : 'neutral');
-          const sign = item.diff > 0 ? '▲' : (item.diff < 0 ? '▼' : '●');
-          const percentStr = item.percent !== 0 ? (item.percent > 0 ? '+' : '') + item.percent.toFixed(1) + '%' : '±0%';
-          html += `
-            <li>
-              <div class="ex-name">${item.name}</div>
-              <div class="ex-stats">
-                <span class="ex-current">${item.lastVolume.toLocaleString()} kg</span>
-                <span class="ex-change ${diffClass}">${sign} ${Math.abs(item.diff).toLocaleString()} kg (${percentStr})</span>
-              </div>
-              <div class="ex-previous">vorher: ${item.prevVolume.toLocaleString()} kg</div>
-            </li>
-          `;
-        });
-      }
-      html += `</ul></div>`;
-
-      statsContainer.innerHTML = html;
-      document.getElementById('statToggle')?.addEventListener('click', function() {
-        showAllStats = !showAllStats;
-        renderStats();
-      });
-    }
-
-    // ========== KALENDER ==========
-    function renderCalendar() {
-      if (!calendarContainer) return;
-      if (calendarView === 'year') {
-        renderYearView();
-        return;
-      }
-      const year = calendarDate.getFullYear();
-      const month = calendarDate.getMonth();
-      const todayStr = getToday();
-
-      const firstDay = new Date(year, month, 1);
-      const daysInMonth = new Date(year, month + 1, 0).getDate();
-      const startDayOfWeek = firstDay.getDay();
-
-      const logMap = {};
-      logs.forEach(log => { if (log.date) logMap[log.date] = log.id; });
-
-      let html = `
-        <div class="calendar-container">
-          <div class="calendar-header">
-            <button class="nav-btn" id="calPrev">‹</button>
-            <span class="month-year">${firstDay.toLocaleDateString('de-DE', { month: 'long', year: 'numeric' })}</span>
-            <button class="nav-btn" id="calNext">›</button>
-            <button class="nav-btn" id="calYearView" style="background:linear-gradient(135deg,#f39c12,#e67e22); color:#fff; padding:0 12px;">Jahr</button>
-          </div>
-          <div class="calendar-grid">
-            <div class="day-name">Mo</div><div class="day-name">Di</div><div class="day-name">Mi</div>
-            <div class="day-name">Do</div><div class="day-name">Fr</div><div class="day-name">Sa</div>
-            <div class="day-name">So</div>
-      `;
-      let startOffset = startDayOfWeek === 0 ? 6 : startDayOfWeek - 1;
-      for (let i = 0; i < startOffset; i++) {
-        const prevDate = new Date(year, month, 0 - (startOffset - i - 1));
-        html += `<div class="day-cell other-month">${prevDate.getDate()}</div>`;
-      }
-      for (let d = 1; d <= daysInMonth; d++) {
-        const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-        const isToday = dateStr === todayStr;
-        const hasTraining = !!logMap[dateStr];
-        let classes = 'day-cell';
-        if (isToday) classes += ' today';
-        if (hasTraining) classes += ' has-training';
-        html += `<div class="${classes}" data-date="${dateStr}" data-logid="${logMap[dateStr]||''}">${d}</div>`;
-      }
-      const remaining = (7 - ((startOffset + daysInMonth) % 7)) % 7;
-      for (let i = 1; i <= remaining; i++) {
-        const nextDate = new Date(year, month + 1, i);
-        html += `<div class="day-cell other-month">${nextDate.getDate()}</div>`;
-      }
-      html += `</div>`;
-
-      const monthStr = String(month+1).padStart(2,'0');
-      const logsThisMonth = logs.filter(log => log.date && log.date.startsWith(`${year}-${monthStr}`));
-      const daysTrained = logsThisMonth.length;
-      let totalVol = 0;
-      logsThisMonth.forEach(log => {
-        log.entries.forEach(entry => { totalVol += calcVolume(entry); });
-      });
-      const avgVol = daysTrained > 0 ? Math.round(totalVol / daysTrained) : 0;
-
-      html += `
-        <div class="calendar-stats">
-          <span>📅 Trainingstage: <span class="count">${daysTrained}</span></span>
-          <span>📊 Volumen: <span class="count">${totalVol} kg</span></span>
-          <span>📈 Ø: <span class="count">${avgVol} kg</span></span>
-        </div>
-      </div>`;
-
-      calendarContainer.innerHTML = html;
-
-      document.getElementById('calPrev')?.addEventListener('click', () => {
-        calendarDate.setMonth(calendarDate.getMonth() - 1);
-        renderCalendar();
-      });
-      document.getElementById('calNext')?.addEventListener('click', () => {
-        calendarDate.setMonth(calendarDate.getMonth() + 1);
-        renderCalendar();
-      });
-      document.getElementById('calYearView')?.addEventListener('click', () => {
-        calendarView = 'year';
-        renderCalendar();
-      });
-      document.querySelectorAll('.day-cell.has-training').forEach(el => {
-        el.addEventListener('click', function() {
-          const logId = this.dataset.logid;
-          if (logId) {
-            showTab('logs');
-            openLogForm(logId, false);
-          }
-        });
-      });
-    }
-
-    function renderYearView() {
-      const year = calendarDate.getFullYear();
-      const todayStr = getToday();
-      const logMap = {};
-      logs.forEach(log => { if (log.date) logMap[log.date] = log.id; });
-
-      const yearStr = String(year);
-      const logsThisYear = logs.filter(log => log.date && log.date.startsWith(yearStr));
-      const daysTrained = logsThisYear.length;
-      let totalVol = 0;
-      logsThisYear.forEach(log => {
-        log.entries.forEach(entry => { totalVol += calcVolume(entry); });
-      });
-      const avgVol = daysTrained > 0 ? Math.round(totalVol / daysTrained) : 0;
-
-      let html = `
-        <div class="calendar-container">
-          <div class="calendar-header">
-            <button class="nav-btn" id="yearPrev">‹</button>
-            <span class="month-year">${year}</span>
-            <button class="nav-btn" id="yearNext">›</button>
-            <button class="nav-btn" id="yearMonthView" style="background:linear-gradient(135deg,#f39c12,#e67e22); color:#fff; padding:0 12px;">Monat</button>
-          </div>
-          <div class="calendar-year-grid">
-      `;
-      for (let m = 0; m < 12; m++) {
-        const monthName = new Date(year, m, 1).toLocaleDateString('de-DE', { month: 'short' });
-        const daysInMonth = new Date(year, m + 1, 0).getDate();
-        const firstDay = new Date(year, m, 1).getDay();
-        let startOffset = firstDay === 0 ? 6 : firstDay - 1;
-        let miniDaysHtml = '';
-        for (let i = 0; i < startOffset; i++) {
-          miniDaysHtml += `<div class="mini-day other-month"></div>`;
-        }
-        for (let d = 1; d <= daysInMonth; d++) {
-          const dateStr = `${year}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-          const hasTraining = !!logMap[dateStr];
-          const isToday = dateStr === todayStr;
-          let cls = 'mini-day';
-          if (hasTraining) cls += ' has-training';
-          if (isToday) cls += ' today';
-          miniDaysHtml += `<div class="${cls}" data-date="${dateStr}" data-logid="${logMap[dateStr]||''}">${d}</div>`;
-        }
-        const total = startOffset + daysInMonth;
-        const rem = (7 - (total % 7)) % 7;
-        for (let i = 0; i < rem; i++) {
-          miniDaysHtml += `<div class="mini-day other-month"></div>`;
-        }
-        html += `
-          <div class="month-card">
-            <div class="month-name">${monthName}</div>
-            <div class="mini-days">${miniDaysHtml}</div>
-          </div>
-        `;
-      }
-      html += `
-          </div>
-          <div class="calendar-stats">
-            <span>📅 Trainingstage: <span class="count">${daysTrained}</span></span>
-            <span>📊 Volumen: <span class="count">${totalVol} kg</span></span>
-            <span>📈 Ø: <span class="count">${avgVol} kg</span></span>
-          </div>
-        </div>
-      `;
-      calendarContainer.innerHTML = html;
-
-      document.getElementById('yearPrev')?.addEventListener('click', () => {
-        calendarDate.setFullYear(calendarDate.getFullYear() - 1);
-        renderCalendar();
-      });
-      document.getElementById('yearNext')?.addEventListener('click', () => {
-        calendarDate.setFullYear(calendarDate.getFullYear() + 1);
-        renderCalendar();
-      });
-      document.getElementById('yearMonthView')?.addEventListener('click', () => {
-        calendarView = 'month';
-        renderCalendar();
-      });
-      document.querySelectorAll('.mini-day.has-training').forEach(el => {
-        el.addEventListener('click', function() {
-          const logId = this.dataset.logid;
-          if (logId) {
-            showTab('logs');
-            openLogForm(logId, false);
-          }
-        });
-      });
-    }
-
-    // ========== EXERCISE-FORMS ==========
+    // ========== CRUD-FUNKTIONEN ==========
+    // ----- EXERCISE -----
     function openExerciseForm(id = null) {
       const isEdit = !!id;
       const ex = isEdit ? exercises.find(e => e.id === id) : null;
@@ -1468,7 +1035,7 @@
       detailContainer.style.display = 'block'; hideAllPages();
       detailContainer.innerHTML = `
         <div class="detail-card">
-          <h3 style="margin-bottom:10px; font-size:1.1rem;">${isEdit ? 'Übung bearbeiten' : 'Neue Übung'}</h3>
+          <h3 style="margin-bottom:8px; font-size:1rem;">${isEdit ? 'Übung bearbeiten' : 'Neue Übung'}</h3>
           <div class="row"><label>Name</label><input type="text" id="formExName" value="${isEdit ? ex.name : ''}" placeholder="z.B. Bankdrücken" /></div>
           <div class="row"><label>Typ</label>
             <select id="formExType">
@@ -1480,7 +1047,7 @@
           <div class="row" style="flex-direction:column; gap:4px;">
             <label>Bild (vom Gerät)</label>
             <input type="file" id="formExImageFile" accept="image/*" />
-            ${isEdit && ex.image ? `<img src="${ex.image}" style="max-width:100px; border-radius:6px; margin-top:4px;" />` : ''}
+            ${isEdit && ex.image ? `<img src="${ex.image}" style="max-width:80px; border-radius:6px; margin-top:4px;" />` : ''}
           </div>
           <div class="btn-row">
             <button class="btn-save" id="btnSaveExercise">${isEdit ? 'Aktualisieren' : 'Speichern'}</button>
@@ -1529,7 +1096,7 @@
       saveData(); renderAll();
     }
 
-    // ========== PLAN-FORMS ==========
+    // ----- PLAN -----
     function openPlanForm(id = null) {
       const isEdit = !!id;
       const plan = isEdit ? plans.find(p => p.id === id) : null;
@@ -1537,12 +1104,12 @@
       detailContainer.style.display = 'block'; hideAllPages();
       detailContainer.innerHTML = `
         <div class="detail-card">
-          <h3 style="margin-bottom:10px; font-size:1.1rem;">${isEdit ? 'Plan bearbeiten' : 'Neuer Plan'}</h3>
+          <h3 style="margin-bottom:8px; font-size:1rem;">${isEdit ? 'Plan bearbeiten' : 'Neuer Plan'}</h3>
           <div class="row"><label>Name</label><input type="text" id="formPlanName" value="${isEdit ? plan.name : ''}" placeholder="z.B. Push-Tag" /></div>
           <div class="row" style="flex-direction:column; gap:4px;">
             <label>Übungen (Reihenfolge durch Pfeile änderbar)</label>
             <ul class="plan-exercise-list" id="planExerciseList"></ul>
-            <span style="font-size:0.7rem; color:#888;">✔ Auswählen, ⬆⬇ Reihenfolge ändern</span>
+            <span style="font-size:0.6rem; color:#888;">✔ Auswählen, ⬆⬇ Reihenfolge ändern</span>
           </div>
           <div class="btn-row">
             <button class="btn-save" id="btnSavePlan">${isEdit ? 'Aktualisieren' : 'Speichern'}</button>
@@ -1765,12 +1332,10 @@
 
       let exercisesHtml = '';
       let totalVolume = 0;
-      let exerciseCount = 0;
       if (exerciseIds.length) {
         exerciseIds.forEach((exId, idx) => {
           const ex = exercises.find(e => e.id === exId);
           if (!ex) return;
-          exerciseCount++;
           const entry = currentEntries.find(e => e.exerciseId === exId) || { exerciseId: exId, sets: [{ kg: 0, wdh: 0 }], cardioData: { time: 0, distance: 0 }, notiz: '' };
           const sets = entry.sets || [{ kg: 0, wdh: 0 }];
           const mapKey = `${log.id}_${exId}`;
@@ -1833,7 +1398,6 @@
             `;
           }
 
-          const timerId = `timer-${log.id}-${exId}`;
           exercisesHtml += `
             <div class="exercise-entry" data-exid="${exId}" data-logid="${log.id}">
               <div class="ex-header">
@@ -1843,16 +1407,16 @@
                 </div>
               </div>
               ${ex.image ? `<img src="${ex.image}" alt="${ex.name}" />` : ''}
-              <div style="margin:2px 0; font-size:0.75rem; color:#aaa;">⏱️ Pause: ${formatTime(ex.pause || 90)}</div>
+              <div style="margin:2px 0; font-size:0.7rem; color:#aaa;">Pause: ${formatTime(ex.pause || 90)}</div>
               <div class="timer-wrapper" id="timer-wrapper-${log.id}-${exId}">
-                <canvas id="${timerId}-canvas" width="80" height="80"></canvas>
-                <div class="timer-text" id="${timerId}">${formatTime(ex.pause || 90)}<span class="sub">Pause</span></div>
+                <canvas id="timer-${log.id}-${exId}-canvas" width="64" height="64"></canvas>
+                <div class="timer-text" id="timer-${log.id}-${exId}">${formatTime(ex.pause || 90)}<span class="sub">Pause</span></div>
               </div>
               <div class="ex-actions-row">
                 <button class="btn-timer" data-logid="${log.id}" data-exid="${exId}"><i class="fas fa-play"></i> Timer starten</button>
               </div>
               ${setHtml}
-              ${ex.type === 'strength' ? `<div style="font-size:0.75rem; color:#aaa; text-align:right;">Volumen: ${exVolume} kg</div>` : ''}
+              ${ex.type === 'strength' ? `<div style="font-size:0.7rem; color:#aaa; text-align:right;">Volumen: ${exVolume} kg</div>` : ''}
               <div class="ex-notiz">
                 <textarea class="ex-notiz-text" data-logid="${log.id}" data-exid="${exId}" placeholder="Notiz ...">${entry.notiz || ''}</textarea>
               </div>
@@ -1863,22 +1427,13 @@
         exercisesHtml = `<div class="empty-state" style="padding:10px 0;">Wähle einen Plan aus, um Übungen zu laden.</div>`;
       }
 
-      // Fortschrittsbalken
-      const progressHtml = (plan && exerciseIds.length > 0) ? `
-        <div class="training-progress">
-          <span class="progress-text">Übung <span id="progressCurrent">${Math.min(log.entries.filter(e => e.sets && e.sets.length > 0).length + 1, exerciseIds.length)}</span> von ${exerciseIds.length}</span>
-          <div class="progress-bar"><div class="fill" id="progressFill" style="width:${exerciseIds.length > 0 ? Math.round((log.entries.filter(e => e.sets && e.sets.length > 0).length / exerciseIds.length)*100) : 0}%;"></div></div>
-          <span class="progress-text" id="progressPercent">${exerciseIds.length > 0 ? Math.round((log.entries.filter(e => e.sets && e.sets.length > 0).length / exerciseIds.length)*100) : 0}%</span>
-        </div>
-      ` : '';
-
       let chartHtml = '';
       if (isEdit && exerciseIds.length) {
         const firstStrength = exerciseIds.find(id => { const ex = exercises.find(e => e.id === id); return ex && ex.type === 'strength'; });
         if (firstStrength) {
           chartHtml = `
             <div class="chart-container" id="chartContainer">
-              <div style="font-size:0.75rem; color:#aaa; margin-bottom:4px;">📈 KG-Verlauf (${exercises.find(e=>e.id===firstStrength)?.name})</div>
+              <div style="font-size:0.7rem; color:#aaa; margin-bottom:4px;">📈 KG-Verlauf (${exercises.find(e=>e.id===firstStrength)?.name})</div>
             </div>
           `;
         }
@@ -1886,12 +1441,12 @@
 
       let timerButtonHtml = '';
       if (!overallTimerRunning) {
-        timerButtonHtml = `<button class="btn-save" id="btnStartOverallTimer" style="margin-bottom:6px; font-size:0.95rem; padding:10px 14px;"><i class="fas fa-play"></i> Training starten</button>`;
+        timerButtonHtml = `<button class="btn-save" id="btnStartOverallTimer" style="margin-bottom:4px; font-size:0.85rem; padding:8px 12px;"><i class="fas fa-play"></i> Training starten</button>`;
       }
 
       const wakeToggleHtml = `
-        <div style="display:flex; align-items:center; gap:8px; margin:4px 0 8px; flex-wrap:wrap;">
-          <span style="font-size:0.75rem; color:#aaa;">🖥️ Bildschirm:</span>
+        <div style="display:flex; align-items:center; gap:6px; margin:4px 0 6px; flex-wrap:wrap;">
+          <span style="font-size:0.7rem; color:#aaa;">🖥️ Bildschirm:</span>
           <div class="wake-toggle ${wakeLock ? 'active' : ''}" id="wakeToggleBtn" style="cursor:pointer;">
             <i class="fas fa-desktop"></i> ${wakeLock ? 'an' : 'aus'}
           </div>
@@ -1900,16 +1455,15 @@
 
       detailContainer.innerHTML = `
         <div class="detail-card">
-          <h3 style="margin-bottom:8px; font-size:1rem;">${isEdit ? 'Training bearbeiten' : 'Neues Training'}</h3>
+          <h3 style="margin-bottom:6px; font-size:0.95rem;">${isEdit ? 'Training bearbeiten' : 'Neues Training'}</h3>
           ${timerButtonHtml}
           ${wakeToggleHtml}
           <div class="row"><label>Plan</label><select id="formLogPlan"><option value="">-- Plan wählen --</option>${planOptions}</select></div>
           <div class="row"><label>Datum</label><input type="date" id="formLogDate" value="${log.date || getToday()}" /></div>
-          <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.04); padding:4px 8px; border-radius:12px; margin-bottom:4px;">
-            <span style="font-size:0.75rem; color:#aaa;">⏱️ Trainingsdauer:</span>
-            <span id="overallTimerDisplay" style="font-weight:700; color:#2ecc71; font-size:0.9rem;">${overallTimerRunning ? '00:00' : '⏸️ nicht gestartet'}</span>
+          <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.04); padding:4px 8px; border-radius:10px; margin-bottom:4px;">
+            <span style="font-size:0.7rem; color:#aaa;">⏱️ Trainingsdauer:</span>
+            <span id="overallTimerDisplay" style="font-weight:700; color:#2ecc71; font-size:0.85rem;">${overallTimerRunning ? '00:00' : '⏸️ nicht gestartet'}</span>
           </div>
-          ${progressHtml}
           <div class="volume-summary">
             <div class="item"><span class="label">Gesamtvolumen</span><span class="value" id="totalVolumeDisplay">${totalVolume} kg</span></div>
             <div class="item"><span class="label">Übungen</span><span class="value">${exerciseIds.length}</span></div>
@@ -1948,8 +1502,6 @@
           openLogForm(logId, overallTimerRunning);
         });
       });
-
-      // Weitere Event-Listener (Satz hinzufügen, entfernen, Werte ändern) – siehe Event-Delegation weiter unten
 
       // WakeToggle
       document.getElementById('wakeToggleBtn')?.addEventListener('click', function(e) {
@@ -2015,24 +1567,6 @@
       }
 
       updateOverallTimer();
-      updateTrainingProgress(editingId);
-    }
-
-    function updateTrainingProgress(logId) {
-      const log = logs.find(l => l.id === logId);
-      if (!log) return;
-      const plan = plans.find(p => p.id === log.planId);
-      if (!plan) return;
-      const total = plan.exerciseIds.length;
-      if (total === 0) return;
-      const done = log.entries.filter(e => e.sets && e.sets.length > 0).length;
-      const pct = Math.round((done / total) * 100);
-      const current = document.getElementById('progressCurrent');
-      const fill = document.getElementById('progressFill');
-      const percent = document.getElementById('progressPercent');
-      if (current) current.textContent = Math.min(done + 1, total);
-      if (fill) fill.style.width = pct + '%';
-      if (percent) percent.textContent = pct + '%';
     }
 
     // ========== LOG-OPERATIONEN ==========
@@ -2149,7 +1683,7 @@
     function renderChart(exerciseId, container) {
       const logsForEx = logs.filter(log => log.entries.some(e => e.exerciseId === exerciseId && e.sets && e.sets.length > 0));
       if (logsForEx.length < 2) {
-        container.innerHTML = `<div style="text-align:center; color:#666; padding:10px;">Nicht genug Daten für Diagramm (mind. 2 Trainings nötig).</div>`;
+        container.innerHTML = `<div style="text-align:center; color:#666; padding:8px; font-size:0.75rem;">Nicht genug Daten für Diagramm (mind. 2 Trainings nötig).</div>`;
         return;
       }
       logsForEx.sort((a, b) => (a.date || '').localeCompare(b.date || ''));
@@ -2160,7 +1694,7 @@
         return { date: log.date, kg: maxKg };
       }).filter(d => d !== null);
       if (data.length < 2) {
-        container.innerHTML = `<div style="text-align:center; color:#666; padding:10px;">Nicht genug Daten für Diagramm.</div>`;
+        container.innerHTML = `<div style="text-align:center; color:#666; padding:8px; font-size:0.75rem;">Nicht genug Daten für Diagramm.</div>`;
         return;
       }
       const canvas = document.createElement('canvas');
@@ -2168,13 +1702,13 @@
       container.appendChild(canvas);
       const ctx = canvas.getContext('2d');
       const width = container.clientWidth || 300;
-      const height = 100;
+      const height = 80;
       canvas.width = width * 2;
       canvas.height = height * 2;
       canvas.style.width = width + 'px';
       canvas.style.height = height + 'px';
       ctx.scale(2, 2);
-      const padding = { top: 10, bottom: 20, left: 30, right: 10 };
+      const padding = { top: 8, bottom: 16, left: 24, right: 8 };
       const chartWidth = width - padding.left - padding.right;
       const chartHeight = height - padding.top - padding.bottom;
       const maxKg = Math.max(...data.map(d => d.kg)) * 1.1;
@@ -2192,7 +1726,7 @@
       if (data.length > 1) {
         ctx.beginPath();
         ctx.strokeStyle = '#2ecc71';
-        ctx.lineWidth = 2;
+        ctx.lineWidth = 1.5;
         data.forEach((d, i) => {
           const x = padding.left + (i / (data.length - 1)) * chartWidth;
           const y = padding.top + chartHeight - ((d.kg - minKg) / range) * chartHeight;
@@ -2205,19 +1739,19 @@
           const y = padding.top + chartHeight - ((d.kg - minKg) / range) * chartHeight;
           ctx.fillStyle = '#2ecc71';
           ctx.beginPath();
-          ctx.arc(x, y, 3, 0, 2 * Math.PI);
+          ctx.arc(x, y, 2.5, 0, 2 * Math.PI);
           ctx.fill();
           ctx.fillStyle = '#888';
-          ctx.font = '8px sans-serif';
+          ctx.font = '6px sans-serif';
           ctx.textAlign = 'center';
           ctx.fillText(formatDate(d.date), x, height - 4);
         });
       }
       ctx.fillStyle = '#aaa';
-      ctx.font = '8px sans-serif';
+      ctx.font = '6px sans-serif';
       ctx.textAlign = 'right';
-      ctx.fillText(Math.round(maxKg) + 'kg', padding.left - 4, padding.top + 10);
-      ctx.fillText(Math.round(minKg) + 'kg', padding.left - 4, height - padding.bottom - 4);
+      ctx.fillText(Math.round(maxKg) + 'kg', padding.left - 2, padding.top + 8);
+      ctx.fillText(Math.round(minKg) + 'kg', padding.left - 2, height - padding.bottom - 2);
     }
 
     // ========== PAUSENTIMER ==========
@@ -2230,10 +1764,8 @@
       const display = document.getElementById(`timer-${currentTimerLogId}-${currentTimerExId}`);
       if (display) {
         display.textContent = formatTime(remaining);
-        // Kreis zeichnen
         const canvas = document.getElementById(`timer-${currentTimerLogId}-${currentTimerExId}-canvas`);
         if (canvas) drawTimerCircle(canvas, remaining, timerTotalSeconds);
-        // Alarm-Klasse
         if (remaining <= 0) display.classList.add('alarm');
         else display.classList.remove('alarm');
       }
@@ -2250,13 +1782,17 @@
           }
         });
 
-        // Satz-Animation: aktiven Satz mit Häkchen markieren
+        // Satz-Animation: Häkchen
         const mapKey = `${currentTimerLogId}_${currentTimerExId}`;
         const currentIdx = activeSetMap[mapKey] !== undefined ? activeSetMap[mapKey] : 0;
         const activeRow = document.querySelector(`.exercise-entry[data-logid="${currentTimerLogId}"][data-exid="${currentTimerExId}"] .sets-table tbody tr[data-setidx="${currentIdx}"]`);
         if (activeRow) {
           const setNumber = activeRow.querySelector('.set-number');
-          if (setNumber) animateSetDone(setNumber);
+          if (setNumber) {
+            setNumber.classList.remove('active');
+            setNumber.classList.add('done');
+            setTimeout(() => setNumber.classList.remove('done'), 500);
+          }
         }
 
         playBeep();
@@ -2303,11 +1839,6 @@
         currentTimerLogId = null;
         currentTimerExId = null;
       }
-    }
-
-    function animateSetDone(element) {
-      element.classList.add('done');
-      setTimeout(() => element.classList.remove('done'), 500);
     }
 
     function toggleTimer(logId, exId, btnElement) {
@@ -2360,6 +1891,337 @@
       timerInterval = setInterval(updateTimerDisplay, 1000);
     }
 
+    // ========== STATISTIK ==========
+    let showAllStats = false;
+    function renderStats() {
+      if (!statsContainer) return;
+      const totalLogs = logs.length;
+      if (totalLogs === 0) {
+        statsContainer.innerHTML = `<div class="empty-state">Noch keine Trainingsdaten für Statistiken.<br/>Mache dein erstes Training!</div>`;
+        return;
+      }
+
+      const now = new Date();
+      const currentMonth = now.getMonth();
+      const currentYear = now.getFullYear();
+      const daysThisMonth = logs.filter(log => {
+        if (!log.date) return false;
+        const [y, m, d] = log.date.split('-');
+        const logD = new Date(y, m - 1, d);
+        return logD.getMonth() === currentMonth && logD.getFullYear() === currentYear;
+      }).length;
+
+      let lastTrainingVolume = 0;
+      if (logs.length > 0) {
+        const sortedLogs = [...logs].sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+        const lastLog = sortedLogs[0];
+        lastLog.entries.forEach(entry => { lastTrainingVolume += calcVolume(entry); });
+      }
+
+      const exerciseProgress = [];
+      const exerciseLogs = {};
+      logs.forEach(log => {
+        if (!log.date) return;
+        log.entries.forEach(entry => {
+          const exId = entry.exerciseId;
+          if (!exId) return;
+          const vol = calcVolume(entry);
+          if (!exerciseLogs[exId]) exerciseLogs[exId] = [];
+          exerciseLogs[exId].push({ date: log.date, volume: vol });
+        });
+      });
+
+      Object.keys(exerciseLogs).forEach(exId => {
+        const entries = exerciseLogs[exId];
+        if (entries.length < 2) return;
+        entries.sort((a, b) => a.date.localeCompare(b.date));
+        const last = entries[entries.length - 1];
+        const prev = entries[entries.length - 2];
+        const diff = last.volume - prev.volume;
+        const percent = prev.volume > 0 ? (diff / prev.volume) * 100 : 0;
+        const ex = exercises.find(e => e.id === exId);
+        if (ex) {
+          exerciseProgress.push({
+            name: ex.name,
+            lastVolume: last.volume,
+            prevVolume: prev.volume,
+            diff: diff,
+            percent: percent
+          });
+        }
+      });
+
+      exerciseProgress.sort((a, b) => Math.abs(b.diff) - Math.abs(a.diff));
+      let filtered = showAllStats ? exerciseProgress : exerciseProgress.filter(p => p.diff !== 0);
+
+      const days = [];
+      const todayMidnight = new Date();
+      todayMidnight.setHours(0,0,0,0);
+      for (let i = 6; i >= 0; i--) {
+        const targetDate = new Date(todayMidnight);
+        targetDate.setDate(targetDate.getDate() - i);
+        const dayName = targetDate.toLocaleDateString('de-DE', { weekday: 'short' });
+        const dayLabel = `${dayName} ${targetDate.getDate()}.`;
+        let dayVol = 0;
+        logs.forEach(log => {
+          if (!log.date) return;
+          const [y, m, d] = log.date.split('-');
+          const logDate = new Date(y, m - 1, d);
+          logDate.setHours(0,0,0,0);
+          if (logDate.getTime() === targetDate.getTime()) {
+            log.entries.forEach(entry => { dayVol += calcVolume(entry); });
+          }
+        });
+        days.push({ label: dayLabel, vol: dayVol });
+      }
+
+      let html = `
+        <div class="stat-card">
+          <div style="display:flex; gap:12px; flex-wrap:wrap; justify-content:space-around;">
+            <div><span class="stat-value">${daysThisMonth}</span><div class="stat-label">Trainingstage diesen Monat</div></div>
+            <div><span class="stat-value">${totalLogs}</span><div class="stat-label">Trainings insgesamt</div></div>
+            <div><span class="stat-value">${lastTrainingVolume.toLocaleString()}</span><div class="stat-label">Letztes Training (kg)</div></div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div style="font-weight:600; margin-bottom:6px; font-size:0.9rem;">📊 Tägliches Volumen (letzte 7 Tage)</div>
+          <div style="display:flex; gap:3px; justify-content:space-around; align-items:flex-end; height:80px; padding-top:6px;">
+      `;
+      const maxDayVol = Math.max(...days.map(d => d.vol), 1);
+      days.forEach(d => {
+        const height = Math.max(4, (d.vol / maxDayVol) * 64);
+        html += `
+          <div style="display:flex; flex-direction:column; align-items:center; flex:1;">
+            <div style="background:#2ecc71; width:100%; max-width:20px; height:${height}px; border-radius:3px 3px 0 0;"></div>
+            <div style="font-size:0.55rem; color:#888; margin-top:3px; text-align:center;">${d.label}</div>
+            <div style="font-size:0.5rem; color:#aaa;">${d.vol > 0 ? d.vol.toLocaleString() : '-'}</div>
+          </div>
+        `;
+      });
+      html += `</div></div>`;
+
+      html += `
+        <div class="stat-card">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; flex-wrap:wrap; gap:4px;">
+            <span style="font-weight:600; font-size:0.9rem;">📈 Fortschritt pro Übung</span>
+            <div class="stat-toggle ${showAllStats ? 'active' : ''}" id="statToggle">
+              <i class="fas ${showAllStats ? 'fa-eye' : 'fa-eye-slash'}"></i>
+              ${showAllStats ? 'Alle anzeigen' : 'Nur Veränderung'}
+            </div>
+          </div>
+          <ul class="stat-progress-list">
+      `;
+      if (filtered.length === 0) {
+        html += `<li class="empty-state" style="padding:8px 0;">Keine Übungen mit Veränderung gefunden.</li>`;
+      } else {
+        filtered.forEach(item => {
+          const diffClass = item.diff > 0 ? 'up' : (item.diff < 0 ? 'down' : 'neutral');
+          const sign = item.diff > 0 ? '▲' : (item.diff < 0 ? '▼' : '●');
+          const percentStr = item.percent !== 0 ? (item.percent > 0 ? '+' : '') + item.percent.toFixed(1) + '%' : '±0%';
+          html += `
+            <li>
+              <div class="ex-name">${item.name}</div>
+              <div class="ex-stats">
+                <span class="ex-current">${item.lastVolume.toLocaleString()} kg</span>
+                <span class="ex-change ${diffClass}">${sign} ${Math.abs(item.diff).toLocaleString()} kg (${percentStr})</span>
+              </div>
+              <div class="ex-previous">vorher: ${item.prevVolume.toLocaleString()} kg</div>
+            </li>
+          `;
+        });
+      }
+      html += `</ul></div>`;
+
+      statsContainer.innerHTML = html;
+      document.getElementById('statToggle')?.addEventListener('click', function() {
+        showAllStats = !showAllStats;
+        renderStats();
+      });
+    }
+
+    // ========== KALENDER ==========
+    function renderCalendar() {
+      if (!calendarContainer) return;
+      if (calendarView === 'year') {
+        renderYearView();
+        return;
+      }
+      const year = calendarDate.getFullYear();
+      const month = calendarDate.getMonth();
+      const todayStr = getToday();
+
+      const firstDay = new Date(year, month, 1);
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const startDayOfWeek = firstDay.getDay();
+
+      const logMap = {};
+      logs.forEach(log => { if (log.date) logMap[log.date] = log.id; });
+
+      let html = `
+        <div class="calendar-container">
+          <div class="calendar-header">
+            <button class="nav-btn" id="calPrev">‹</button>
+            <span class="month-year">${firstDay.toLocaleDateString('de-DE', { month: 'long', year: 'numeric' })}</span>
+            <button class="nav-btn" id="calNext">›</button>
+            <button class="nav-btn" id="calYearView" style="background:linear-gradient(135deg,#f39c12,#e67e22); color:#fff; padding:0 10px; font-size:0.8rem;">Jahr</button>
+          </div>
+          <div class="calendar-grid">
+            <div class="day-name">Mo</div><div class="day-name">Di</div><div class="day-name">Mi</div>
+            <div class="day-name">Do</div><div class="day-name">Fr</div><div class="day-name">Sa</div>
+            <div class="day-name">So</div>
+      `;
+      let startOffset = startDayOfWeek === 0 ? 6 : startDayOfWeek - 1;
+      for (let i = 0; i < startOffset; i++) {
+        const prevDate = new Date(year, month, 0 - (startOffset - i - 1));
+        html += `<div class="day-cell other-month">${prevDate.getDate()}</div>`;
+      }
+      for (let d = 1; d <= daysInMonth; d++) {
+        const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+        const isToday = dateStr === todayStr;
+        const hasTraining = !!logMap[dateStr];
+        let classes = 'day-cell';
+        if (isToday) classes += ' today';
+        if (hasTraining) classes += ' has-training';
+        html += `<div class="${classes}" data-date="${dateStr}" data-logid="${logMap[dateStr]||''}">${d}</div>`;
+      }
+      const remaining = (7 - ((startOffset + daysInMonth) % 7)) % 7;
+      for (let i = 1; i <= remaining; i++) {
+        const nextDate = new Date(year, month + 1, i);
+        html += `<div class="day-cell other-month">${nextDate.getDate()}</div>`;
+      }
+      html += `</div>`;
+
+      const monthStr = String(month+1).padStart(2,'0');
+      const logsThisMonth = logs.filter(log => log.date && log.date.startsWith(`${year}-${monthStr}`));
+      const daysTrained = logsThisMonth.length;
+      let totalVol = 0;
+      logsThisMonth.forEach(log => {
+        log.entries.forEach(entry => { totalVol += calcVolume(entry); });
+      });
+      const avgVol = daysTrained > 0 ? Math.round(totalVol / daysTrained) : 0;
+
+      html += `
+        <div class="calendar-stats">
+          <span>📅 Trainingstage: <span class="count">${daysTrained}</span></span>
+          <span>📊 Volumen: <span class="count">${totalVol} kg</span></span>
+          <span>📈 Ø: <span class="count">${avgVol} kg</span></span>
+        </div>
+      </div>`;
+
+      calendarContainer.innerHTML = html;
+
+      document.getElementById('calPrev')?.addEventListener('click', () => {
+        calendarDate.setMonth(calendarDate.getMonth() - 1);
+        renderCalendar();
+      });
+      document.getElementById('calNext')?.addEventListener('click', () => {
+        calendarDate.setMonth(calendarDate.getMonth() + 1);
+        renderCalendar();
+      });
+      document.getElementById('calYearView')?.addEventListener('click', () => {
+        calendarView = 'year';
+        renderCalendar();
+      });
+      document.querySelectorAll('.day-cell.has-training').forEach(el => {
+        el.addEventListener('click', function() {
+          const logId = this.dataset.logid;
+          if (logId) {
+            showTab('logs');
+            openLogForm(logId, false);
+          }
+        });
+      });
+    }
+
+    function renderYearView() {
+      const year = calendarDate.getFullYear();
+      const todayStr = getToday();
+      const logMap = {};
+      logs.forEach(log => { if (log.date) logMap[log.date] = log.id; });
+
+      const yearStr = String(year);
+      const logsThisYear = logs.filter(log => log.date && log.date.startsWith(yearStr));
+      const daysTrained = logsThisYear.length;
+      let totalVol = 0;
+      logsThisYear.forEach(log => {
+        log.entries.forEach(entry => { totalVol += calcVolume(entry); });
+      });
+      const avgVol = daysTrained > 0 ? Math.round(totalVol / daysTrained) : 0;
+
+      let html = `
+        <div class="calendar-container">
+          <div class="calendar-header">
+            <button class="nav-btn" id="yearPrev">‹</button>
+            <span class="month-year">${year}</span>
+            <button class="nav-btn" id="yearNext">›</button>
+            <button class="nav-btn" id="yearMonthView" style="background:linear-gradient(135deg,#f39c12,#e67e22); color:#fff; padding:0 10px; font-size:0.8rem;">Monat</button>
+          </div>
+          <div class="calendar-year-grid">
+      `;
+      for (let m = 0; m < 12; m++) {
+        const monthName = new Date(year, m, 1).toLocaleDateString('de-DE', { month: 'short' });
+        const daysInMonth = new Date(year, m + 1, 0).getDate();
+        const firstDay = new Date(year, m, 1).getDay();
+        let startOffset = firstDay === 0 ? 6 : firstDay - 1;
+        let miniDaysHtml = '';
+        for (let i = 0; i < startOffset; i++) {
+          miniDaysHtml += `<div class="mini-day other-month"></div>`;
+        }
+        for (let d = 1; d <= daysInMonth; d++) {
+          const dateStr = `${year}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+          const hasTraining = !!logMap[dateStr];
+          const isToday = dateStr === todayStr;
+          let cls = 'mini-day';
+          if (hasTraining) cls += ' has-training';
+          if (isToday) cls += ' today';
+          miniDaysHtml += `<div class="${cls}" data-date="${dateStr}" data-logid="${logMap[dateStr]||''}">${d}</div>`;
+        }
+        const total = startOffset + daysInMonth;
+        const rem = (7 - (total % 7)) % 7;
+        for (let i = 0; i < rem; i++) {
+          miniDaysHtml += `<div class="mini-day other-month"></div>`;
+        }
+        html += `
+          <div class="month-card">
+            <div class="month-name">${monthName}</div>
+            <div class="mini-days">${miniDaysHtml}</div>
+          </div>
+        `;
+      }
+      html += `
+          </div>
+          <div class="calendar-stats">
+            <span>📅 Trainingstage: <span class="count">${daysTrained}</span></span>
+            <span>📊 Volumen: <span class="count">${totalVol} kg</span></span>
+            <span>📈 Ø: <span class="count">${avgVol} kg</span></span>
+          </div>
+        </div>
+      `;
+      calendarContainer.innerHTML = html;
+
+      document.getElementById('yearPrev')?.addEventListener('click', () => {
+        calendarDate.setFullYear(calendarDate.getFullYear() - 1);
+        renderCalendar();
+      });
+      document.getElementById('yearNext')?.addEventListener('click', () => {
+        calendarDate.setFullYear(calendarDate.getFullYear() + 1);
+        renderCalendar();
+      });
+      document.getElementById('yearMonthView')?.addEventListener('click', () => {
+        calendarView = 'month';
+        renderCalendar();
+      });
+      document.querySelectorAll('.mini-day.has-training').forEach(el => {
+        el.addEventListener('click', function() {
+          const logId = this.dataset.logid;
+          if (logId) {
+            showTab('logs');
+            openLogForm(logId, false);
+          }
+        });
+      });
+    }
+
     // ========== BACKUP ==========
     function exportData() {
       const data = { exercises, plans, logs };
@@ -2371,7 +2233,6 @@
       a.click();
       URL.revokeObjectURL(url);
     }
-
     function importData(file) {
       const reader = new FileReader();
       reader.onload = function(e) {
@@ -2389,7 +2250,6 @@
       };
       reader.readAsText(file);
     }
-
     async function restoreAutoBackup() {
       try {
         const autoBackup = await idbGet('bb_auto_backup');
@@ -2443,12 +2303,11 @@
       detailContainer.style.display = 'none';
     }
 
-    // ========== EVENT DELEGATION FÜR LOG ==========
+    // ========== EVENT DELEGATION ==========
     detailContainer.addEventListener('click', function(e) {
       if (editingType !== 'log') return;
       const target = e.target;
 
-      // Timer-Button (via Delegation, falls nicht direkt gebunden)
       const btnTimer = target.closest('.btn-timer');
       if (btnTimer) { toggleTimer(btnTimer.dataset.logid, btnTimer.dataset.exid, btnTimer); return; }
 
@@ -2484,7 +2343,6 @@
         return;
       }
 
-      // Satz-Klick (aktiven Satz setzen) – wird auch über direkten Listener behandelt, aber zur Sicherheit hier
       const trActiveSet = target.closest('.exercise-entry .sets-table tbody tr');
       if (trActiveSet) {
         if (target.tagName === 'INPUT' || target.tagName === 'BUTTON' || target.closest('button')) return;
@@ -2521,7 +2379,6 @@
       }
       else if (target.classList.contains('ex-notiz-text')) {
         updateNotizInLog(target.dataset.logid, target.dataset.exid, target.value);
-        // Fortschrittsbalken aktualisieren? Nicht nötig.
       }
     });
 
@@ -2559,7 +2416,7 @@
     // Haptisches Feedback
     document.addEventListener('pointerdown', function(e) {
       if (e.target.closest('button') || e.target.closest('.list-item') || e.target.closest('.day-cell.has-training')) {
-        if (navigator.vibrate) navigator.vibrate(15);
+        if (navigator.vibrate) navigator.vibrate(12);
       }
     }, { passive: true });
 
