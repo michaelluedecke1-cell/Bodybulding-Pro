@@ -1322,7 +1322,7 @@
       const planOptions = plans.map(p => `<option value="${p.id}" ${log.planId === p.id ? 'selected' : ''}>${p.name}</option>`).join('');
       const plan = plans.find(p => p.id === log.planId);
 
-      // --- NEU: Bei bestehendem Log werden die gespeicherten Einträge verwendet ---
+      // --- Bei bestehendem Log werden die gespeicherten Einträge verwendet ---
       let entries = [];
       let exerciseIds = [];
       if (isEdit) {
@@ -1536,7 +1536,7 @@
         }
       });
 
-      // Plan-Änderung (NEU: mit aktuellen Trainingsdaten)
+      // Plan-Änderung (mit aktuellen Trainingsdaten)
       document.getElementById('formLogPlan')?.addEventListener('change', function() {
         const newPlanId = this.value;
         collectLogEntries(editingId);
@@ -2363,9 +2363,16 @@
           if (entry) {
             // Korrekte Logik:
             // idx = 0 → kein Satz erledigt (currentSetIndex = 0)
-            // idx > 0 → alle Sätze bis einschließlich idx sind erledigt (currentSetIndex = idx + 1)
-            // Wenn idx der letzte Satz ist, dann currentSetIndex = Anzahl der Sätze
-            const newIdx = (idx === 0) ? 0 : Math.min(idx + 1, entry.sets.length);
+            // idx = letzter Satz → alle Sätze erledigt (currentSetIndex = sets.length)
+            // sonst: Sätze < idx sind erledigt, idx ist aktiv (currentSetIndex = idx)
+            let newIdx;
+            if (idx === 0) {
+              newIdx = 0;
+            } else if (idx === entry.sets.length - 1) {
+              newIdx = entry.sets.length;
+            } else {
+              newIdx = idx; // Sätze < idx erledigt, idx ist aktiv
+            }
             entry.currentSetIndex = newIdx;
             saveData();
             openLogForm(logId, overallTimerRunning);
