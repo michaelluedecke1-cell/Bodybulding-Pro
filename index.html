@@ -1223,7 +1223,7 @@
       if (display) display.textContent = formatTime(elapsed);
     }
 
-    // ===== LOG-FORM =====
+    // ===== LOG-FORM (mit korrigierter Volumenberechnung) =====
     function openLogForm(id = null, startTimer = false) {
       const isEdit = !!id;
       let log = isEdit ? logs.find(l => l.id === id) : null;
@@ -1293,8 +1293,9 @@
         log.entries = entries;
         saveData();
       }
-      let totalVolume = 0;
-      entries.forEach(entry => { totalVolume += calcVolume(entry); });
+      // NEU: Volumen immer frisch aus den aktuellen entries berechnen
+      let totalVolume = entries.reduce((sum, entry) => sum + calcVolume(entry), 0);
+
       let exercisesHtml = '';
       if (exerciseIds.length) {
         exerciseIds.forEach((exId, idx) => {
@@ -1319,7 +1320,6 @@
             exVolume = 0;
           } else {
             exVolume = calcVolume(entry);
-            totalVolume += exVolume;
             let setRows = sets.map((set, si) => {
               const isDone = si < currentSetIdx;
               const isActive = si === currentSetIdx;
@@ -1593,7 +1593,9 @@
       const planId = document.getElementById('formLogPlan').value;
       log.planId = planId;
       collectLogEntries(logId);
-      saveData(); renderAll(); closeDetail();
+      saveData();
+      renderAll();
+      closeDetail();
     }
     function deleteLog(id) {
       if (!confirm('Training aus dem Log löschen?')) return;
@@ -2216,10 +2218,9 @@
         if (log) {
           const entry = log.entries.find(e => e.exerciseId === exId);
           if (entry) {
-            // NEUE LOGIK: Klick auf Satz idx markiert alle Sätze bis einschließlich idx als erledigt
-            // idx = 0 → Satz 1 bekommt Haken (currentSetIndex = 1)
+            // Korrektur: idx = 0 → Satz 1 bekommt Haken (currentSetIndex = 1)
             // idx = 1 → Satz 1+2 bekommen Haken (currentSetIndex = 2)
-            // idx = letzter → alle Sätze haben Haken (currentSetIndex = sets.length)
+            // idx = letzter → alle Sätze Haken (currentSetIndex = sets.length)
             const newIdx = Math.min(idx + 1, entry.sets.length);
             entry.currentSetIndex = newIdx;
             saveData();
