@@ -1778,7 +1778,7 @@
       ctx.fillText(Math.round(minKg) + 'kg', padding.left - 2, height - padding.bottom - 2);
     }
 
-    // ========== PAUSENTIMER (mit done-Logik) ==========
+    // ========== PAUSENTIMER (KEINE HAKEN, KEINE MELDUNG) ==========
     function updateTimerDisplay() {
       if (!timerRunning) return;
       const now = Date.now();
@@ -1795,10 +1795,12 @@
       }
 
       if (remaining <= 0) {
+        // Timer abgelaufen – einfach stoppen und zurücksetzen, ohne Haken oder Meldung
         clearInterval(timerInterval);
         timerInterval = null;
         timerRunning = false;
 
+        // Button zurücksetzen
         document.querySelectorAll('.btn-timer').forEach(b => {
           if (b.dataset.logid === currentTimerLogId && b.dataset.exid === currentTimerExId) {
             b.innerHTML = '<i class="fas fa-play"></i> Timer starten';
@@ -1806,46 +1808,23 @@
           }
         });
 
-        // Satz als erledigt markieren: currentSetIndex erhöhen
-        const log = logs.find(l => l.id === currentTimerLogId);
-        if (log) {
-          const entry = log.entries.find(e => e.exerciseId === currentTimerExId);
-          if (entry) {
-            const newIdx = (entry.currentSetIndex || 0) + 1;
-            entry.currentSetIndex = newIdx;
-            saveData();
-            // Prüfen, ob noch Sätze übrig sind
-            if (newIdx < entry.sets.length) {
-              // Formular neu laden, um aktuelle Anzeige zu bekommen
-              const oldLogId = currentTimerLogId;
-              currentTimerLogId = null;
-              currentTimerExId = null;
-              openLogForm(oldLogId, overallTimerRunning);
-              return;
-            } else {
-              // Alle Sätze erledigt – Formular ebenfalls neu laden, damit alle Sätze den Haken bekommen
-              alert('🏁 Alle Sätze dieser Übung abgeschlossen!');
-              const displayEl = document.getElementById(`timer-${currentTimerLogId}-${currentTimerExId}`);
-              if (displayEl) {
-                const ex = exercises.find(e => e.id === currentTimerExId);
-                const pauseSec = ex ? ex.pause || 90 : 90;
-                displayEl.textContent = formatTime(pauseSec);
-                displayEl.classList.remove('alarm');
-                const canvas = document.getElementById(`timer-${currentTimerLogId}-${currentTimerExId}-canvas`);
-                if (canvas) drawTimerCircle(canvas, pauseSec, pauseSec);
-              }
-              const logId = currentTimerLogId;
-              currentTimerLogId = null;
-              currentTimerExId = null;
-              openLogForm(logId, overallTimerRunning);
-              return;
-            }
-          }
+        // Anzeige auf Pausenwert zurücksetzen
+        const ex = exercises.find(e => e.id === currentTimerExId);
+        const pauseSec = ex ? ex.pause || 90 : 90;
+        const displayEl = document.getElementById(`timer-${currentTimerLogId}-${currentTimerExId}`);
+        if (displayEl) {
+          displayEl.textContent = formatTime(pauseSec);
+          displayEl.classList.remove('alarm');
+          const canvas = document.getElementById(`timer-${currentTimerLogId}-${currentTimerExId}-canvas`);
+          if (canvas) drawTimerCircle(canvas, pauseSec, pauseSec);
         }
+
+        // Nur Piepton, kein Alert, kein Haken, kein Neuladen
         playBeep();
         const exName = exercises.find(e => e.id === currentTimerExId)?.name || 'Übung';
         sendNotification(`Pause für ${exName} beendet!`);
         if (navigator.vibrate) navigator.vibrate(200);
+
         currentTimerLogId = null;
         currentTimerExId = null;
       }
@@ -2369,7 +2348,7 @@
         return;
       }
 
-      // Klick auf Satzzeile: alle Sätze bis zu diesem als erledigt markieren
+      // Klick auf Satzzeile: alle Sätze bis zu diesem als erledigt markieren (MANUELL)
       const trActiveSet = target.closest('.exercise-entry .sets-table tbody tr');
       if (trActiveSet) {
         if (target.tagName === 'INPUT' || target.tagName === 'BUTTON' || target.closest('button')) return;
@@ -2382,7 +2361,7 @@
         if (log) {
           const entry = log.entries.find(e => e.exerciseId === exId);
           if (entry) {
-            // Begrenzung: currentSetIndex darf nicht größer als die Anzahl der Sätze sein
+            // currentSetIndex = idx + 1 (alle Sätze bis einschließlich idx als erledigt)
             entry.currentSetIndex = Math.min(idx + 1, entry.sets.length);
             saveData();
             openLogForm(logId, overallTimerRunning);
