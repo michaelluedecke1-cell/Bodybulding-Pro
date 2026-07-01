@@ -2361,9 +2361,12 @@
         if (log) {
           const entry = log.entries.find(e => e.exerciseId === exId);
           if (entry) {
-            // currentSetIndex = idx (alle Sätze VOR idx sind erledigt, idx ist der aktuelle)
-            // Wenn idx=0, dann ist kein Satz erledigt (alle Haken weg)
-            entry.currentSetIndex = Math.min(idx, entry.sets.length);
+            // Korrekte Logik:
+            // idx = 0 → kein Satz erledigt (currentSetIndex = 0)
+            // idx > 0 → alle Sätze bis einschließlich idx sind erledigt (currentSetIndex = idx + 1)
+            // Wenn idx der letzte Satz ist, dann currentSetIndex = Anzahl der Sätze
+            const newIdx = (idx === 0) ? 0 : Math.min(idx + 1, entry.sets.length);
+            entry.currentSetIndex = newIdx;
             saveData();
             openLogForm(logId, overallTimerRunning);
           }
