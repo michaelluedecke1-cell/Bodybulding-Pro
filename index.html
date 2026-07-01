@@ -205,7 +205,6 @@
     .exercise-entry .sets-table .set-controls {
       display: flex; align-items: center; gap: 4px;
     }
-    /* ===== GRÖSSERE PLUS/MINUS BUTTONS ===== */
     .exercise-entry .sets-table .set-controls button {
       background: rgba(255,255,255,0.06);
       border: none; color: #ddd;
@@ -235,7 +234,7 @@
       font-size: 1rem; cursor: pointer; padding: 0 4px;
     }
 
-    /* ===== NEUE LOGIK: DONE = permanente Häkchen für erledigte Sätze ===== */
+    /* Satzmarkierungen */
     .exercise-entry .sets-table .set-number.done {
       color: #2ecc71;
       font-weight: 700;
@@ -245,15 +244,12 @@
       color: #2ecc71;
     }
     .exercise-entry .sets-table .set-number.active {
-      color: #2ecc71;
+      background: rgba(46, 204, 113, 0.15);
+      border-radius: 4px;
+      padding: 0 6px;
       font-weight: 700;
-    }
-    .exercise-entry .sets-table .set-number.active::before {
-      content: "✓ ";
       color: #2ecc71;
     }
-
-    /* Kurze Animation beim Abschluss eines Satzes (optional) */
     .exercise-entry .sets-table .set-number.just-done {
       animation: setDone 0.4s ease;
     }
@@ -647,7 +643,6 @@
     let overallTimerInterval = null;
     let overallTimerRunning = false;
 
-    const activeSetMap = {};
     let lastBackupDate = null;
 
     // ========== DOM-REFERENZEN ==========
@@ -818,7 +813,10 @@
 
       exercises.forEach(ex => { if (!ex.type) ex.type = 'strength'; });
       logs.forEach(log => {
-        log.entries.forEach(entry => { if (!entry.cardioData) entry.cardioData = { time: 0, distance: 0 }; });
+        log.entries.forEach(entry => {
+          if (!entry.cardioData) entry.cardioData = { time: 0, distance: 0 };
+          if (entry.currentSetIndex === undefined) entry.currentSetIndex = 0;
+        });
         if (log.duration === undefined) log.duration = 0;
       });
 
@@ -842,9 +840,9 @@
           logs = [{
             id: generateId(), planId: planId, date: getToday(), duration: 0,
             entries: [
-              { exerciseId: ex1.id, sets: [{ kg: 28, wdh: 12 }, { kg: 28, wdh: 12 }, { kg: 28, wdh: 12 }], cardioData: { time: 0, distance: 0 }, notiz: '1kg pro Woche mehr' },
-              { exerciseId: ex2.id, sets: [{ kg: 60, wdh: 12 }], cardioData: { time: 0, distance: 0 }, notiz: '' },
-              { exerciseId: ex3.id, sets: [], cardioData: { time: 15, distance: 2.5 }, notiz: 'Steigung 2%' }
+              { exerciseId: ex1.id, sets: [{ kg: 28, wdh: 12 }, { kg: 28, wdh: 12 }, { kg: 28, wdh: 12 }], cardioData: { time: 0, distance: 0 }, notiz: '1kg pro Woche mehr', currentSetIndex: 0 },
+              { exerciseId: ex2.id, sets: [{ kg: 60, wdh: 12 }], cardioData: { time: 0, distance: 0 }, notiz: '', currentSetIndex: 0 },
+              { exerciseId: ex3.id, sets: [], cardioData: { time: 15, distance: 2.5 }, notiz: 'Steigung 2%', currentSetIndex: 0 }
             ]
           }];
           saveData();
@@ -855,17 +853,20 @@
       if (stored) { lastBackupDate = stored; if (lastBackupDateSpan) lastBackupDateSpan.textContent = stored; }
     }
 
-    // ========== Letzte Daten (KG, WDH, Notiz) für Übung ==========
+    // ========== LETZTE TRAININGSDATEN (ALLE SÄTZE) ==========
     function getLastTrainingDataForExercise(exerciseId) {
       const sortedLogs = [...logs].sort((a, b) => (a.date || '').localeCompare(b.date || '') * -1);
       for (const log of sortedLogs) {
         const entry = log.entries.find(e => e.exerciseId === exerciseId);
         if (entry) {
-          const lastSet = entry.sets && entry.sets.length > 0 ? entry.sets[entry.sets.length - 1] : { kg: 0, wdh: 0 };
-          return { kg: lastSet.kg || 0, wdh: lastSet.wdh || 0, notiz: entry.notiz || '' };
+          return {
+            sets: entry.sets || [{ kg: 0, wdh: 0 }],
+            notiz: entry.notiz || '',
+            currentSetIndex: entry.currentSetIndex || 0
+          };
         }
       }
-      return { kg: 0, wdh: 0, notiz: '' };
+      return { sets: [{ kg: 0, wdh: 0 }], notiz: '', currentSetIndex: 0 };
     }
 
     // ========== VOLUMEN ==========
@@ -1247,9 +1248,10 @@
           const data = getLastTrainingDataForExercise(exId);
           return {
             exerciseId: exId,
-            sets: [{ kg: data.kg, wdh: data.wdh }],
+            sets: data.sets,
             cardioData: { time: 0, distance: 0 },
-            notiz: data.notiz
+            notiz: data.notiz,
+            currentSetIndex: 0
           };
         })
       };
@@ -1287,7 +1289,7 @@
       if (display) display.textContent = formatTime(elapsed);
     }
 
-    // ========== LOG-FORMS (HIER WIRD DIE NEUE LOGIK UMGESETZT) ==========
+    // ========== LOG-FORMS (KERNLOGIK) ==========
     function openLogForm(id = null, startTimer = false) {
       const isEdit = !!id;
       let log = isEdit ? logs.find(l => l.id === id) : null;
@@ -1319,37 +1321,64 @@
 
       const planOptions = plans.map(p => `<option value="${p.id}" ${log.planId === p.id ? 'selected' : ''}>${p.name}</option>`).join('');
       const plan = plans.find(p => p.id === log.planId);
-      const exerciseIds = plan ? plan.exerciseIds : [];
-      const entries = log.entries || [];
 
-      if (plan && exerciseIds.length > 0 && entries.length === 0) {
-        if (!isEdit || log.entries.length === 0) {
-          log.entries = exerciseIds.map(exId => {
+      // --- NEU: Bei bestehendem Log werden die gespeicherten Einträge verwendet ---
+      let entries = [];
+      let exerciseIds = [];
+      if (isEdit) {
+        entries = log.entries || [];
+        exerciseIds = entries.map(e => e.exerciseId);
+      } else {
+        // Neues Log: Einträge aus Plan generieren (falls vorhanden)
+        if (plan && plan.exerciseIds) {
+          exerciseIds = plan.exerciseIds;
+          entries = exerciseIds.map(exId => {
             const data = getLastTrainingDataForExercise(exId);
             return {
               exerciseId: exId,
-              sets: [{ kg: data.kg, wdh: data.wdh }],
+              sets: data.sets,
               cardioData: { time: 0, distance: 0 },
-              notiz: data.notiz
+              notiz: data.notiz,
+              currentSetIndex: 0   // neues Training → bei 0 starten
             };
           });
+          log.entries = entries;
           saveData();
+        } else {
+          entries = [];
+          exerciseIds = [];
         }
       }
 
-      const currentEntries = log.entries || [];
+      // Falls im bestehenden Log der Plan gewechselt wurde, aber noch keine Einträge da sind
+      if (isEdit && entries.length === 0 && plan && plan.exerciseIds) {
+        exerciseIds = plan.exerciseIds;
+        entries = exerciseIds.map(exId => {
+          const data = getLastTrainingDataForExercise(exId);
+          return {
+            exerciseId: exId,
+            sets: data.sets,
+            cardioData: { time: 0, distance: 0 },
+            notiz: data.notiz,
+            currentSetIndex: 0
+          };
+        });
+        log.entries = entries;
+        saveData();
+      }
 
-      let exercisesHtml = '';
       let totalVolume = 0;
+      entries.forEach(entry => { totalVolume += calcVolume(entry); });
+
+      // --- HTML generieren ---
+      let exercisesHtml = '';
       if (exerciseIds.length) {
         exerciseIds.forEach((exId, idx) => {
           const ex = exercises.find(e => e.id === exId);
           if (!ex) return;
-          const entry = currentEntries.find(e => e.exerciseId === exId) || { exerciseId: exId, sets: [{ kg: 0, wdh: 0 }], cardioData: { time: 0, distance: 0 }, notiz: '' };
+          const entry = entries.find(e => e.exerciseId === exId) || { exerciseId: exId, sets: [{ kg: 0, wdh: 0 }], cardioData: { time: 0, distance: 0 }, notiz: '', currentSetIndex: 0 };
           const sets = entry.sets || [{ kg: 0, wdh: 0 }];
-          const mapKey = `${log.id}_${exId}`;
-          // activeIdx ist der Index des aktuell aktiven Satzes (der als nächstes dran ist)
-          const activeIdx = activeSetMap[mapKey] !== undefined ? activeSetMap[mapKey] : 0;
+          const currentSetIdx = entry.currentSetIndex || 0;
 
           let setHtml = '';
           let exVolume = 0;
@@ -1369,13 +1398,11 @@
             exVolume = calcVolume(entry);
             totalVolume += exVolume;
             let setRows = sets.map((set, si) => {
-              // NEUE LOGIK: ist der Satz erledigt? (si < activeIdx) oder aktiv (si === activeIdx)?
-              const isDone = si < activeIdx;
-              const isActive = si === activeIdx;
+              const isDone = si < currentSetIdx;
+              const isActive = si === currentSetIdx;
               let classes = '';
-              if (isDone) classes += ' done';      // dauerhaftes Häkchen
-              else if (isActive) classes += ' active'; // aktueller Satz (auch Häkchen)
-              // zusätzlich: wenn der Satz gerade eben durch Timer abgeschlossen wurde, könnte man 'just-done' setzen – aber das machen wir im Timer-Callback
+              if (isDone) classes = 'done';
+              else if (isActive) classes = 'active';
               return `
                 <tr data-setidx="${si}">
                   <td class="set-number ${classes}">${si+1}</td>
@@ -1400,7 +1427,7 @@
 
             setHtml = `
               <div class="set-progress">
-                <span>Satz <span class="current-set-label">${activeIdx + 1}</span> von ${sets.length}</span>
+                <span>Satz <span class="current-set-label">${Math.min(currentSetIdx + 1, sets.length)}</span> von ${sets.length}</span>
                 <span style="color:#888;">(Klick auf Satzzeile zum Markieren)</span>
               </div>
               <table class="sets-table">
@@ -1493,16 +1520,12 @@
         </div>
       `;
 
-      // ===== TIMER-EVENT MIT DELEGATION (wie gehabt) =====
-      // (wird global behandelt)
-
-      // WakeToggle
+      // ===== EVENT-LISTENER =====
       document.getElementById('wakeToggleBtn')?.addEventListener('click', function(e) {
         e.stopPropagation();
         toggleWakeLock();
       });
 
-      // Start Overall Timer
       document.getElementById('btnStartOverallTimer')?.addEventListener('click', function() {
         if (!overallTimerRunning) {
           startOverallTimer();
@@ -1513,7 +1536,7 @@
         }
       });
 
-      // Plan-Änderung
+      // Plan-Änderung (NEU: mit aktuellen Trainingsdaten)
       document.getElementById('formLogPlan')?.addEventListener('change', function() {
         const newPlanId = this.value;
         collectLogEntries(editingId);
@@ -1524,7 +1547,13 @@
           if (planObj && planObj.exerciseIds) {
             logObj.entries = planObj.exerciseIds.map(exId => {
               const data = getLastTrainingDataForExercise(exId);
-              return { exerciseId: exId, sets: [{ kg: data.kg, wdh: data.wdh }], cardioData: { time: 0, distance: 0 }, notiz: data.notiz };
+              return {
+                exerciseId: exId,
+                sets: data.sets,
+                cardioData: { time: 0, distance: 0 },
+                notiz: data.notiz,
+                currentSetIndex: 0
+              };
             });
           } else {
             logObj.entries = [];
@@ -1588,8 +1617,10 @@
             sets.push({ kg, wdh });
           });
         }
+        const existingEntry = log.entries.find(e => e.exerciseId === exId);
+        const currentSetIndex = existingEntry ? existingEntry.currentSetIndex || 0 : 0;
         const notiz = block.querySelector('.ex-notiz-text')?.value || '';
-        entries.push({ exerciseId: exId, sets, cardioData, notiz });
+        entries.push({ exerciseId: exId, sets, cardioData, notiz, currentSetIndex });
       });
       log.entries = entries;
     }
@@ -1598,9 +1629,10 @@
       const log = logs.find(l => l.id === logId);
       if (!log) return;
       let entry = log.entries.find(e => e.exerciseId === exId);
-      if (!entry) { entry = { exerciseId: exId, sets: [], cardioData: { time: 0, distance: 0 }, notiz: '' }; log.entries.push(entry); }
+      if (!entry) { entry = { exerciseId: exId, sets: [], cardioData: { time: 0, distance: 0 }, notiz: '', currentSetIndex: 0 }; log.entries.push(entry); }
       const last = entry.sets[entry.sets.length - 1] || { kg: 0, wdh: 0 };
       entry.sets.push({ kg: last.kg, wdh: last.wdh });
+      if ((entry.currentSetIndex || 0) >= entry.sets.length) entry.currentSetIndex = entry.sets.length - 1;
       saveData(); openLogForm(logId, overallTimerRunning);
     }
 
@@ -1610,8 +1642,7 @@
       const entry = log.entries.find(e => e.exerciseId === exId);
       if (!entry || entry.sets.length <= 1) { alert('Mindestens ein Satz muss bleiben.'); return; }
       entry.sets.splice(idx, 1);
-      const mapKey = `${logId}_${exId}`;
-      if (activeSetMap[mapKey] >= entry.sets.length) activeSetMap[mapKey] = entry.sets.length - 1;
+      if ((entry.currentSetIndex || 0) >= entry.sets.length) entry.currentSetIndex = entry.sets.length - 1;
       saveData(); openLogForm(logId, overallTimerRunning);
     }
 
@@ -1628,7 +1659,7 @@
       const log = logs.find(l => l.id === logId);
       if (!log) return;
       let entry = log.entries.find(e => e.exerciseId === exId);
-      if (!entry) { entry = { exerciseId: exId, sets: [], cardioData: { time: 0, distance: 0 }, notiz: '' }; log.entries.push(entry); }
+      if (!entry) { entry = { exerciseId: exId, sets: [], cardioData: { time: 0, distance: 0 }, notiz: '', currentSetIndex: 0 }; log.entries.push(entry); }
       entry.cardioData[field] = value;
       saveData();
     }
@@ -1637,7 +1668,7 @@
       const log = logs.find(l => l.id === logId);
       if (!log) return;
       let entry = log.entries.find(e => e.exerciseId === exId);
-      if (!entry) { entry = { exerciseId: exId, sets: [], cardioData: { time: 0, distance: 0 }, notiz: '' }; log.entries.push(entry); }
+      if (!entry) { entry = { exerciseId: exId, sets: [], cardioData: { time: 0, distance: 0 }, notiz: '', currentSetIndex: 0 }; log.entries.push(entry); }
       entry.notiz = value;
       saveData();
     }
@@ -1747,7 +1778,7 @@
       ctx.fillText(Math.round(minKg) + 'kg', padding.left - 2, height - padding.bottom - 2);
     }
 
-    // ========== PAUSENTIMER (mit neuer done-Logik) ==========
+    // ========== PAUSENTIMER (mit done-Logik) ==========
     function updateTimerDisplay() {
       if (!timerRunning) return;
       const now = Date.now();
@@ -1775,72 +1806,44 @@
           }
         });
 
-        // Satz als erledigt markieren: activeIdx erhöhen
-        const mapKey = `${currentTimerLogId}_${currentTimerExId}`;
-        const currentIdx = activeSetMap[mapKey] !== undefined ? activeSetMap[mapKey] : 0;
-        // Der aktuelle Satz wird erledigt – erhöhe den Index auf den nächsten Satz
-        const newIdx = currentIdx + 1;
-        activeSetMap[mapKey] = newIdx; // jetzt ist der nächste Satz aktiv
-
-        // Hole die Zeile des gerade erledigten Satzes (vor der Erhöhung)
-        const rowSelector = `.exercise-entry[data-logid="${currentTimerLogId}"][data-exid="${currentTimerExId}"] .sets-table tbody tr[data-setidx="${currentIdx}"]`;
-        const doneRow = document.querySelector(rowSelector);
-        if (doneRow) {
-          const setNumber = doneRow.querySelector('.set-number');
-          if (setNumber) {
-            // Entferne active, setze done (wird durch isDone-Logik beim nächsten Rendern ohnehin gesetzt)
-            setNumber.classList.remove('active');
-            setNumber.classList.add('done');
-            // Kurze Animation
-            setNumber.classList.add('just-done');
-            setTimeout(() => setNumber.classList.remove('just-done'), 500);
+        // Satz als erledigt markieren: currentSetIndex erhöhen
+        const log = logs.find(l => l.id === currentTimerLogId);
+        if (log) {
+          const entry = log.entries.find(e => e.exerciseId === currentTimerExId);
+          if (entry) {
+            const newIdx = (entry.currentSetIndex || 0) + 1;
+            entry.currentSetIndex = newIdx;
+            saveData();
+            // Prüfen, ob noch Sätze übrig sind
+            if (newIdx < entry.sets.length) {
+              // Formular neu laden, um aktuelle Anzeige zu bekommen
+              const oldLogId = currentTimerLogId;
+              currentTimerLogId = null;
+              currentTimerExId = null;
+              openLogForm(oldLogId, overallTimerRunning);
+              return;
+            } else {
+              // Alle Sätze erledigt
+              alert('🏁 Alle Sätze dieser Übung abgeschlossen!');
+              const displayEl = document.getElementById(`timer-${currentTimerLogId}-${currentTimerExId}`);
+              if (displayEl) {
+                const ex = exercises.find(e => e.id === currentTimerExId);
+                const pauseSec = ex ? ex.pause || 90 : 90;
+                displayEl.textContent = formatTime(pauseSec);
+                displayEl.classList.remove('alarm');
+                const canvas = document.getElementById(`timer-${currentTimerLogId}-${currentTimerExId}-canvas`);
+                if (canvas) drawTimerCircle(canvas, pauseSec, pauseSec);
+              }
+              currentTimerLogId = null;
+              currentTimerExId = null;
+              return;
+            }
           }
         }
-
         playBeep();
         const exName = exercises.find(e => e.id === currentTimerExId)?.name || 'Übung';
         sendNotification(`Pause für ${exName} beendet!`);
         if (navigator.vibrate) navigator.vibrate(200);
-
-        const ex = exercises.find(e => e.id === currentTimerExId);
-        if (ex && ex.type === 'strength') {
-          const log = logs.find(l => l.id === currentTimerLogId);
-          if (log) {
-            const entry = log.entries.find(e => e.exerciseId === currentTimerExId);
-            if (entry) {
-              const totalSets = entry.sets.length;
-              // Prüfen, ob es noch einen weiteren Satz gibt (neuer activeIdx < totalSets)
-              if (newIdx < totalSets) {
-                // Es gibt noch einen nächsten Satz – Formular neu laden, damit die Anzeige aktualisiert wird
-                collectLogEntries(currentTimerLogId);
-                const oldLogId = currentTimerLogId;
-                currentTimerLogId = null;
-                currentTimerExId = null;
-                openLogForm(oldLogId, overallTimerRunning);
-                return;
-              } else {
-                // Alle Sätze erledigt
-                alert('🏁 Alle Sätze dieser Übung abgeschlossen!');
-                if (display && ex) {
-                  const pauseSec = ex.pause || 90;
-                  display.textContent = formatTime(pauseSec);
-                  display.classList.remove('alarm');
-                  const canvas = document.getElementById(`timer-${currentTimerLogId}-${currentTimerExId}-canvas`);
-                  if (canvas) drawTimerCircle(canvas, pauseSec, pauseSec);
-                }
-              }
-            }
-          }
-        } else {
-          // Cardio – Timer einfach zurücksetzen
-          if (display && ex) {
-            const pauseSec = ex.pause || 90;
-            display.textContent = formatTime(pauseSec);
-            display.classList.remove('alarm');
-            const canvas = document.getElementById(`timer-${currentTimerLogId}-${currentTimerExId}-canvas`);
-            if (canvas) drawTimerCircle(canvas, pauseSec, pauseSec);
-          }
-        }
         currentTimerLogId = null;
         currentTimerExId = null;
       }
@@ -2311,7 +2314,7 @@
       detailContainer.style.display = 'none';
     }
 
-    // ========== EVENT DELEGATION (für Timer u.a.) ==========
+    // ========== EVENT DELEGATION ==========
     detailContainer.addEventListener('click', function(e) {
       if (editingType !== 'log') return;
       const target = e.target;
@@ -2329,7 +2332,12 @@
       if (btnAddSet) { addSetToLogEntry(btnAddSet.dataset.logid, btnAddSet.dataset.exid); return; }
 
       const btnRemoveSet = target.closest('.btn-remove-set');
-      if (btnRemoveSet) { removeSetFromLogEntry(btnRemoveSet.dataset.logid, btnRemoveSet.dataset.exid, parseInt(btnRemoveSet.dataset.idx)); return; }
+      if (btnRemoveSet) {
+        e.preventDefault();
+        if (!confirm('Diesen Satz wirklich löschen?')) return;
+        removeSetFromLogEntry(btnRemoveSet.dataset.logid, btnRemoveSet.dataset.exid, parseInt(btnRemoveSet.dataset.idx));
+        return;
+      }
 
       const btnSetControl = target.closest('.set-controls button');
       if (btnSetControl) {
@@ -2353,6 +2361,8 @@
 
       const btnDelEx = target.closest('.ex-header .del');
       if (btnDelEx) {
+        e.preventDefault();
+        if (!confirm('Möchten Sie diese Übung wirklich aus diesem Training entfernen?')) return;
         removeExerciseFromLog(editingId, btnDelEx.dataset.exid);
         return;
       }
@@ -2366,11 +2376,15 @@
         const logId = exEntry.dataset.logid;
         const idx = parseInt(trActiveSet.dataset.setidx);
         if (isNaN(idx)) return;
-        const mapKey = `${logId}_${exId}`;
-        activeSetMap[mapKey] = idx; // setze aktiven Satz auf den geklickten
-        collectLogEntries(logId);
-        openLogForm(logId, overallTimerRunning);
-        return;
+        const log = logs.find(l => l.id === logId);
+        if (log) {
+          const entry = log.entries.find(e => e.exerciseId === exId);
+          if (entry) {
+            entry.currentSetIndex = idx;
+            saveData();
+            openLogForm(logId, overallTimerRunning);
+          }
+        }
       }
     });
 
