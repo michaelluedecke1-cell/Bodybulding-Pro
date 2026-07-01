@@ -11,7 +11,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <style>
-    /* ===== KOMPAKTES DESIGN FÜR HANDY ===== */
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', -apple-system, sans-serif; }
     html, body { overscroll-behavior-y: none; }
     body {
@@ -22,7 +21,6 @@
       font-size: 0.82rem;
       line-height: 1.4;
     }
-
     .app-header {
       display: flex; justify-content: space-between; align-items: center;
       padding: 12px 0 10px;
@@ -57,7 +55,6 @@
       background: linear-gradient(135deg, #f39c12, #e67e22);
       color: #fff; box-shadow: 0 4px 12px rgba(243,156,18,0.3);
     }
-
     .tab-bar {
       display: flex; gap: 4px; background: rgba(255,255,255,0.04);
       border-radius: 14px; padding: 4px; margin-bottom: 14px; flex-wrap: wrap;
@@ -70,10 +67,8 @@
     }
     .tab-btn.active { background: rgba(255,255,255,0.08); color: #fff; }
     .tab-btn:active { transform: scale(0.96); }
-
     .page { display: none; flex-direction: column; gap: 12px; }
     .page.active { display: flex; }
-
     .list-item {
       background: rgba(255,255,255,0.04);
       border-radius: 14px;
@@ -103,11 +98,9 @@
     .list-item .actions .del { color: #e74c3c; }
     .list-item .actions .star { color: #f39c12; }
     .list-item .actions .star.active { color: #2ecc71; }
-
     .empty-state {
       text-align: center; color: #666; padding: 30px 0; font-size: 0.85rem;
     }
-
     .detail-card {
       background: rgba(255,255,255,0.04);
       border-radius: 14px;
@@ -127,7 +120,6 @@
     .detail-card input:focus, .detail-card textarea:focus, .detail-card select:focus {
       border-color: #2ecc71; outline: none;
     }
-
     .btn-row {
       display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap;
     }
@@ -146,7 +138,6 @@
       background: linear-gradient(135deg, #e74c3c, #c0392b);
       color: #fff; box-shadow: 0 4px 12px rgba(231,76,60,0.3);
     }
-
     .plan-exercise-list {
       list-style: none; padding: 0; margin: 4px 0;
     }
@@ -169,7 +160,6 @@
       display: flex; align-items: center; justify-content: center;
     }
     .plan-exercise-list li .move-buttons button:active { background: rgba(255,255,255,0.12); }
-
     .exercise-entry {
       background: rgba(255,255,255,0.04);
       border-radius: 14px;
@@ -190,7 +180,6 @@
       max-width: 100%; max-height: 60px; object-fit: contain;
       border-radius: 8px; margin: 4px 0; background: rgba(0,0,0,0.3);
     }
-
     .exercise-entry .sets-table input[type="number"] {
       width: 48px; font-size: 0.85rem; padding: 4px 2px;
       background: rgba(255,255,255,0.06);
@@ -217,7 +206,6 @@
     .exercise-entry .sets-table .set-controls button:active { background: rgba(255,255,255,0.15); transform: scale(0.95); }
     .exercise-entry .sets-table .set-controls button.inc { color: #2ecc71; }
     .exercise-entry .sets-table .set-controls button.dec { color: #e74c3c; }
-
     .exercise-entry .sets-table {
       width: 100%; border-collapse: collapse; margin: 4px 0;
     }
@@ -233,8 +221,6 @@
       background: none; border: none; color: #e74c3c;
       font-size: 1rem; cursor: pointer; padding: 0 4px;
     }
-
-    /* Satzmarkierungen */
     .exercise-entry .sets-table .set-number.done {
       color: #2ecc71;
       font-weight: 700;
@@ -257,7 +243,6 @@
       0% { transform: scale(1.2); opacity: 0.6; }
       100% { transform: scale(1); opacity: 1; }
     }
-
     .exercise-entry .set-progress {
       font-size: 0.65rem; color: #aaa; margin: 3px 0;
       display: flex; justify-content: space-between;
@@ -265,7 +250,6 @@
     .exercise-entry .set-progress .current-set-label {
       color: #2ecc71; font-weight: 600;
     }
-
     .exercise-entry .ex-actions-row {
       display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px;
     }
@@ -289,7 +273,6 @@
       background: linear-gradient(135deg, #2ecc71, #27ae60);
       color: #fff; box-shadow: 0 4px 10px rgba(46,204,113,0.3);
     }
-
     .exercise-entry .timer-wrapper {
       position: relative;
       width: 64px;
@@ -328,7 +311,6 @@
       0% { opacity: 1; }
       100% { opacity: 0.3; }
     }
-
     .exercise-entry .ex-notiz {
       background: rgba(255,255,255,0.04);
       padding: 4px 8px; border-radius: 8px; margin-top: 4px;
@@ -338,7 +320,6 @@
       color: #ddd; resize: vertical; font-size: 0.75rem;
       outline: none; min-height: 24px;
     }
-
     .volume-summary {
       background: rgba(255,255,255,0.04);
       padding: 6px 10px; border-radius: 10px;
@@ -350,7 +331,6 @@
     .volume-summary .item { text-align: center; }
     .volume-summary .item .label { font-size: 0.6rem; color: #888; }
     .volume-summary .item .value { font-size: 0.95rem; font-weight: 700; color: #2ecc71; }
-
     .cardio-row {
       display: flex; gap: 10px; margin: 4px 0; align-items: center;
       background: rgba(255,255,255,0.04);
@@ -362,7 +342,6 @@
       border: 1px solid rgba(255,255,255,0.1);
       border-radius: 8px; color: #fff; padding: 4px 6px; font-size: 0.8rem;
     }
-
     .calendar-container {
       background: rgba(255,255,255,0.04);
       border-radius: 14px;
@@ -407,7 +386,6 @@
     }
     .calendar-grid .day-cell.today { border: 1px solid #f39c12; }
     .calendar-grid .day-cell:active { background: rgba(255,255,255,0.08); }
-
     .calendar-year-grid {
       display: grid; grid-template-columns: repeat(3, 1fr);
       gap: 10px; margin: 8px 0;
@@ -433,14 +411,12 @@
       background: #2ecc71; color: #0d0d1a; font-weight: 700; cursor: pointer;
     }
     .calendar-year-grid .month-card .mini-day.other-month { opacity: 0.3; }
-
     .calendar-stats {
       display: flex; gap: 12px; justify-content: center;
       flex-wrap: wrap; margin-top: 10px; font-size: 0.75rem; color: #aaa;
     }
     .calendar-stats span { background: rgba(255,255,255,0.04); padding: 4px 12px; border-radius: 16px; }
     .calendar-stats .count { color: #2ecc71; font-weight: 700; }
-
     .stat-card {
       background: rgba(255,255,255,0.04);
       border-radius: 14px;
@@ -451,7 +427,6 @@
       font-size: 1.5rem; font-weight: 700; color: #2ecc71;
     }
     .stat-card .stat-label { font-size: 0.7rem; color: #aaa; }
-
     .stat-progress-list {
       list-style: none; padding: 0; margin: 0;
     }
@@ -489,7 +464,6 @@
     }
     .stat-toggle.active { background: rgba(46,204,113,0.15); border-color: #2ecc71; }
     .stat-toggle:active { transform: scale(0.96); }
-
     .backup-overlay {
       display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(0,0,0,0.7);
@@ -520,7 +494,6 @@
       font-weight: 600; cursor: pointer; transition: transform 0.1s; font-size: 0.8rem;
     }
     .backup-modal .btn-row button:active { transform: scale(0.96); }
-
     .wake-toggle {
       display: inline-flex; align-items: center; gap: 4px;
       background: rgba(255,255,255,0.06);
@@ -530,7 +503,6 @@
     }
     .wake-toggle.active { background: rgba(46,204,113,0.15); border-color: #2ecc71; }
     .wake-toggle:active { transform: scale(0.96); }
-
     .chart-container {
       background: rgba(255,255,255,0.04);
       border-radius: 10px; padding: 8px;
@@ -538,7 +510,6 @@
       overflow-x: auto;
     }
     .chart-container canvas { width: 100%; height: 80px; }
-
     @media (min-width: 600px) {
       body { max-width: 480px; margin: 0 auto; padding: 10px 16px 80px; }
     }
@@ -554,7 +525,6 @@
         <button class="btn-icon primary" id="btnGlobalAdd" title="Neu"><i class="fas fa-plus"></i></button>
       </div>
     </header>
-
     <div class="tab-bar">
       <button class="tab-btn active" data-tab="exercises"><i class="fas fa-dumbbell"></i> Übungen</button>
       <button class="tab-btn" data-tab="plans"><i class="fas fa-list"></i> Pläne</button>
@@ -562,22 +532,17 @@
       <button class="tab-btn" data-tab="calendar"><i class="fas fa-calendar-alt"></i> Kalender</button>
       <button class="tab-btn" data-tab="stats"><i class="fas fa-chart-bar"></i> Statistik</button>
     </div>
-
     <div id="page-exercises" class="page active"><div id="exerciseList" class="list-container"></div></div>
     <div id="page-plans" class="page"><div id="planList" class="list-container"></div></div>
     <div id="page-logs" class="page"><div id="logList" class="list-container"></div></div>
     <div id="page-calendar" class="page"><div id="calendarContainer"></div></div>
     <div id="page-stats" class="page"><div id="statsContainer"></div></div>
-
     <div id="detailContainer" style="display:none;"></div>
-
     <div id="backupOverlay" class="backup-overlay">
       <div class="backup-modal">
         <h3>💾 Backup & Wiederherstellung</h3>
         <p class="backup-info" id="backupInfo">Letztes Backup: <span id="lastBackupDate">–</span></p>
-        <p style="margin-bottom:10px; font-size:0.8rem; color:#aaa;">
-          Automatisches Backup wird bei jedem Speichern erstellt.
-        </p>
+        <p style="margin-bottom:10px; font-size:0.8rem; color:#aaa;">Automatisches Backup wird bei jedem Speichern erstellt.</p>
         <div class="btn-row">
           <button class="btn-save" id="btnExport"><i class="fas fa-download"></i> Exportieren</button>
           <button class="btn-cancel" id="btnImportTrigger"><i class="fas fa-upload"></i> Importieren</button>
@@ -588,9 +553,8 @@
       </div>
     </div>
   </div>
-
   <script>
-    // ===== JS-FALLBACK FÜR IOS PULL-TO-REFRESH =====
+    // ===== FALLBACK IOS PULL-TO-REFRESH =====
     let _startY = 0;
     document.addEventListener('touchstart', e => { _startY = e.touches[0].pageY; }, { passive: true });
     document.addEventListener('touchmove', e => {
@@ -598,14 +562,13 @@
       if (window.scrollY === 0 && y > _startY) e.preventDefault();
     }, { passive: false });
 
-    // ========== INDEXED-DB WRAPPER ==========
+    // ===== INDEXED-DB =====
     const dbPromise = new Promise((resolve, reject) => {
       const request = indexedDB.open('BodybuildingProDB', 1);
       request.onupgradeneeded = (e) => { e.target.result.createObjectStore('store'); };
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error);
     });
-
     async function idbSet(key, val) {
       const db = await dbPromise;
       return new Promise((resolve, reject) => {
@@ -615,7 +578,6 @@
         tx.onerror = () => reject(tx.error);
       });
     }
-
     async function idbGet(key) {
       const db = await dbPromise;
       return new Promise((resolve, reject) => {
@@ -626,26 +588,20 @@
       });
     }
 
-    // ========== GLOBALE VARIABLEN ==========
+    // ===== GLOBALE VARIABLEN =====
     let exercises = [], plans = [], logs = [];
     let currentTab = 'exercises', editingId = null, editingType = null;
     let calendarDate = new Date();
     let calendarView = 'month';
     let activePlanId = null;
-
     let timerInterval = null, timerRunning = false;
     let currentTimerLogId = null, currentTimerExId = null;
     let timerStartTime = null, timerTotalSeconds = 0, timerRemainingSeconds = 0;
-    let wakeLock = null;
-    let wakeLockManual = false;
-
-    let overallTimerStart = null;
-    let overallTimerInterval = null;
-    let overallTimerRunning = false;
-
+    let wakeLock = null, wakeLockManual = false;
+    let overallTimerStart = null, overallTimerInterval = null, overallTimerRunning = false;
     let lastBackupDate = null;
 
-    // ========== DOM-REFERENZEN ==========
+    // ===== DOM-REFERENZEN =====
     const pageExercises = document.getElementById('page-exercises');
     const pagePlans = document.getElementById('page-plans');
     const pageLogs = document.getElementById('page-logs');
@@ -669,7 +625,7 @@
     const fileInput = document.getElementById('fileInput');
     const lastBackupDateSpan = document.getElementById('lastBackupDate');
 
-    // ========== HILFSFUNKTIONEN ==========
+    // ===== HILFSFUNKTIONEN =====
     function generateId() { return Date.now().toString(36) + Math.random().toString(36).substr(2, 5); }
     function formatTime(sec) {
       const m = String(Math.floor(sec / 60)).padStart(2, '0');
@@ -686,7 +642,6 @@
       return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
     }
     function formatDate(d) { if (!d) return ''; const p = d.split('-'); return `${p[2]}.${p[1]}.${p[0]}`; }
-
     function getExerciseIcon(ex) {
       const name = ex.name.toLowerCase();
       if (ex.type === 'cardio') return 'fa-person-running';
@@ -705,7 +660,6 @@
       if (name.includes('rudergerät') || name.includes('ergometer')) return 'fa-oar';
       return 'fa-dumbbell';
     }
-
     function playBeep() {
       try {
         const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -728,7 +682,7 @@
       }
     }
 
-    // ========== WAKE LOCK ==========
+    // ===== WAKE LOCK =====
     async function requestWakeLock() {
       try {
         if ('wakeLock' in navigator) {
@@ -756,7 +710,7 @@
       }
     }
 
-    // ========== PERSISTENT STORAGE ==========
+    // ===== PERSISTENT STORAGE =====
     async function enablePersistentStorage() {
       if ('storage' in navigator && 'persist' in navigator.storage) {
         try {
@@ -770,7 +724,7 @@
       }
     }
 
-    // ========== SPEICHERN & LADEN ==========
+    // ===== SPEICHERN & LADEN =====
     function saveData() {
       idbSet('bb_exercises', exercises).catch(console.warn);
       idbSet('bb_plans', plans).catch(console.warn);
@@ -784,7 +738,6 @@
         console.log('✅ Auto-Backup gespeichert');
       }).catch(console.warn);
     }
-
     async function loadData() {
       try {
         const e = await idbGet('bb_exercises'); if (e) exercises = e;
@@ -792,7 +745,6 @@
         const l = await idbGet('bb_logs'); if (l) logs = l;
         const act = await idbGet('bb_activePlan'); if (act !== undefined) activePlanId = act;
       } catch(err) { console.warn('Laden fehlgeschlagen:', err); }
-
       if (exercises.length === 0 && plans.length === 0 && logs.length === 0) {
         const oldEx = localStorage.getItem('bb_exercises');
         if (oldEx) {
@@ -810,7 +762,6 @@
           } catch(err) { console.warn('Migrationsfehler:', err); }
         }
       }
-
       exercises.forEach(ex => { if (!ex.type) ex.type = 'strength'; });
       logs.forEach(log => {
         log.entries.forEach(entry => {
@@ -819,7 +770,6 @@
         });
         if (log.duration === undefined) log.duration = 0;
       });
-
       if (exercises.length === 0 && plans.length === 0 && logs.length === 0) {
         const autoBackup = await idbGet('bb_auto_backup');
         if (autoBackup && autoBackup.exercises && autoBackup.plans && autoBackup.logs) {
@@ -848,12 +798,11 @@
           saveData();
         }
       }
-
       const stored = localStorage.getItem('bb_last_backup');
       if (stored) { lastBackupDate = stored; if (lastBackupDateSpan) lastBackupDateSpan.textContent = stored; }
     }
 
-    // ========== LETZTE TRAININGSDATEN (ALLE SÄTZE) ==========
+    // ===== LETZTE TRAININGSDATEN =====
     function getLastTrainingDataForExercise(exerciseId) {
       const sortedLogs = [...logs].sort((a, b) => (a.date || '').localeCompare(b.date || '') * -1);
       for (const log of sortedLogs) {
@@ -869,13 +818,13 @@
       return { sets: [{ kg: 0, wdh: 0 }], notiz: '', currentSetIndex: 0 };
     }
 
-    // ========== VOLUMEN ==========
+    // ===== VOLUMEN =====
     function calcVolume(entry) {
       if (!entry.sets) return 0;
       return entry.sets.reduce((sum, set) => sum + (set.kg || 0) * (set.wdh || 0), 0);
     }
 
-    // ========== TIMER (KREIS) ==========
+    // ===== TIMER KREIS =====
     function drawTimerCircle(canvas, remaining, total) {
       const ctx = canvas.getContext('2d');
       const w = canvas.width, h = canvas.height;
@@ -884,13 +833,11 @@
       const progress = total > 0 ? remaining / total : 1;
       const startAngle = -Math.PI/2;
       const endAngle = startAngle + (progress * 2 * Math.PI);
-
       ctx.beginPath();
       ctx.arc(cx, cy, r, 0, 2 * Math.PI);
       ctx.strokeStyle = 'rgba(255,255,255,0.08)';
       ctx.lineWidth = 5;
       ctx.stroke();
-
       const grad = ctx.createConicGradient(startAngle, cx, cy);
       grad.addColorStop(0, '#2ecc71');
       grad.addColorStop(0.5, '#f39c12');
@@ -901,7 +848,6 @@
       ctx.lineWidth = 5;
       ctx.lineCap = 'round';
       ctx.stroke();
-
       if (remaining < 5 && remaining > 0) {
         ctx.shadowColor = '#e74c3c';
         ctx.shadowBlur = 16;
@@ -914,14 +860,12 @@
       }
     }
 
-    // ========== RENDER-FUNKTIONEN ==========
+    // ===== RENDER-FUNKTIONEN =====
     function renderAll() {
       renderExercises(); renderPlans(); renderLogs();
       if (currentTab === 'calendar') renderCalendar();
       if (currentTab === 'stats') renderStats();
     }
-
-    // ----- EXERCISES -----
     function renderExercises() {
       if (!exercises.length) {
         exerciseList.innerHTML = `<div class="empty-state"><i class="fas fa-dumbbell" style="font-size:2rem; display:block; margin-bottom:10px;"></i>Keine Übungen vorhanden.<br/>Klicke auf +, um eine anzulegen.</div>`;
@@ -957,8 +901,6 @@
         item.addEventListener('click', () => openExerciseForm(item.dataset.id));
       });
     }
-
-    // ----- PLANS -----
     function renderPlans() {
       if (!plans.length) {
         planList.innerHTML = `<div class="empty-state"><i class="fas fa-list" style="font-size:2rem; display:block; margin-bottom:10px;"></i>Keine Trainingspläne.<br/>Klicke auf +, um einen zu erstellen.</div>`;
@@ -1001,8 +943,6 @@
         item.addEventListener('click', () => openPlanForm(item.dataset.id));
       });
     }
-
-    // ----- LOGS -----
     function renderLogs() {
       if (!logs.length) {
         logList.innerHTML = `<div class="empty-state"><i class="fas fa-history" style="font-size:2rem; display:block; margin-bottom:10px;"></i>Keine Trainingslogs.<br/>Klicke auf +, um ein Training zu protokollieren.</div>`;
@@ -1036,8 +976,7 @@
       });
     }
 
-    // ========== CRUD-FUNKTIONEN ==========
-    // ----- EXERCISE -----
+    // ===== CRUD =====
     function openExerciseForm(id = null) {
       const isEdit = !!id;
       const ex = isEdit ? exercises.find(e => e.id === id) : null;
@@ -1072,7 +1011,6 @@
         document.getElementById('btnDeleteExercise').addEventListener('click', () => { deleteExercise(id); closeDetail(); });
       }
     }
-
     function saveExerciseForm() {
       const name = document.getElementById('formExName').value.trim();
       if (!name) { alert('Bitte Namen eingeben.'); return; }
@@ -1105,8 +1043,6 @@
       logs.forEach(log => { log.entries = log.entries.filter(entry => entry.exerciseId !== id); });
       saveData(); renderAll();
     }
-
-    // ----- PLAN -----
     function openPlanForm(id = null) {
       const isEdit = !!id;
       const plan = isEdit ? plans.find(p => p.id === id) : null;
@@ -1136,7 +1072,6 @@
         document.getElementById('btnDeletePlan').addEventListener('click', () => { deletePlan(id); closeDetail(); });
       }
     }
-
     function updatePlanExerciseList(container, selectedIds) {
       if (!container) return;
       const selected = selectedIds || [];
@@ -1223,7 +1158,7 @@
       saveData(); renderAll();
     }
 
-    // ========== QUICKSTART ==========
+    // ===== QUICKSTART =====
     function quickStart() {
       if (!activePlanId) {
         alert('Kein aktiver Plan ausgewählt. Markiere einen Plan mit ⭐ als aktiv.');
@@ -1238,7 +1173,6 @@
         renderPlans();
         return;
       }
-
       const newLog = {
         id: generateId(),
         planId: activePlanId,
@@ -1261,7 +1195,7 @@
       openLogForm(newLog.id, true);
     }
 
-    // ========== GESAMTTIMER ==========
+    // ===== GESAMTTIMER =====
     function startOverallTimer() {
       if (!overallTimerRunning) {
         overallTimerStart = Date.now();
@@ -1289,11 +1223,10 @@
       if (display) display.textContent = formatTime(elapsed);
     }
 
-    // ========== LOG-FORMS (KERNLOGIK) ==========
+    // ===== LOG-FORM =====
     function openLogForm(id = null, startTimer = false) {
       const isEdit = !!id;
       let log = isEdit ? logs.find(l => l.id === id) : null;
-
       if (!isEdit) {
         log = { id: generateId(), planId: '', date: getToday(), duration: 0, entries: [] };
         editingId = log.id;
@@ -1318,18 +1251,14 @@
       editingType = 'log';
       detailContainer.style.display = 'block';
       hideAllPages();
-
       const planOptions = plans.map(p => `<option value="${p.id}" ${log.planId === p.id ? 'selected' : ''}>${p.name}</option>`).join('');
       const plan = plans.find(p => p.id === log.planId);
-
-      // --- Bei bestehendem Log werden die gespeicherten Einträge verwendet ---
       let entries = [];
       let exerciseIds = [];
       if (isEdit) {
         entries = log.entries || [];
         exerciseIds = entries.map(e => e.exerciseId);
       } else {
-        // Neues Log: Einträge aus Plan generieren (falls vorhanden)
         if (plan && plan.exerciseIds) {
           exerciseIds = plan.exerciseIds;
           entries = exerciseIds.map(exId => {
@@ -1339,7 +1268,7 @@
               sets: data.sets,
               cardioData: { time: 0, distance: 0 },
               notiz: data.notiz,
-              currentSetIndex: 0   // neues Training → bei 0 starten
+              currentSetIndex: 0
             };
           });
           log.entries = entries;
@@ -1349,8 +1278,6 @@
           exerciseIds = [];
         }
       }
-
-      // Falls im bestehenden Log der Plan gewechselt wurde, aber noch keine Einträge da sind
       if (isEdit && entries.length === 0 && plan && plan.exerciseIds) {
         exerciseIds = plan.exerciseIds;
         entries = exerciseIds.map(exId => {
@@ -1366,11 +1293,8 @@
         log.entries = entries;
         saveData();
       }
-
       let totalVolume = 0;
       entries.forEach(entry => { totalVolume += calcVolume(entry); });
-
-      // --- HTML generieren ---
       let exercisesHtml = '';
       if (exerciseIds.length) {
         exerciseIds.forEach((exId, idx) => {
@@ -1379,7 +1303,6 @@
           const entry = entries.find(e => e.exerciseId === exId) || { exerciseId: exId, sets: [{ kg: 0, wdh: 0 }], cardioData: { time: 0, distance: 0 }, notiz: '', currentSetIndex: 0 };
           const sets = entry.sets || [{ kg: 0, wdh: 0 }];
           const currentSetIdx = entry.currentSetIndex || 0;
-
           let setHtml = '';
           let exVolume = 0;
           if (ex.type === 'cardio') {
@@ -1424,7 +1347,6 @@
                 </tr>
               `;
             }).join('');
-
             setHtml = `
               <div class="set-progress">
                 <span>Satz <span class="current-set-label">${Math.min(currentSetIdx + 1, sets.length)}</span> von ${sets.length}</span>
@@ -1439,7 +1361,6 @@
               </div>
             `;
           }
-
           exercisesHtml += `
             <div class="exercise-entry" data-exid="${exId}" data-logid="${log.id}">
               <div class="ex-header">
@@ -1468,7 +1389,6 @@
       } else {
         exercisesHtml = `<div class="empty-state" style="padding:10px 0;">Wähle einen Plan aus, um Übungen zu laden.</div>`;
       }
-
       let chartHtml = '';
       if (isEdit && exerciseIds.length) {
         const firstStrength = exerciseIds.find(id => { const ex = exercises.find(e => e.id === id); return ex && ex.type === 'strength'; });
@@ -1480,12 +1400,10 @@
           `;
         }
       }
-
       let timerButtonHtml = '';
       if (!overallTimerRunning) {
         timerButtonHtml = `<button class="btn-save" id="btnStartOverallTimer" style="margin-bottom:4px; font-size:0.85rem; padding:8px 12px;"><i class="fas fa-play"></i> Training starten</button>`;
       }
-
       const wakeToggleHtml = `
         <div style="display:flex; align-items:center; gap:6px; margin:4px 0 6px; flex-wrap:wrap;">
           <span style="font-size:0.7rem; color:#aaa;">🖥️ Bildschirm:</span>
@@ -1494,7 +1412,6 @@
           </div>
         </div>
       `;
-
       detailContainer.innerHTML = `
         <div class="detail-card">
           <h3 style="margin-bottom:6px; font-size:0.95rem;">${isEdit ? 'Training bearbeiten' : 'Neues Training'}</h3>
@@ -1519,13 +1436,10 @@
           </div>
         </div>
       `;
-
-      // ===== EVENT-LISTENER =====
       document.getElementById('wakeToggleBtn')?.addEventListener('click', function(e) {
         e.stopPropagation();
         toggleWakeLock();
       });
-
       document.getElementById('btnStartOverallTimer')?.addEventListener('click', function() {
         if (!overallTimerRunning) {
           startOverallTimer();
@@ -1535,8 +1449,6 @@
           updateWakeToggleUI(true);
         }
       });
-
-      // Plan-Änderung (mit aktuellen Trainingsdaten)
       document.getElementById('formLogPlan')?.addEventListener('change', function() {
         const newPlanId = this.value;
         collectLogEntries(editingId);
@@ -1562,14 +1474,11 @@
         }
         openLogForm(editingId, overallTimerRunning);
       });
-
       document.getElementById('btnSaveLog').addEventListener('click', () => saveLogForm());
       document.getElementById('btnCancelDetail').addEventListener('click', closeDetail);
       if (isEdit) {
         document.getElementById('btnDeleteLog').addEventListener('click', () => { deleteLog(id); closeDetail(); });
       }
-
-      // Zeichne Timer-Kreise initial
       exerciseIds.forEach(exId => {
         const ex = exercises.find(e => e.id === exId);
         if (!ex) return;
@@ -1579,19 +1488,16 @@
           drawTimerCircle(canvas, pause, pause);
         }
       });
-
-      // Chart
       if (isEdit && exerciseIds.length) {
         const firstStrength = exerciseIds.find(id => { const ex = exercises.find(e => e.id === id); return ex && ex.type === 'strength'; });
         if (firstStrength && document.getElementById('chartContainer')) {
           renderChart(firstStrength, document.getElementById('chartContainer'));
         }
       }
-
       updateOverallTimer();
     }
 
-    // ========== LOG-OPERATIONEN ==========
+    // ===== LOG-OPERATIONEN =====
     function collectLogEntries(logId) {
       const log = logs.find(l => l.id === logId);
       if (!log) return;
@@ -1624,7 +1530,6 @@
       });
       log.entries = entries;
     }
-
     function addSetToLogEntry(logId, exId) {
       const log = logs.find(l => l.id === logId);
       if (!log) return;
@@ -1635,7 +1540,6 @@
       if ((entry.currentSetIndex || 0) >= entry.sets.length) entry.currentSetIndex = entry.sets.length - 1;
       saveData(); openLogForm(logId, overallTimerRunning);
     }
-
     function removeSetFromLogEntry(logId, exId, idx) {
       const log = logs.find(l => l.id === logId);
       if (!log) return;
@@ -1645,7 +1549,6 @@
       if ((entry.currentSetIndex || 0) >= entry.sets.length) entry.currentSetIndex = entry.sets.length - 1;
       saveData(); openLogForm(logId, overallTimerRunning);
     }
-
     function updateSetValueInLog(logId, exId, idx, field, value) {
       const log = logs.find(l => l.id === logId);
       if (!log) return;
@@ -1654,7 +1557,6 @@
       entry.sets[idx][field] = value;
       saveData();
     }
-
     function updateCardioData(logId, exId, field, value) {
       const log = logs.find(l => l.id === logId);
       if (!log) return;
@@ -1663,7 +1565,6 @@
       entry.cardioData[field] = value;
       saveData();
     }
-
     function updateNotizInLog(logId, exId, value) {
       const log = logs.find(l => l.id === logId);
       if (!log) return;
@@ -1672,14 +1573,12 @@
       entry.notiz = value;
       saveData();
     }
-
     function removeExerciseFromLog(logId, exId) {
       const log = logs.find(l => l.id === logId);
       if (!log) return;
       log.entries = log.entries.filter(e => e.exerciseId !== exId);
       saveData(); openLogForm(logId, overallTimerRunning);
     }
-
     function saveLogForm() {
       const logId = editingId;
       let log = logs.find(l => l.id === logId);
@@ -1696,14 +1595,13 @@
       collectLogEntries(logId);
       saveData(); renderAll(); closeDetail();
     }
-
     function deleteLog(id) {
       if (!confirm('Training aus dem Log löschen?')) return;
       logs = logs.filter(l => l.id !== id);
       saveData(); renderAll();
     }
 
-    // ========== CHART ==========
+    // ===== CHART =====
     function renderChart(exerciseId, container) {
       const logsForEx = logs.filter(log => log.entries.some(e => e.exerciseId === exerciseId && e.sets && e.sets.length > 0));
       if (logsForEx.length < 2) {
@@ -1778,7 +1676,7 @@
       ctx.fillText(Math.round(minKg) + 'kg', padding.left - 2, height - padding.bottom - 2);
     }
 
-    // ========== PAUSENTIMER (KEINE HAKEN, KEINE MELDUNG) ==========
+    // ===== PAUSENTIMER (KEINE HAKEN, KEINE MELDUNG) =====
     function updateTimerDisplay() {
       if (!timerRunning) return;
       const now = Date.now();
@@ -1793,22 +1691,16 @@
         if (remaining <= 0) display.classList.add('alarm');
         else display.classList.remove('alarm');
       }
-
       if (remaining <= 0) {
-        // Timer abgelaufen – einfach stoppen und zurücksetzen, ohne Haken oder Meldung
         clearInterval(timerInterval);
         timerInterval = null;
         timerRunning = false;
-
-        // Button zurücksetzen
         document.querySelectorAll('.btn-timer').forEach(b => {
           if (b.dataset.logid === currentTimerLogId && b.dataset.exid === currentTimerExId) {
             b.innerHTML = '<i class="fas fa-play"></i> Timer starten';
             b.classList.remove('active');
           }
         });
-
-        // Anzeige auf Pausenwert zurücksetzen
         const ex = exercises.find(e => e.id === currentTimerExId);
         const pauseSec = ex ? ex.pause || 90 : 90;
         const displayEl = document.getElementById(`timer-${currentTimerLogId}-${currentTimerExId}`);
@@ -1818,20 +1710,15 @@
           const canvas = document.getElementById(`timer-${currentTimerLogId}-${currentTimerExId}-canvas`);
           if (canvas) drawTimerCircle(canvas, pauseSec, pauseSec);
         }
-
-        // Nur Piepton, kein Alert, kein Haken, kein Neuladen
         playBeep();
         const exName = exercises.find(e => e.id === currentTimerExId)?.name || 'Übung';
         sendNotification(`Pause für ${exName} beendet!`);
         if (navigator.vibrate) navigator.vibrate(200);
-
         currentTimerLogId = null;
         currentTimerExId = null;
       }
     }
-
     function toggleTimer(logId, exId, btnElement) {
-      // Wenn ein anderer Timer läuft, stoppen
       if (timerRunning && (currentTimerLogId !== logId || currentTimerExId !== exId)) {
         clearInterval(timerInterval);
         timerInterval = null;
@@ -1845,8 +1732,6 @@
         const oldDisplay = document.getElementById(`timer-${currentTimerLogId}-${currentTimerExId}`);
         if (oldDisplay) oldDisplay.classList.remove('alarm');
       }
-
-      // Wenn der gleiche Timer läuft, stoppen
       if (timerRunning && currentTimerLogId === logId && currentTimerExId === exId) {
         clearInterval(timerInterval);
         timerInterval = null;
@@ -1857,8 +1742,6 @@
         if (display) display.classList.remove('alarm');
         return;
       }
-
-      // Timer starten
       const ex = exercises.find(e => e.id === exId);
       if (!ex) return;
       const pauseSec = ex.pause || 90;
@@ -1870,7 +1753,6 @@
       timerRunning = true;
       btnElement.innerHTML = '<i class="fas fa-stop"></i> Stopp';
       btnElement.classList.add('active');
-
       const display = document.getElementById(`timer-${logId}-${exId}`);
       if (display) {
         display.textContent = formatTime(pauseSec);
@@ -1878,12 +1760,11 @@
         const canvas = document.getElementById(`timer-${logId}-${exId}-canvas`);
         if (canvas) drawTimerCircle(canvas, pauseSec, pauseSec);
       }
-
       if (timerInterval) clearInterval(timerInterval);
       timerInterval = setInterval(updateTimerDisplay, 1000);
     }
 
-    // ========== STATISTIK ==========
+    // ===== STATISTIK =====
     let showAllStats = false;
     function renderStats() {
       if (!statsContainer) return;
@@ -1892,7 +1773,6 @@
         statsContainer.innerHTML = `<div class="empty-state">Noch keine Trainingsdaten für Statistiken.<br/>Mache dein erstes Training!</div>`;
         return;
       }
-
       const now = new Date();
       const currentMonth = now.getMonth();
       const currentYear = now.getFullYear();
@@ -1902,14 +1782,12 @@
         const logD = new Date(y, m - 1, d);
         return logD.getMonth() === currentMonth && logD.getFullYear() === currentYear;
       }).length;
-
       let lastTrainingVolume = 0;
       if (logs.length > 0) {
         const sortedLogs = [...logs].sort((a, b) => (b.date || '').localeCompare(a.date || ''));
         const lastLog = sortedLogs[0];
         lastLog.entries.forEach(entry => { lastTrainingVolume += calcVolume(entry); });
       }
-
       const exerciseProgress = [];
       const exerciseLogs = {};
       logs.forEach(log => {
@@ -1922,7 +1800,6 @@
           exerciseLogs[exId].push({ date: log.date, volume: vol });
         });
       });
-
       Object.keys(exerciseLogs).forEach(exId => {
         const entries = exerciseLogs[exId];
         if (entries.length < 2) return;
@@ -1942,10 +1819,8 @@
           });
         }
       });
-
       exerciseProgress.sort((a, b) => Math.abs(b.diff) - Math.abs(a.diff));
       let filtered = showAllStats ? exerciseProgress : exerciseProgress.filter(p => p.diff !== 0);
-
       const days = [];
       const todayMidnight = new Date();
       todayMidnight.setHours(0,0,0,0);
@@ -1966,7 +1841,6 @@
         });
         days.push({ label: dayLabel, vol: dayVol });
       }
-
       let html = `
         <div class="stat-card">
           <div style="display:flex; gap:12px; flex-wrap:wrap; justify-content:space-around;">
@@ -1991,7 +1865,6 @@
         `;
       });
       html += `</div></div>`;
-
       html += `
         <div class="stat-card">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; flex-wrap:wrap; gap:4px;">
@@ -2023,7 +1896,6 @@
         });
       }
       html += `</ul></div>`;
-
       statsContainer.innerHTML = html;
       document.getElementById('statToggle')?.addEventListener('click', function() {
         showAllStats = !showAllStats;
@@ -2031,7 +1903,7 @@
       });
     }
 
-    // ========== KALENDER ==========
+    // ===== KALENDER =====
     function renderCalendar() {
       if (!calendarContainer) return;
       if (calendarView === 'year') {
@@ -2041,14 +1913,11 @@
       const year = calendarDate.getFullYear();
       const month = calendarDate.getMonth();
       const todayStr = getToday();
-
       const firstDay = new Date(year, month, 1);
       const daysInMonth = new Date(year, month + 1, 0).getDate();
       const startDayOfWeek = firstDay.getDay();
-
       const logMap = {};
       logs.forEach(log => { if (log.date) logMap[log.date] = log.id; });
-
       let html = `
         <div class="calendar-container">
           <div class="calendar-header">
@@ -2082,7 +1951,6 @@
         html += `<div class="day-cell other-month">${nextDate.getDate()}</div>`;
       }
       html += `</div>`;
-
       const monthStr = String(month+1).padStart(2,'0');
       const logsThisMonth = logs.filter(log => log.date && log.date.startsWith(`${year}-${monthStr}`));
       const daysTrained = logsThisMonth.length;
@@ -2091,7 +1959,6 @@
         log.entries.forEach(entry => { totalVol += calcVolume(entry); });
       });
       const avgVol = daysTrained > 0 ? Math.round(totalVol / daysTrained) : 0;
-
       html += `
         <div class="calendar-stats">
           <span>📅 Trainingstage: <span class="count">${daysTrained}</span></span>
@@ -2099,9 +1966,7 @@
           <span>📈 Ø: <span class="count">${avgVol} kg</span></span>
         </div>
       </div>`;
-
       calendarContainer.innerHTML = html;
-
       document.getElementById('calPrev')?.addEventListener('click', () => {
         calendarDate.setMonth(calendarDate.getMonth() - 1);
         renderCalendar();
@@ -2124,13 +1989,11 @@
         });
       });
     }
-
     function renderYearView() {
       const year = calendarDate.getFullYear();
       const todayStr = getToday();
       const logMap = {};
       logs.forEach(log => { if (log.date) logMap[log.date] = log.id; });
-
       const yearStr = String(year);
       const logsThisYear = logs.filter(log => log.date && log.date.startsWith(yearStr));
       const daysTrained = logsThisYear.length;
@@ -2139,7 +2002,6 @@
         log.entries.forEach(entry => { totalVol += calcVolume(entry); });
       });
       const avgVol = daysTrained > 0 ? Math.round(totalVol / daysTrained) : 0;
-
       let html = `
         <div class="calendar-container">
           <div class="calendar-header">
@@ -2190,7 +2052,6 @@
         </div>
       `;
       calendarContainer.innerHTML = html;
-
       document.getElementById('yearPrev')?.addEventListener('click', () => {
         calendarDate.setFullYear(calendarDate.getFullYear() - 1);
         renderCalendar();
@@ -2214,7 +2075,7 @@
       });
     }
 
-    // ========== BACKUP ==========
+    // ===== BACKUP =====
     function exportData() {
       const data = { exercises, plans, logs };
       const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -2265,7 +2126,7 @@
       }
     }
 
-    // ========== UI-HILFEN ==========
+    // ===== UI =====
     function hideAllPages() { document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); }
     function closeDetail() {
       if (overallTimerRunning) releaseOverallTimer();
@@ -2295,11 +2156,10 @@
       detailContainer.style.display = 'none';
     }
 
-    // ========== EVENT DELEGATION ==========
+    // ===== EVENT DELEGATION =====
     detailContainer.addEventListener('click', function(e) {
       if (editingType !== 'log') return;
       const target = e.target;
-
       const btnTimer = target.closest('.btn-timer');
       if (btnTimer) {
         e.preventDefault();
@@ -2308,10 +2168,8 @@
         toggleTimer(logId, exId, btnTimer);
         return;
       }
-
       const btnAddSet = target.closest('.btn-add-set');
       if (btnAddSet) { addSetToLogEntry(btnAddSet.dataset.logid, btnAddSet.dataset.exid); return; }
-
       const btnRemoveSet = target.closest('.btn-remove-set');
       if (btnRemoveSet) {
         e.preventDefault();
@@ -2319,7 +2177,6 @@
         removeSetFromLogEntry(btnRemoveSet.dataset.logid, btnRemoveSet.dataset.exid, parseInt(btnRemoveSet.dataset.idx));
         return;
       }
-
       const btnSetControl = target.closest('.set-controls button');
       if (btnSetControl) {
         e.preventDefault();
@@ -2339,7 +2196,6 @@
         input.dispatchEvent(new Event('change', { bubbles: true }));
         return;
       }
-
       const btnDelEx = target.closest('.ex-header .del');
       if (btnDelEx) {
         e.preventDefault();
@@ -2347,8 +2203,7 @@
         removeExerciseFromLog(editingId, btnDelEx.dataset.exid);
         return;
       }
-
-      // Klick auf Satzzeile: alle Sätze bis zu diesem als erledigt markieren (MANUELL)
+      // Klick auf Satzzeile: alle Sätze bis zu diesem als erledigt markieren
       const trActiveSet = target.closest('.exercise-entry .sets-table tbody tr');
       if (trActiveSet) {
         if (target.tagName === 'INPUT' || target.tagName === 'BUTTON' || target.closest('button')) return;
@@ -2361,18 +2216,11 @@
         if (log) {
           const entry = log.entries.find(e => e.exerciseId === exId);
           if (entry) {
-            // Logik:
-            // idx = 0 → kein Satz erledigt (currentSetIndex = 0)
-            // idx = letzter Satz → alle Sätze erledigt (currentSetIndex = sets.length)
-            // sonst → Sätze < idx erledigt, idx ist aktiv (currentSetIndex = idx)
-            let newIdx;
-            if (idx === 0) {
-              newIdx = 0;
-            } else if (idx === entry.sets.length - 1) {
-              newIdx = entry.sets.length;
-            } else {
-              newIdx = idx;
-            }
+            // NEUE LOGIK: Klick auf Satz idx markiert alle Sätze bis einschließlich idx als erledigt
+            // idx = 0 → Satz 1 bekommt Haken (currentSetIndex = 1)
+            // idx = 1 → Satz 1+2 bekommen Haken (currentSetIndex = 2)
+            // idx = letzter → alle Sätze haben Haken (currentSetIndex = sets.length)
+            const newIdx = Math.min(idx + 1, entry.sets.length);
             entry.currentSetIndex = newIdx;
             saveData();
             openLogForm(logId, overallTimerRunning);
@@ -2384,7 +2232,6 @@
     detailContainer.addEventListener('change', function(e) {
       if (editingType !== 'log') return;
       const target = e.target;
-
       if (target.classList.contains('set-kg')) {
         updateSetValueInLog(target.dataset.logid, target.dataset.exid, parseInt(target.dataset.idx), 'kg', parseFloat(target.value) || 0);
         updateVolumeDisplay(target.dataset.logid);
@@ -2412,7 +2259,7 @@
       if (display) display.textContent = total + ' kg';
     }
 
-    // ========== EVENT LISTENER ==========
+    // ===== EVENT LISTENER =====
     tabBtns.forEach(btn => {
       btn.addEventListener('click', () => { showTab(btn.dataset.tab); });
     });
@@ -2434,15 +2281,13 @@
       if (this.files && this.files[0]) { importData(this.files[0]); this.value = ''; }
     });
     backupOverlay.addEventListener('click', function(e) { if (e.target === this) this.classList.remove('active'); });
-
-    // Haptisches Feedback
     document.addEventListener('pointerdown', function(e) {
       if (e.target.closest('button') || e.target.closest('.list-item') || e.target.closest('.day-cell.has-training')) {
         if (navigator.vibrate) navigator.vibrate(12);
       }
     }, { passive: true });
 
-    // ========== INIT ==========
+    // ===== INIT =====
     async function initApp() {
       await loadData();
       enablePersistentStorage();
@@ -2452,7 +2297,6 @@
         navigator.serviceWorker.register('sw.js').catch(() => {});
       }
     }
-
     initApp();
   </script>
 </body>
