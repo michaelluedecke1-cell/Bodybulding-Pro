@@ -2361,17 +2361,17 @@
         if (log) {
           const entry = log.entries.find(e => e.exerciseId === exId);
           if (entry) {
-            // Korrekte Logik:
+            // Logik:
             // idx = 0 → kein Satz erledigt (currentSetIndex = 0)
             // idx = letzter Satz → alle Sätze erledigt (currentSetIndex = sets.length)
-            // sonst: Sätze < idx sind erledigt, idx ist aktiv (currentSetIndex = idx)
+            // sonst → Sätze < idx erledigt, idx ist aktiv (currentSetIndex = idx)
             let newIdx;
             if (idx === 0) {
               newIdx = 0;
             } else if (idx === entry.sets.length - 1) {
               newIdx = entry.sets.length;
             } else {
-              newIdx = idx; // Sätze < idx erledigt, idx ist aktiv
+              newIdx = idx;
             }
             entry.currentSetIndex = newIdx;
             saveData();
