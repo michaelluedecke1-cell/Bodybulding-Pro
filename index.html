@@ -1428,7 +1428,7 @@
             setHtml = `
               <div class="set-progress">
                 <span>Satz <span class="current-set-label">${Math.min(currentSetIdx + 1, sets.length)}</span> von ${sets.length}</span>
-                <span style="color:#888;">(Klick auf Satzzeile zum Markieren)</span>
+                <span style="color:#888;">(Klick auf Satzzeile zum Markieren als erledigt)</span>
               </div>
               <table class="sets-table">
                 <thead><tr><th>Satz</th><th>KG</th><th>WDH</th><th></th></tr></thead>
@@ -1823,7 +1823,7 @@
               openLogForm(oldLogId, overallTimerRunning);
               return;
             } else {
-              // Alle Sätze erledigt
+              // Alle Sätze erledigt – Formular ebenfalls neu laden, damit alle Sätze den Haken bekommen
               alert('🏁 Alle Sätze dieser Übung abgeschlossen!');
               const displayEl = document.getElementById(`timer-${currentTimerLogId}-${currentTimerExId}`);
               if (displayEl) {
@@ -1834,8 +1834,10 @@
                 const canvas = document.getElementById(`timer-${currentTimerLogId}-${currentTimerExId}-canvas`);
                 if (canvas) drawTimerCircle(canvas, pauseSec, pauseSec);
               }
+              const logId = currentTimerLogId;
               currentTimerLogId = null;
               currentTimerExId = null;
+              openLogForm(logId, overallTimerRunning);
               return;
             }
           }
@@ -2367,7 +2369,7 @@
         return;
       }
 
-      // Klick auf Satzzeile: aktiven Satz setzen
+      // Klick auf Satzzeile: alle Sätze bis zu diesem als erledigt markieren
       const trActiveSet = target.closest('.exercise-entry .sets-table tbody tr');
       if (trActiveSet) {
         if (target.tagName === 'INPUT' || target.tagName === 'BUTTON' || target.closest('button')) return;
@@ -2380,7 +2382,8 @@
         if (log) {
           const entry = log.entries.find(e => e.exerciseId === exId);
           if (entry) {
-            entry.currentSetIndex = idx;
+            // Begrenzung: currentSetIndex darf nicht größer als die Anzahl der Sätze sein
+            entry.currentSetIndex = Math.min(idx + 1, entry.sets.length);
             saveData();
             openLogForm(logId, overallTimerRunning);
           }
