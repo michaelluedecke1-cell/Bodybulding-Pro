@@ -177,8 +177,12 @@
     }
     .exercise-entry .ex-header .ex-actions .del { color: #e74c3c; }
     .exercise-entry img {
-      max-width: 100%; max-height: 60px; object-fit: contain;
-      border-radius: 8px; margin: 4px 0; background: rgba(0,0,0,0.3);
+      max-width: 100%;
+      max-height: 100px; /* geändert von 60px auf 100px */
+      object-fit: contain;
+      border-radius: 8px;
+      margin: 4px 0;
+      background: rgba(0,0,0,0.3);
     }
     .exercise-entry .sets-table input[type="number"] {
       width: 48px; font-size: 0.85rem; padding: 4px 2px;
@@ -275,22 +279,22 @@
     }
     .exercise-entry .timer-wrapper {
       position: relative;
-      width: 64px;
-      height: 64px;
+      width: 80px;   /* geändert von 64px */
+      height: 80px;  /* geändert von 64px */
       margin: 4px auto 6px;
       display: flex;
       align-items: center;
       justify-content: center;
     }
     .exercise-entry .timer-wrapper canvas {
-      width: 64px;
-      height: 64px;
+      width: 80px;   /* geändert von 64px */
+      height: 80px;  /* geändert von 64px */
       border-radius: 50%;
       display: block;
     }
     .exercise-entry .timer-wrapper .timer-text {
       position: absolute;
-      font-size: 1rem;
+      font-size: 1.2rem; /* etwas größer */
       font-weight: 700;
       color: #fff;
       text-align: center;
@@ -298,7 +302,7 @@
       pointer-events: none;
     }
     .exercise-entry .timer-wrapper .timer-text .sub {
-      font-size: 0.5rem;
+      font-size: 0.6rem;
       font-weight: 400;
       color: #888;
       display: block;
@@ -824,19 +828,19 @@
       return entry.sets.reduce((sum, set) => sum + (set.kg || 0) * (set.wdh || 0), 0);
     }
 
-    // ===== TIMER KREIS =====
+    // ===== TIMER KREIS (angepasst für 80x80 Canvas) =====
     function drawTimerCircle(canvas, remaining, total) {
       const ctx = canvas.getContext('2d');
       const w = canvas.width, h = canvas.height;
       ctx.clearRect(0, 0, w, h);
-      const cx = w/2, cy = h/2, r = Math.min(w,h)/2 - 6;
+      const cx = w/2, cy = h/2, r = Math.min(w,h)/2 - 8; // etwas Rand
       const progress = total > 0 ? remaining / total : 1;
       const startAngle = -Math.PI/2;
       const endAngle = startAngle + (progress * 2 * Math.PI);
       ctx.beginPath();
       ctx.arc(cx, cy, r, 0, 2 * Math.PI);
       ctx.strokeStyle = 'rgba(255,255,255,0.08)';
-      ctx.lineWidth = 5;
+      ctx.lineWidth = 6;
       ctx.stroke();
       const grad = ctx.createConicGradient(startAngle, cx, cy);
       grad.addColorStop(0, '#2ecc71');
@@ -845,16 +849,16 @@
       ctx.beginPath();
       ctx.arc(cx, cy, r, startAngle, endAngle);
       ctx.strokeStyle = grad;
-      ctx.lineWidth = 5;
+      ctx.lineWidth = 6;
       ctx.lineCap = 'round';
       ctx.stroke();
       if (remaining < 5 && remaining > 0) {
         ctx.shadowColor = '#e74c3c';
-        ctx.shadowBlur = 16;
+        ctx.shadowBlur = 20;
         ctx.beginPath();
         ctx.arc(cx, cy, r, startAngle, endAngle);
         ctx.strokeStyle = 'rgba(231,76,60,0.3)';
-        ctx.lineWidth = 8;
+        ctx.lineWidth = 10;
         ctx.stroke();
         ctx.shadowBlur = 0;
       }
@@ -1223,7 +1227,7 @@
       if (display) display.textContent = formatTime(elapsed);
     }
 
-    // ===== LOG-FORM (mit korrigierter Volumenberechnung) =====
+    // ===== LOG-FORM (mit Timer-Größe 80x80) =====
     function openLogForm(id = null, startTimer = false) {
       const isEdit = !!id;
       let log = isEdit ? logs.find(l => l.id === id) : null;
@@ -1293,9 +1297,7 @@
         log.entries = entries;
         saveData();
       }
-      // NEU: Volumen immer frisch aus den aktuellen entries berechnen
       let totalVolume = entries.reduce((sum, entry) => sum + calcVolume(entry), 0);
-
       let exercisesHtml = '';
       if (exerciseIds.length) {
         exerciseIds.forEach((exId, idx) => {
@@ -1361,6 +1363,7 @@
               </div>
             `;
           }
+          // Timer Canvas mit 80x80
           exercisesHtml += `
             <div class="exercise-entry" data-exid="${exId}" data-logid="${log.id}">
               <div class="ex-header">
@@ -1372,7 +1375,7 @@
               ${ex.image ? `<img src="${ex.image}" alt="${ex.name}" />` : ''}
               <div style="margin:2px 0; font-size:0.7rem; color:#aaa;">Pause: ${formatTime(ex.pause || 90)}</div>
               <div class="timer-wrapper" id="timer-wrapper-${log.id}-${exId}">
-                <canvas id="timer-${log.id}-${exId}-canvas" width="64" height="64"></canvas>
+                <canvas id="timer-${log.id}-${exId}-canvas" width="80" height="80"></canvas>
                 <div class="timer-text" id="timer-${log.id}-${exId}">${formatTime(ex.pause || 90)}<span class="sub">Pause</span></div>
               </div>
               <div class="ex-actions-row">
@@ -2205,7 +2208,6 @@
         removeExerciseFromLog(editingId, btnDelEx.dataset.exid);
         return;
       }
-      // Klick auf Satzzeile: alle Sätze bis zu diesem als erledigt markieren
       const trActiveSet = target.closest('.exercise-entry .sets-table tbody tr');
       if (trActiveSet) {
         if (target.tagName === 'INPUT' || target.tagName === 'BUTTON' || target.closest('button')) return;
@@ -2218,9 +2220,6 @@
         if (log) {
           const entry = log.entries.find(e => e.exerciseId === exId);
           if (entry) {
-            // Korrektur: idx = 0 → Satz 1 bekommt Haken (currentSetIndex = 1)
-            // idx = 1 → Satz 1+2 bekommen Haken (currentSetIndex = 2)
-            // idx = letzter → alle Sätze Haken (currentSetIndex = sets.length)
             const newIdx = Math.min(idx + 1, entry.sets.length);
             entry.currentSetIndex = newIdx;
             saveData();
