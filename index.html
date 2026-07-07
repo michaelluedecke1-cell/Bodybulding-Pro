@@ -178,7 +178,7 @@
     .exercise-entry .ex-header .ex-actions .del { color: #e74c3c; }
     .exercise-entry img {
       max-width: 100%;
-      max-height: 100px; /* geändert von 60px auf 100px */
+      max-height: 100px;
       object-fit: contain;
       border-radius: 8px;
       margin: 4px 0;
@@ -279,22 +279,22 @@
     }
     .exercise-entry .timer-wrapper {
       position: relative;
-      width: 80px;   /* geändert von 64px */
-      height: 80px;  /* geändert von 64px */
+      width: 80px;
+      height: 80px;
       margin: 4px auto 6px;
       display: flex;
       align-items: center;
       justify-content: center;
     }
     .exercise-entry .timer-wrapper canvas {
-      width: 80px;   /* geändert von 64px */
-      height: 80px;  /* geändert von 64px */
+      width: 80px;
+      height: 80px;
       border-radius: 50%;
       display: block;
     }
     .exercise-entry .timer-wrapper .timer-text {
       position: absolute;
-      font-size: 1.2rem; /* etwas größer */
+      font-size: 1.2rem;
       font-weight: 700;
       color: #fff;
       text-align: center;
@@ -806,14 +806,14 @@
       if (stored) { lastBackupDate = stored; if (lastBackupDateSpan) lastBackupDateSpan.textContent = stored; }
     }
 
-    // ===== LETZTE TRAININGSDATEN =====
+    // ===== LETZTE TRAININGSDATEN (KORRIGIERT) =====
     function getLastTrainingDataForExercise(exerciseId) {
       const sortedLogs = [...logs].sort((a, b) => (a.date || '').localeCompare(b.date || '') * -1);
       for (const log of sortedLogs) {
         const entry = log.entries.find(e => e.exerciseId === exerciseId);
         if (entry) {
           return {
-            sets: entry.sets || [{ kg: 0, wdh: 0 }],
+            sets: entry.sets ? entry.sets.map(set => ({ ...set })) : [{ kg: 0, wdh: 0 }],
             notiz: entry.notiz || '',
             currentSetIndex: entry.currentSetIndex || 0
           };
@@ -828,12 +828,12 @@
       return entry.sets.reduce((sum, set) => sum + (set.kg || 0) * (set.wdh || 0), 0);
     }
 
-    // ===== TIMER KREIS (angepasst für 80x80 Canvas) =====
+    // ===== TIMER KREIS =====
     function drawTimerCircle(canvas, remaining, total) {
       const ctx = canvas.getContext('2d');
       const w = canvas.width, h = canvas.height;
       ctx.clearRect(0, 0, w, h);
-      const cx = w/2, cy = h/2, r = Math.min(w,h)/2 - 8; // etwas Rand
+      const cx = w/2, cy = h/2, r = Math.min(w,h)/2 - 8;
       const progress = total > 0 ? remaining / total : 1;
       const startAngle = -Math.PI/2;
       const endAngle = startAngle + (progress * 2 * Math.PI);
@@ -1227,7 +1227,7 @@
       if (display) display.textContent = formatTime(elapsed);
     }
 
-    // ===== LOG-FORM (mit Timer-Größe 80x80) =====
+    // ===== LOG-FORM =====
     function openLogForm(id = null, startTimer = false) {
       const isEdit = !!id;
       let log = isEdit ? logs.find(l => l.id === id) : null;
@@ -1363,7 +1363,6 @@
               </div>
             `;
           }
-          // Timer Canvas mit 80x80
           exercisesHtml += `
             <div class="exercise-entry" data-exid="${exId}" data-logid="${log.id}">
               <div class="ex-header">
@@ -1681,7 +1680,7 @@
       ctx.fillText(Math.round(minKg) + 'kg', padding.left - 2, height - padding.bottom - 2);
     }
 
-    // ===== PAUSENTIMER (KEINE HAKEN, KEINE MELDUNG) =====
+    // ===== PAUSENTIMER =====
     function updateTimerDisplay() {
       if (!timerRunning) return;
       const now = Date.now();
