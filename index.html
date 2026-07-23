@@ -92,7 +92,6 @@
       cursor: pointer; padding: 0 4px; transition: color 0.2s;
     }
     .list-item .actions .del { color: #e74c3c; }
-    /* Radio für Plan-Auswahl */
     .plan-radio {
       appearance: none;
       width: 20px; height: 20px;
@@ -121,7 +120,6 @@
     .empty-state {
       text-align: center; color: #666; padding: 30px 0; font-size: 0.85rem;
     }
-    /* Detail-Overlay – immer über allem, scrollbar */
     #detailContainer {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
@@ -170,7 +168,6 @@
       background: linear-gradient(135deg, #e74c3c, #c0392b);
       color: #fff; box-shadow: 0 4px 12px rgba(231,76,60,0.3);
     }
-    /* Restliche Styles unverändert (Plan‑Liste, Übungs‑Einträge, Timer, etc.) */
     .plan-exercise-list {
       list-style: none; padding: 0; margin: 4px 0;
     }
@@ -575,7 +572,6 @@
     <div id="page-logs" class="page"><div id="logList" class="list-container"></div></div>
     <div id="page-calendar" class="page"><div id="calendarContainer"></div></div>
     <div id="page-stats" class="page"><div id="statsContainer"></div></div>
-    <!-- Detail-Overlay (wird per JS befüllt) -->
     <div id="detailContainer" style="display:none;"></div>
     <div id="backupOverlay" class="backup-overlay">
       <div class="backup-modal">
@@ -955,7 +951,7 @@
               <div class="sub">🏋️ ${plan.exerciseIds ? plan.exerciseIds.length : 0} Übungen</div>
             </div>
             <div class="actions">
-              <input type="radio" name="activePlanRadio" value="${plan.id}" ${isActive ? 'checked' : ''} class="plan-radio" title="Als aktiven Plan wählen" />
+              <input type="radio" name="activePlanRadio" value="${plan.id}" ${isActive ? 'checked' : ''} class="plan-radio" title="Als aktiven Plan wählen" onclick="event.stopPropagation();" />
               <button class="edit" data-id="${plan.id}" title="Bearbeiten">✏️</button>
               <button class="del" data-id="${plan.id}" title="Löschen">🗑️</button>
             </div>
@@ -965,6 +961,7 @@
       // Radio-Change-Listener
       planList.querySelectorAll('.plan-radio').forEach(radio => {
         radio.addEventListener('change', function(e) {
+          // Das Event bubbelt nicht mehr, aber sicherheitshalber trotzdem
           e.stopPropagation();
           if (this.checked) {
             activePlanId = this.value;
@@ -2190,7 +2187,6 @@
       else if (tab === 'calendar') { pageCalendar.classList.add('active'); renderCalendar(); }
       else if (tab === 'stats') { pageStats.classList.add('active'); renderStats(); }
       tabBtns.forEach(btn => { btn.classList.toggle('active', btn.dataset.tab === tab); });
-      // Detail-Overlay bleibt sichtbar, wenn ein Log geöffnet ist – schließen nur bei anderen Typen
       if (!(editingType === 'log' && detailContainer.style.display !== 'none')) {
         detailContainer.style.display = 'none';
       }
