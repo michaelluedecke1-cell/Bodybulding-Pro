@@ -961,7 +961,6 @@
       // Radio-Change-Listener
       planList.querySelectorAll('.plan-radio').forEach(radio => {
         radio.addEventListener('change', function(e) {
-          // Das Event bubbelt nicht mehr, aber sicherheitshalber trotzdem
           e.stopPropagation();
           if (this.checked) {
             activePlanId = this.value;
@@ -976,8 +975,13 @@
       planList.querySelectorAll('.del').forEach(btn => {
         btn.addEventListener('click', (e) => { e.stopPropagation(); deletePlan(btn.dataset.id); });
       });
+      // Wichtig: Klick auf das gesamte Listenelement – aber nicht, wenn auf Input/Button geklickt wurde
       planList.querySelectorAll('.list-item').forEach(item => {
-        item.addEventListener('click', () => openPlanForm(item.dataset.id));
+        item.addEventListener('click', (e) => {
+          // Wenn das Ziel ein input oder button ist, abbrechen
+          if (e.target.closest('input, button')) return;
+          openPlanForm(item.dataset.id);
+        });
       });
     }
     function renderLogs() {
