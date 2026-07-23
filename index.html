@@ -6,12 +6,8 @@
   <title>Bodybuilding Pro</title>
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#0d0d1a" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', -apple-system, sans-serif; }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
     html, body { overscroll-behavior-y: none; }
     body {
       background: #0d0d1a;
@@ -37,7 +33,7 @@
     .header-actions { display: flex; gap: 8px; align-items: center; }
     .btn-icon {
       background: rgba(255,255,255,0.06);
-      border: none; color: #ddd; font-size: 1rem;
+      border: none; color: #ddd; font-size: 1.2rem;
       width: 36px; height: 36px; border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
       cursor: pointer; transition: background 0.2s, transform 0.1s;
@@ -101,11 +97,23 @@
     .empty-state {
       text-align: center; color: #666; padding: 30px 0; font-size: 0.85rem;
     }
+    /* Detail-Overlay – immer über allem, scrollbar */
+    #detailContainer {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      z-index: 1000;
+      background: rgba(13,13,26,0.96);
+      overflow-y: auto;
+      padding: 12px;
+      display: none;
+    }
     .detail-card {
       background: rgba(255,255,255,0.04);
       border-radius: 14px;
       padding: 14px;
       border: 1px solid rgba(255,255,255,0.06);
+      max-width: 480px;
+      margin: 0 auto;
     }
     .detail-card .row {
       display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 8px;
@@ -138,6 +146,7 @@
       background: linear-gradient(135deg, #e74c3c, #c0392b);
       color: #fff; box-shadow: 0 4px 12px rgba(231,76,60,0.3);
     }
+    /* Restliche Styles unverändert (Plan‑Liste, Übungs‑Einträge, Timer, etc.) */
     .plan-exercise-list {
       list-style: none; padding: 0; margin: 4px 0;
     }
@@ -472,7 +481,7 @@
       display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(0,0,0,0.7);
       justify-content: center; align-items: center;
-      z-index: 1000; backdrop-filter: blur(6px);
+      z-index: 2000; backdrop-filter: blur(6px);
     }
     .backup-overlay.active { display: flex; }
     .backup-modal {
@@ -516,6 +525,7 @@
     .chart-container canvas { width: 100%; height: 80px; }
     @media (min-width: 600px) {
       body { max-width: 480px; margin: 0 auto; padding: 10px 16px 80px; }
+      .detail-card { max-width: 480px; }
     }
   </style>
 </head>
@@ -524,23 +534,24 @@
     <header class="app-header">
       <h1>🏋️ Pro</h1>
       <div class="header-actions">
-        <button class="btn-icon quickstart" id="btnQuickStart" title="Training starten"><i class="fas fa-play"></i></button>
-        <button class="btn-icon backup" id="btnBackup" title="Backup & Auto-Backup"><i class="fas fa-database"></i></button>
-        <button class="btn-icon primary" id="btnGlobalAdd" title="Neu"><i class="fas fa-plus"></i></button>
+        <button class="btn-icon quickstart" id="btnQuickStart" title="Training starten">▶️</button>
+        <button class="btn-icon backup" id="btnBackup" title="Backup & Auto-Backup">💾</button>
+        <button class="btn-icon primary" id="btnGlobalAdd" title="Neu">➕</button>
       </div>
     </header>
     <div class="tab-bar">
-      <button class="tab-btn active" data-tab="exercises"><i class="fas fa-dumbbell"></i> Übungen</button>
-      <button class="tab-btn" data-tab="plans"><i class="fas fa-list"></i> Pläne</button>
-      <button class="tab-btn" data-tab="logs"><i class="fas fa-history"></i> Logs</button>
-      <button class="tab-btn" data-tab="calendar"><i class="fas fa-calendar-alt"></i> Kalender</button>
-      <button class="tab-btn" data-tab="stats"><i class="fas fa-chart-bar"></i> Statistik</button>
+      <button class="tab-btn active" data-tab="exercises">💪 Übungen</button>
+      <button class="tab-btn" data-tab="plans">📋 Pläne</button>
+      <button class="tab-btn" data-tab="logs">📝 Logs</button>
+      <button class="tab-btn" data-tab="calendar">📅 Kalender</button>
+      <button class="tab-btn" data-tab="stats">📊 Statistik</button>
     </div>
     <div id="page-exercises" class="page active"><div id="exerciseList" class="list-container"></div></div>
     <div id="page-plans" class="page"><div id="planList" class="list-container"></div></div>
     <div id="page-logs" class="page"><div id="logList" class="list-container"></div></div>
     <div id="page-calendar" class="page"><div id="calendarContainer"></div></div>
     <div id="page-stats" class="page"><div id="statsContainer"></div></div>
+    <!-- Detail-Overlay (wird per JS befüllt) -->
     <div id="detailContainer" style="display:none;"></div>
     <div id="backupOverlay" class="backup-overlay">
       <div class="backup-modal">
@@ -648,21 +659,21 @@
     function formatDate(d) { if (!d) return ''; const p = d.split('-'); return `${p[2]}.${p[1]}.${p[0]}`; }
     function getExerciseIcon(ex) {
       const name = ex.name.toLowerCase();
-      if (ex.type === 'cardio') return 'fa-person-running';
-      if (name.includes('bankdrücken') || name.includes('bench')) return 'fa-dumbbell';
-      if (name.includes('kniebeuge') || name.includes('squat')) return 'fa-person-walking';
-      if (name.includes('kreuzheben') || name.includes('deadlift')) return 'fa-weight-hanging';
-      if (name.includes('ruder')) return 'fa-rowing';
-      if (name.includes('schulter') || name.includes('shoulder')) return 'fa-hand-fist';
-      if (name.includes('curl')) return 'fa-hand-sparkles';
-      if (name.includes('trizeps') || name.includes('triceps')) return 'fa-hand-back-fist';
-      if (name.includes('klimmzug') || name.includes('pull-up')) return 'fa-person-pulling-up';
-      if (name.includes('liegestütz') || name.includes('push-up')) return 'fa-person-push-up';
-      if (name.includes('plank')) return 'fa-table';
-      if (name.includes('laufband') || name.includes('treadmill')) return 'fa-person-running';
-      if (name.includes('rad') || name.includes('bike')) return 'fa-bicycle';
-      if (name.includes('rudergerät') || name.includes('ergometer')) return 'fa-oar';
-      return 'fa-dumbbell';
+      if (ex.type === 'cardio') return '🏃';
+      if (name.includes('bankdrücken') || name.includes('bench')) return '🏋️';
+      if (name.includes('kniebeuge') || name.includes('squat')) return '🦵';
+      if (name.includes('kreuzheben') || name.includes('deadlift')) return '🏋️';
+      if (name.includes('ruder')) return '🚣';
+      if (name.includes('schulter') || name.includes('shoulder')) return '💪';
+      if (name.includes('curl')) return '💪';
+      if (name.includes('trizeps') || name.includes('triceps')) return '💪';
+      if (name.includes('klimmzug') || name.includes('pull-up')) return '🧗';
+      if (name.includes('liegestütz') || name.includes('push-up')) return '⬇️';
+      if (name.includes('plank')) return '🧘';
+      if (name.includes('laufband') || name.includes('treadmill')) return '🏃';
+      if (name.includes('rad') || name.includes('bike')) return '🚴';
+      if (name.includes('rudergerät') || name.includes('ergometer')) return '🚣';
+      return '🏋️';
     }
     function playBeep() {
       try {
@@ -709,8 +720,8 @@
     function updateWakeToggleUI(active) {
       const btn = document.getElementById('wakeToggleBtn');
       if (btn) {
-        if (active) { btn.classList.add('active'); btn.innerHTML = '<i class="fas fa-desktop"></i> Bildschirm an'; }
-        else { btn.classList.remove('active'); btn.innerHTML = '<i class="fas fa-desktop"></i> Bildschirm aus'; }
+        if (active) { btn.classList.add('active'); btn.innerHTML = '🖥️ an'; }
+        else { btn.classList.remove('active'); btn.innerHTML = '🖥️ aus'; }
       }
     }
 
@@ -806,7 +817,7 @@
       if (stored) { lastBackupDate = stored; if (lastBackupDateSpan) lastBackupDateSpan.textContent = stored; }
     }
 
-    // ===== LETZTE TRAININGSDATEN (KORRIGIERT) =====
+    // ===== LETZTE TRAININGSDATEN (KORRIGIERT – inkl. cardioData) =====
     function getLastTrainingDataForExercise(exerciseId) {
       const sortedLogs = [...logs].sort((a, b) => (a.date || '').localeCompare(b.date || '') * -1);
       for (const log of sortedLogs) {
@@ -815,11 +826,12 @@
           return {
             sets: entry.sets ? entry.sets.map(set => ({ ...set })) : [{ kg: 0, wdh: 0 }],
             notiz: entry.notiz || '',
-            currentSetIndex: entry.currentSetIndex || 0
+            currentSetIndex: entry.currentSetIndex || 0,
+            cardioData: entry.cardioData ? { ...entry.cardioData } : { time: 0, distance: 0 }
           };
         }
       }
-      return { sets: [{ kg: 0, wdh: 0 }], notiz: '', currentSetIndex: 0 };
+      return { sets: [{ kg: 0, wdh: 0 }], notiz: '', currentSetIndex: 0, cardioData: { time: 0, distance: 0 } };
     }
 
     // ===== VOLUMEN =====
@@ -872,7 +884,7 @@
     }
     function renderExercises() {
       if (!exercises.length) {
-        exerciseList.innerHTML = `<div class="empty-state"><i class="fas fa-dumbbell" style="font-size:2rem; display:block; margin-bottom:10px;"></i>Keine Übungen vorhanden.<br/>Klicke auf +, um eine anzulegen.</div>`;
+        exerciseList.innerHTML = `<div class="empty-state">💪 Keine Übungen vorhanden.<br/>Klicke auf ➕, um eine anzulegen.</div>`;
         return;
       }
       exerciseList.innerHTML = exercises.map(ex => {
@@ -880,8 +892,7 @@
         if (ex.image && ex.image.startsWith('data:image')) {
           thumbHtml = `<img src="${ex.image}" alt="${ex.name}" />`;
         } else {
-          const icon = getExerciseIcon(ex);
-          thumbHtml = `<i class="fas ${icon}"></i>`;
+          thumbHtml = getExerciseIcon(ex);
         }
         return `
           <div class="list-item" data-id="${ex.id}">
@@ -889,8 +900,8 @@
             <div class="info"><h4>${ex.name}</h4>
             <div class="sub">⏱️ ${formatTime(ex.pause || 90)} • ${ex.type === 'cardio' ? 'Cardio' : 'Kraft'}</div></div>
             <div class="actions">
-              <button class="edit" data-id="${ex.id}" title="Bearbeiten"><i class="fas fa-edit"></i></button>
-              <button class="del" data-id="${ex.id}" title="Löschen"><i class="fas fa-trash"></i></button>
+              <button class="edit" data-id="${ex.id}" title="Bearbeiten">✏️</button>
+              <button class="del" data-id="${ex.id}" title="Löschen">🗑️</button>
             </div>
           </div>
         `;
@@ -907,22 +918,22 @@
     }
     function renderPlans() {
       if (!plans.length) {
-        planList.innerHTML = `<div class="empty-state"><i class="fas fa-list" style="font-size:2rem; display:block; margin-bottom:10px;"></i>Keine Trainingspläne.<br/>Klicke auf +, um einen zu erstellen.</div>`;
+        planList.innerHTML = `<div class="empty-state">📋 Keine Trainingspläne.<br/>Klicke auf ➕, um einen zu erstellen.</div>`;
         return;
       }
       planList.innerHTML = plans.map(plan => {
         const isActive = plan.id === activePlanId;
         return `
           <div class="list-item" data-id="${plan.id}" style="${isActive ? 'border-left-color: #2ecc71;' : ''}">
-            <div class="thumbnail"><i class="fas ${isActive ? 'fa-star' : 'fa-clipboard-list'}"></i></div>
+            <div class="thumbnail">${isActive ? '⭐' : '📋'}</div>
             <div class="info">
               <h4>${plan.name} ${isActive ? '⭐' : ''}</h4>
               <div class="sub">🏋️ ${plan.exerciseIds ? plan.exerciseIds.length : 0} Übungen</div>
             </div>
             <div class="actions">
-              <button class="star ${isActive ? 'active' : ''}" data-id="${plan.id}" title="Als aktiv markieren"><i class="fas fa-star"></i></button>
-              <button class="edit" data-id="${plan.id}" title="Bearbeiten"><i class="fas fa-edit"></i></button>
-              <button class="del" data-id="${plan.id}" title="Löschen"><i class="fas fa-trash"></i></button>
+              <button class="star ${isActive ? 'active' : ''}" data-id="${plan.id}" title="Als aktiv markieren">⭐</button>
+              <button class="edit" data-id="${plan.id}" title="Bearbeiten">✏️</button>
+              <button class="del" data-id="${plan.id}" title="Löschen">🗑️</button>
             </div>
           </div>
         `;
@@ -949,7 +960,7 @@
     }
     function renderLogs() {
       if (!logs.length) {
-        logList.innerHTML = `<div class="empty-state"><i class="fas fa-history" style="font-size:2rem; display:block; margin-bottom:10px;"></i>Keine Trainingslogs.<br/>Klicke auf +, um ein Training zu protokollieren.</div>`;
+        logList.innerHTML = `<div class="empty-state">📝 Keine Trainingslogs.<br/>Klicke auf ➕, um ein Training zu protokollieren.</div>`;
         return;
       }
       const sorted = [...logs].sort((a, b) => (a.date || '').localeCompare(b.date || '') * -1);
@@ -959,12 +970,12 @@
         const exCount = log.entries ? log.entries.length : 0;
         return `
           <div class="list-item" data-id="${log.id}">
-            <div class="thumbnail"><i class="fas fa-calendar-check"></i></div>
+            <div class="thumbnail">📅</div>
             <div class="info"><h4>${planName}</h4>
             <div class="sub">📅 ${formatDate(log.date)} • ${exCount} Übungen • ⏱️ ${formatDuration(log.duration || 0)}</div></div>
             <div class="actions">
-              <button class="edit" data-id="${log.id}" title="Bearbeiten"><i class="fas fa-edit"></i></button>
-              <button class="del" data-id="${log.id}" title="Löschen"><i class="fas fa-trash"></i></button>
+              <button class="edit" data-id="${log.id}" title="Bearbeiten">✏️</button>
+              <button class="del" data-id="${log.id}" title="Löschen">🗑️</button>
             </div>
           </div>
         `;
@@ -985,7 +996,8 @@
       const isEdit = !!id;
       const ex = isEdit ? exercises.find(e => e.id === id) : null;
       editingId = id; editingType = 'exercise';
-      detailContainer.style.display = 'block'; hideAllPages();
+      detailContainer.style.display = 'block';
+      // Seiten nicht ausblenden, Overlay liegt darüber
       detailContainer.innerHTML = `
         <div class="detail-card">
           <h3 style="margin-bottom:8px; font-size:1rem;">${isEdit ? 'Übung bearbeiten' : 'Neue Übung'}</h3>
@@ -1051,7 +1063,7 @@
       const isEdit = !!id;
       const plan = isEdit ? plans.find(p => p.id === id) : null;
       editingId = id; editingType = 'plan';
-      detailContainer.style.display = 'block'; hideAllPages();
+      detailContainer.style.display = 'block';
       detailContainer.innerHTML = `
         <div class="detail-card">
           <h3 style="margin-bottom:8px; font-size:1rem;">${isEdit ? 'Plan bearbeiten' : 'Neuer Plan'}</h3>
@@ -1187,7 +1199,7 @@
           return {
             exerciseId: exId,
             sets: data.sets,
-            cardioData: { time: 0, distance: 0 },
+            cardioData: data.cardioData,
             notiz: data.notiz,
             currentSetIndex: 0
           };
@@ -1254,7 +1266,7 @@
       }
       editingType = 'log';
       detailContainer.style.display = 'block';
-      hideAllPages();
+      // Seiten nicht ausblenden
       const planOptions = plans.map(p => `<option value="${p.id}" ${log.planId === p.id ? 'selected' : ''}>${p.name}</option>`).join('');
       const plan = plans.find(p => p.id === log.planId);
       let entries = [];
@@ -1270,7 +1282,7 @@
             return {
               exerciseId: exId,
               sets: data.sets,
-              cardioData: { time: 0, distance: 0 },
+              cardioData: data.cardioData,
               notiz: data.notiz,
               currentSetIndex: 0
             };
@@ -1289,7 +1301,7 @@
           return {
             exerciseId: exId,
             sets: data.sets,
-            cardioData: { time: 0, distance: 0 },
+            cardioData: data.cardioData,
             notiz: data.notiz,
             currentSetIndex: 0
           };
@@ -1410,7 +1422,7 @@
         <div style="display:flex; align-items:center; gap:6px; margin:4px 0 6px; flex-wrap:wrap;">
           <span style="font-size:0.7rem; color:#aaa;">🖥️ Bildschirm:</span>
           <div class="wake-toggle ${wakeLock ? 'active' : ''}" id="wakeToggleBtn" style="cursor:pointer;">
-            <i class="fas fa-desktop"></i> ${wakeLock ? 'an' : 'aus'}
+            ${wakeLock ? '🖥️ an' : '🖥️ aus'}
           </div>
         </div>
       `;
@@ -1464,7 +1476,7 @@
               return {
                 exerciseId: exId,
                 sets: data.sets,
-                cardioData: { time: 0, distance: 0 },
+                cardioData: data.cardioData,
                 notiz: data.notiz,
                 currentSetIndex: 0
               };
@@ -1701,7 +1713,7 @@
         timerRunning = false;
         document.querySelectorAll('.btn-timer').forEach(b => {
           if (b.dataset.logid === currentTimerLogId && b.dataset.exid === currentTimerExId) {
-            b.innerHTML = '<i class="fas fa-play"></i> Timer starten';
+            b.innerHTML = '▶️ Timer starten';
             b.classList.remove('active');
           }
         });
@@ -1729,7 +1741,7 @@
         timerRunning = false;
         document.querySelectorAll('.btn-timer').forEach(b => {
           if (b.dataset.logid === currentTimerLogId && b.dataset.exid === currentTimerExId) {
-            b.innerHTML = '<i class="fas fa-play"></i> Timer starten';
+            b.innerHTML = '▶️ Timer starten';
             b.classList.remove('active');
           }
         });
@@ -1740,7 +1752,7 @@
         clearInterval(timerInterval);
         timerInterval = null;
         timerRunning = false;
-        btnElement.innerHTML = '<i class="fas fa-play"></i> Timer starten';
+        btnElement.innerHTML = '▶️ Timer starten';
         btnElement.classList.remove('active');
         const display = document.getElementById(`timer-${logId}-${exId}`);
         if (display) display.classList.remove('alarm');
@@ -1755,7 +1767,7 @@
       currentTimerLogId = logId;
       currentTimerExId = exId;
       timerRunning = true;
-      btnElement.innerHTML = '<i class="fas fa-stop"></i> Stopp';
+      btnElement.innerHTML = '⏹️ Stopp';
       btnElement.classList.add('active');
       const display = document.getElementById(`timer-${logId}-${exId}`);
       if (display) {
@@ -1874,8 +1886,7 @@
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; flex-wrap:wrap; gap:4px;">
             <span style="font-weight:600; font-size:0.9rem;">📈 Fortschritt pro Übung</span>
             <div class="stat-toggle ${showAllStats ? 'active' : ''}" id="statToggle">
-              <i class="fas ${showAllStats ? 'fa-eye' : 'fa-eye-slash'}"></i>
-              ${showAllStats ? 'Alle anzeigen' : 'Nur Veränderung'}
+              ${showAllStats ? '👁️ Alle anzeigen' : '👁️‍🗨️ Nur Veränderung'}
             </div>
           </div>
           <ul class="stat-progress-list">
@@ -1928,7 +1939,7 @@
             <button class="nav-btn" id="calPrev">‹</button>
             <span class="month-year">${firstDay.toLocaleDateString('de-DE', { month: 'long', year: 'numeric' })}</span>
             <button class="nav-btn" id="calNext">›</button>
-            <button class="nav-btn" id="calYearView" style="background:linear-gradient(135deg,#f39c12,#e67e22); color:#fff; padding:0 10px; font-size:0.8rem;">Jahr</button>
+            <button class="nav-btn" id="calYearView" style="background:linear-gradient(135deg,#f39c12,#e67e22); color:#fff; padding:0 10px; font-size:0.8rem;">📅 Jahr</button>
           </div>
           <div class="calendar-grid">
             <div class="day-name">Mo</div><div class="day-name">Di</div><div class="day-name">Mi</div>
@@ -2012,7 +2023,7 @@
             <button class="nav-btn" id="yearPrev">‹</button>
             <span class="month-year">${year}</span>
             <button class="nav-btn" id="yearNext">›</button>
-            <button class="nav-btn" id="yearMonthView" style="background:linear-gradient(135deg,#f39c12,#e67e22); color:#fff; padding:0 10px; font-size:0.8rem;">Monat</button>
+            <button class="nav-btn" id="yearMonthView" style="background:linear-gradient(135deg,#f39c12,#e67e22); color:#fff; padding:0 10px; font-size:0.8rem;">📅 Monat</button>
           </div>
           <div class="calendar-year-grid">
       `;
@@ -2135,18 +2146,18 @@
     function closeDetail() {
       if (overallTimerRunning) releaseOverallTimer();
       detailContainer.style.display = 'none';
-      showTab(currentTab);
       editingId = null; editingType = null;
       if (timerRunning) {
         clearInterval(timerInterval); timerInterval = null; timerRunning = false;
         document.querySelectorAll('.btn-timer').forEach(b => {
-          b.innerHTML = '<i class="fas fa-play"></i> Timer starten';
+          b.innerHTML = '▶️ Timer starten';
           b.classList.remove('active');
         });
         const display = document.getElementById(`timer-${currentTimerLogId}-${currentTimerExId}`);
         if (display) display.classList.remove('alarm');
         currentTimerLogId = null; currentTimerExId = null;
       }
+      // Tab-Anzeige bleibt erhalten, aber wir müssen die aktuelle Seite nicht neu laden
     }
     function showTab(tab) {
       currentTab = tab;
@@ -2157,7 +2168,10 @@
       else if (tab === 'calendar') { pageCalendar.classList.add('active'); renderCalendar(); }
       else if (tab === 'stats') { pageStats.classList.add('active'); renderStats(); }
       tabBtns.forEach(btn => { btn.classList.toggle('active', btn.dataset.tab === tab); });
-      detailContainer.style.display = 'none';
+      // Detail-Overlay bleibt sichtbar, wenn ein Log geöffnet ist – schließen nur bei anderen Typen
+      if (!(editingType === 'log' && detailContainer.style.display !== 'none')) {
+        detailContainer.style.display = 'none';
+      }
     }
 
     // ===== EVENT DELEGATION =====
