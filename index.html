@@ -7,7 +7,7 @@
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#0d0d1a" />
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
     html, body { overscroll-behavior-y: none; }
     body {
       background: #0d0d1a;
@@ -86,14 +86,38 @@
       font-size: 1.3rem; color: #f39c12; overflow: hidden;
     }
     .list-item .thumbnail img { width: 100%; height: 100%; object-fit: cover; }
-    .list-item .actions { display: flex; gap: 6px; }
+    .list-item .actions { display: flex; gap: 6px; align-items: center; }
     .list-item .actions button {
       background: none; border: none; color: #aaa; font-size: 1rem;
       cursor: pointer; padding: 0 4px; transition: color 0.2s;
     }
     .list-item .actions .del { color: #e74c3c; }
-    .list-item .actions .star { color: #f39c12; }
-    .list-item .actions .star.active { color: #2ecc71; }
+    /* Radio für Plan-Auswahl */
+    .plan-radio {
+      appearance: none;
+      width: 20px; height: 20px;
+      border: 2px solid #555;
+      border-radius: 50%;
+      background: transparent;
+      transition: all 0.2s;
+      cursor: pointer;
+      flex-shrink: 0;
+      position: relative;
+    }
+    .plan-radio:checked {
+      border-color: #2ecc71;
+      background: #2ecc71;
+      box-shadow: 0 0 10px rgba(46,204,113,0.4);
+    }
+    .plan-radio:checked::after {
+      content: "✓";
+      color: #0d0d1a;
+      font-size: 14px;
+      font-weight: 700;
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+    }
     .empty-state {
       text-align: center; color: #666; padding: 30px 0; font-size: 0.85rem;
     }
@@ -559,10 +583,10 @@
         <p class="backup-info" id="backupInfo">Letztes Backup: <span id="lastBackupDate">–</span></p>
         <p style="margin-bottom:10px; font-size:0.8rem; color:#aaa;">Automatisches Backup wird bei jedem Speichern erstellt.</p>
         <div class="btn-row">
-          <button class="btn-save" id="btnExport"><i class="fas fa-download"></i> Exportieren</button>
-          <button class="btn-cancel" id="btnImportTrigger"><i class="fas fa-upload"></i> Importieren</button>
-          <button class="btn-save" id="btnRestoreAutoBackup" style="background:linear-gradient(135deg,#f39c12,#e67e22); color:#fff;"><i class="fas fa-undo-alt"></i> Auto-Backup</button>
-          <button class="btn-danger" id="btnCloseBackup"><i class="fas fa-times"></i> Schließen</button>
+          <button class="btn-save" id="btnExport">⬇️ Exportieren</button>
+          <button class="btn-cancel" id="btnImportTrigger">⬆️ Importieren</button>
+          <button class="btn-save" id="btnRestoreAutoBackup" style="background:linear-gradient(135deg,#f39c12,#e67e22); color:#fff;">↩️ Auto-Backup</button>
+          <button class="btn-danger" id="btnCloseBackup">✖️ Schließen</button>
         </div>
         <input type="file" id="fileInput" accept=".json" style="display:none;" />
       </div>
@@ -817,7 +841,7 @@
       if (stored) { lastBackupDate = stored; if (lastBackupDateSpan) lastBackupDateSpan.textContent = stored; }
     }
 
-    // ===== LETZTE TRAININGSDATEN (KORRIGIERT – inkl. cardioData) =====
+    // ===== LETZTE TRAININGSDATEN (inkl. cardioData) =====
     function getLastTrainingDataForExercise(exerciseId) {
       const sortedLogs = [...logs].sort((a, b) => (a.date || '').localeCompare(b.date || '') * -1);
       for (const log of sortedLogs) {
@@ -925,27 +949,28 @@
         const isActive = plan.id === activePlanId;
         return `
           <div class="list-item" data-id="${plan.id}" style="${isActive ? 'border-left-color: #2ecc71;' : ''}">
-            <div class="thumbnail">${isActive ? '⭐' : '📋'}</div>
+            <div class="thumbnail">📋</div>
             <div class="info">
               <h4>${plan.name} ${isActive ? '⭐' : ''}</h4>
               <div class="sub">🏋️ ${plan.exerciseIds ? plan.exerciseIds.length : 0} Übungen</div>
             </div>
             <div class="actions">
-              <button class="star ${isActive ? 'active' : ''}" data-id="${plan.id}" title="Als aktiv markieren">⭐</button>
+              <input type="radio" name="activePlanRadio" value="${plan.id}" ${isActive ? 'checked' : ''} class="plan-radio" title="Als aktiven Plan wählen" />
               <button class="edit" data-id="${plan.id}" title="Bearbeiten">✏️</button>
               <button class="del" data-id="${plan.id}" title="Löschen">🗑️</button>
             </div>
           </div>
         `;
       }).join('');
-      planList.querySelectorAll('.star').forEach(btn => {
-        btn.addEventListener('click', (e) => {
+      // Radio-Change-Listener
+      planList.querySelectorAll('.plan-radio').forEach(radio => {
+        radio.addEventListener('change', function(e) {
           e.stopPropagation();
-          const id = btn.dataset.id;
-          if (activePlanId === id) activePlanId = null;
-          else activePlanId = id;
-          saveData();
-          renderPlans();
+          if (this.checked) {
+            activePlanId = this.value;
+            saveData();
+            renderPlans();
+          }
         });
       });
       planList.querySelectorAll('.edit').forEach(btn => {
@@ -997,7 +1022,6 @@
       const ex = isEdit ? exercises.find(e => e.id === id) : null;
       editingId = id; editingType = 'exercise';
       detailContainer.style.display = 'block';
-      // Seiten nicht ausblenden, Overlay liegt darüber
       detailContainer.innerHTML = `
         <div class="detail-card">
           <h3 style="margin-bottom:8px; font-size:1rem;">${isEdit ? 'Übung bearbeiten' : 'Neue Übung'}</h3>
@@ -1177,7 +1201,7 @@
     // ===== QUICKSTART =====
     function quickStart() {
       if (!activePlanId) {
-        alert('Kein aktiver Plan ausgewählt. Markiere einen Plan mit ⭐ als aktiv.');
+        alert('Kein aktiver Plan ausgewählt. Wähle einen Plan mit dem ⭕ Kästchen aus.');
         showTab('plans');
         return;
       }
@@ -1266,7 +1290,6 @@
       }
       editingType = 'log';
       detailContainer.style.display = 'block';
-      // Seiten nicht ausblenden
       const planOptions = plans.map(p => `<option value="${p.id}" ${log.planId === p.id ? 'selected' : ''}>${p.name}</option>`).join('');
       const plan = plans.find(p => p.id === log.planId);
       let entries = [];
@@ -1371,7 +1394,7 @@
                 <tbody>${setRows}</tbody>
               </table>
               <div class="ex-actions-row">
-                <button class="btn-add-set" data-logid="${log.id}" data-exid="${exId}"><i class="fas fa-plus-circle"></i> Satz</button>
+                <button class="btn-add-set" data-logid="${log.id}" data-exid="${exId}">➕ Satz</button>
               </div>
             `;
           }
@@ -1390,7 +1413,7 @@
                 <div class="timer-text" id="timer-${log.id}-${exId}">${formatTime(ex.pause || 90)}<span class="sub">Pause</span></div>
               </div>
               <div class="ex-actions-row">
-                <button class="btn-timer" data-logid="${log.id}" data-exid="${exId}"><i class="fas fa-play"></i> Timer starten</button>
+                <button class="btn-timer" data-logid="${log.id}" data-exid="${exId}">▶️ Timer starten</button>
               </div>
               ${setHtml}
               ${ex.type === 'strength' ? `<div style="font-size:0.7rem; color:#aaa; text-align:right;">Volumen: ${exVolume} kg</div>` : ''}
@@ -1416,7 +1439,7 @@
       }
       let timerButtonHtml = '';
       if (!overallTimerRunning) {
-        timerButtonHtml = `<button class="btn-save" id="btnStartOverallTimer" style="margin-bottom:4px; font-size:0.85rem; padding:8px 12px;"><i class="fas fa-play"></i> Training starten</button>`;
+        timerButtonHtml = `<button class="btn-save" id="btnStartOverallTimer" style="margin-bottom:4px; font-size:0.85rem; padding:8px 12px;">▶️ Training starten</button>`;
       }
       const wakeToggleHtml = `
         <div style="display:flex; align-items:center; gap:6px; margin:4px 0 6px; flex-wrap:wrap;">
@@ -2157,7 +2180,6 @@
         if (display) display.classList.remove('alarm');
         currentTimerLogId = null; currentTimerExId = null;
       }
-      // Tab-Anzeige bleibt erhalten, aber wir müssen die aktuelle Seite nicht neu laden
     }
     function showTab(tab) {
       currentTab = tab;
