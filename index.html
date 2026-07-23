@@ -10,7 +10,7 @@
     /* ===== GLOBAL ===== */
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
     html, body {
-      overscroll-behavior: none; /* kein Pull-to-Refresh, aber Scrollen in Overlays erlaubt */
+      overscroll-behavior: none;
       background: #0d0d1a;
       color: #e0e0e0;
       min-height: 100vh;
@@ -129,7 +129,7 @@
       top: 0; left: 0; right: 0; bottom: 0;
       z-index: 1000;
       background: #0d0d1a;
-      overflow-y: auto;   /* wichtig für Scrollen */
+      overflow-y: auto;
       padding: 12px;
       display: none;
     }
@@ -594,8 +594,6 @@
     </div>
   </div>
   <script>
-    // ===== FALLBACK IOS PULL-TO-REFRESH (entfernt, da CSS overscroll-behavior die bessere Lösung ist) =====
-
     // ===== INDEXED-DB =====
     const dbPromise = new Promise((resolve, reject) => {
       const request = indexedDB.open('BodybuildingProDB', 1);
@@ -1260,8 +1258,17 @@
       if (display) display.textContent = formatTime(elapsed);
     }
 
-    // ===== LOG-FORM =====
+    // ===== LOG-FORM (optimiert – kein vollständiges Neu-Rendering bei jeder Änderung) =====
+    let currentLogRendering = false; // verhindert rekursive Aufrufe
+
     function openLogForm(id = null, startTimer = false) {
+      // Wenn bereits ein Log geöffnet ist und wir nur Daten aktualisieren, kein Neu-Rendering
+      if (editingType === 'log' && editingId === id && !startTimer) {
+        // Nur Volumen aktualisieren
+        updateVolumeDisplay(id);
+        return;
+      }
+
       const isEdit = !!id;
       let log = isEdit ? logs.find(l => l.id === id) : null;
       if (!isEdit) {
@@ -1531,7 +1538,7 @@
       updateOverallTimer();
     }
 
-    // ===== LOG-OPERATIONEN =====
+    // ===== LOG-OPERATIONEN (ohne Neu-Rendering, nur Daten-Update) =====
     function collectLogEntries(logId) {
       const log = logs.find(l => l.id === logId);
       if (!log) return;
@@ -1572,7 +1579,9 @@
       const last = entry.sets[entry.sets.length - 1] || { kg: 0, wdh: 0 };
       entry.sets.push({ kg: last.kg, wdh: last.wdh });
       if ((entry.currentSetIndex || 0) >= entry.sets.length) entry.currentSetIndex = entry.sets.length - 1;
-      saveData(); openLogForm(logId, overallTimerRunning);
+      saveData();
+      // Neu-Rendering nur bei Strukturänderung
+      openLogForm(logId, overallTimerRunning);
     }
     function removeSetFromLogEntry(logId, exId, idx) {
       const log = logs.find(l => l.id === logId);
@@ -1581,7 +1590,8 @@
       if (!entry || entry.sets.length <= 1) { alert('Mindestens ein Satz muss bleiben.'); return; }
       entry.sets.splice(idx, 1);
       if ((entry.currentSetIndex || 0) >= entry.sets.length) entry.currentSetIndex = entry.sets.length - 1;
-      saveData(); openLogForm(logId, overallTimerRunning);
+      saveData();
+      openLogForm(logId, overallTimerRunning);
     }
     function updateSetValueInLog(logId, exId, idx, field, value) {
       const log = logs.find(l => l.id === logId);
@@ -1590,6 +1600,8 @@
       if (!entry || !entry.sets[idx]) return;
       entry.sets[idx][field] = value;
       saveData();
+      // Nur Volumen aktualisieren, kein Neu-Rendering
+      updateVolumeDisplay(logId);
     }
     function updateCardioData(logId, exId, field, value) {
       const log = logs.find(l => l.id === logId);
@@ -1598,6 +1610,7 @@
       if (!entry) { entry = { exerciseId: exId, sets: [], cardioData: { time: 0, distance: 0 }, notiz: '', currentSetIndex: 0 }; log.entries.push(entry); }
       entry.cardioData[field] = value;
       saveData();
+      // Kein Neu-Rendering nötig
     }
     function updateNotizInLog(logId, exId, value) {
       const log = logs.find(l => l.id === logId);
@@ -1611,7 +1624,8 @@
       const log = logs.find(l => l.id === logId);
       if (!log) return;
       log.entries = log.entries.filter(e => e.exerciseId !== exId);
-      saveData(); openLogForm(logId, overallTimerRunning);
+      saveData();
+      openLogForm(logId, overallTimerRunning);
     }
     function saveLogForm() {
       const logId = editingId;
@@ -2192,6 +2206,15 @@
       }
     }
 
+    // ===== VOLUMEN-UPDATE (ohne Neu-Rendering) =====
+    function updateVolumeDisplay(logId) {
+      const log = logs.find(l => l.id === logId);
+      if (!log) return;
+      const total = log.entries.reduce((sum, entry) => sum + calcVolume(entry), 0);
+      const display = document.getElementById('totalVolumeDisplay');
+      if (display) display.textContent = total + ' kg';
+    }
+
     // ===== EVENT DELEGATION =====
     detailContainer.addEventListener('click', function(e) {
       if (editingType !== 'log') return;
@@ -2205,7 +2228,11 @@
         return;
       }
       const btnAddSet = target.closest('.btn-add-set');
-      if (btnAddSet) { addSetToLogEntry(btnAddSet.dataset.logid, btnAddSet.dataset.exid); return; }
+      if (btnAddSet) { 
+        e.preventDefault();
+        addSetToLogEntry(btnAddSet.dataset.logid, btnAddSet.dataset.exid); 
+        return; 
+      }
       const btnRemoveSet = target.closest('.btn-remove-set');
       if (btnRemoveSet) {
         e.preventDefault();
@@ -2265,11 +2292,9 @@
       const target = e.target;
       if (target.classList.contains('set-kg')) {
         updateSetValueInLog(target.dataset.logid, target.dataset.exid, parseInt(target.dataset.idx), 'kg', parseFloat(target.value) || 0);
-        updateVolumeDisplay(target.dataset.logid);
       }
       else if (target.classList.contains('set-wdh')) {
         updateSetValueInLog(target.dataset.logid, target.dataset.exid, parseInt(target.dataset.idx), 'wdh', parseInt(target.value) || 0);
-        updateVolumeDisplay(target.dataset.logid);
       }
       else if (target.classList.contains('cardio-time')) {
         updateCardioData(target.dataset.logid, target.dataset.exid, 'time', parseFloat(target.value) || 0);
@@ -2281,14 +2306,6 @@
         updateNotizInLog(target.dataset.logid, target.dataset.exid, target.value);
       }
     });
-
-    function updateVolumeDisplay(logId) {
-      const log = logs.find(l => l.id === logId);
-      if (!log) return;
-      const total = log.entries.reduce((sum, entry) => sum + calcVolume(entry), 0);
-      const display = document.getElementById('totalVolumeDisplay');
-      if (display) display.textContent = total + ' kg';
-    }
 
     // ===== EVENT LISTENER =====
     tabBtns.forEach(btn => {
