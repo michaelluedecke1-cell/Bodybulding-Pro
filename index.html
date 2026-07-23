@@ -7,12 +7,15 @@
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#0d0d1a" />
   <style>
+    /* ===== GLOBAL ===== */
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
-    html, body { overscroll-behavior-y: none; }
-    body {
+    html, body {
+      overscroll-behavior: none; /* kein Pull-to-Refresh, aber Scrollen in Overlays erlaubt */
       background: #0d0d1a;
       color: #e0e0e0;
       min-height: 100vh;
+    }
+    body {
       padding: 0 12px 80px;
       font-size: 0.82rem;
       line-height: 1.4;
@@ -120,12 +123,13 @@
     .empty-state {
       text-align: center; color: #666; padding: 30px 0; font-size: 0.85rem;
     }
+    /* ===== DETAIL-OVERLAY ===== */
     #detailContainer {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
       z-index: 1000;
       background: #0d0d1a;
-      overflow-y: auto;
+      overflow-y: auto;   /* wichtig für Scrollen */
       padding: 12px;
       display: none;
     }
@@ -168,6 +172,7 @@
       background: linear-gradient(135deg, #e74c3c, #c0392b);
       color: #fff; box-shadow: 0 4px 12px rgba(231,76,60,0.3);
     }
+    /* ===== Weitere Styles (Plan‑Liste, Übungs‑Einträge, Timer, Kalender, Statistik) ===== */
     .plan-exercise-list {
       list-style: none; padding: 0; margin: 4px 0;
     }
@@ -589,13 +594,7 @@
     </div>
   </div>
   <script>
-    // ===== FALLBACK IOS PULL-TO-REFRESH =====
-    let _startY = 0;
-    document.addEventListener('touchstart', e => { _startY = e.touches[0].pageY; }, { passive: true });
-    document.addEventListener('touchmove', e => {
-      const y = e.touches[0].pageY;
-      if (window.scrollY === 0 && y > _startY) e.preventDefault();
-    }, { passive: false });
+    // ===== FALLBACK IOS PULL-TO-REFRESH (entfernt, da CSS overscroll-behavior die bessere Lösung ist) =====
 
     // ===== INDEXED-DB =====
     const dbPromise = new Promise((resolve, reject) => {
@@ -958,7 +957,6 @@
           </div>
         `;
       }).join('');
-      // Radio-Change-Listener
       planList.querySelectorAll('.plan-radio').forEach(radio => {
         radio.addEventListener('change', function(e) {
           e.stopPropagation();
@@ -975,10 +973,8 @@
       planList.querySelectorAll('.del').forEach(btn => {
         btn.addEventListener('click', (e) => { e.stopPropagation(); deletePlan(btn.dataset.id); });
       });
-      // Wichtig: Klick auf das gesamte Listenelement – aber nicht, wenn auf Input/Button geklickt wurde
       planList.querySelectorAll('.list-item').forEach(item => {
         item.addEventListener('click', (e) => {
-          // Wenn das Ziel ein input oder button ist, abbrechen
           if (e.target.closest('input, button')) return;
           openPlanForm(item.dataset.id);
         });
