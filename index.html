@@ -337,7 +337,7 @@
       outline: none; min-height: 20px;
     }
 
-    /* ===== NEU: SET-ITEM (eine Zeile) ===== */
+    /* ===== NEU: SET-ITEM (eine Zeile, mit Swipe) ===== */
     .set-list {
       display: flex;
       flex-direction: column;
@@ -1458,30 +1458,60 @@
       wakeLockManual = false;
     }
 
-    // ===== SWIPE FÜR SET-ITEMS =====
+    // ===== SWIPE FÜR SET-ITEMS (verbessert) =====
     function initSwipeForSetItems(container) {
       const items = container.querySelectorAll('.set-item');
       items.forEach(item => {
-        let startX = 0, currentX = 0, isSwiping = false;
+        let startX = 0, startY = 0;
+        let isSwiping = false;
+        let hasSwiped = false;
+
         item.addEventListener('touchstart', (e) => {
           const touch = e.touches[0];
           startX = touch.clientX;
-          isSwiping = true;
+          startY = touch.clientY;
+          isSwiping = false;
+          hasSwiped = false;
         }, { passive: true });
+
         item.addEventListener('touchmove', (e) => {
-          if (!isSwiping) return;
+          if (!startX) return;
           const touch = e.touches[0];
-          currentX = touch.clientX;
-          const diff = startX - currentX;
-          if (diff > 20) {
-            item.classList.add('swiped');
-          } else if (diff < -20) {
-            item.classList.remove('swiped');
+          const dx = touch.clientX - startX;
+          const dy = touch.clientY - startY;
+          const absDx = Math.abs(dx);
+          const absDy = Math.abs(dy);
+
+          // Nur horizontal swipen, wenn horizontale Bewegung dominiert und über Schwellwert
+          if (absDx > absDy && absDx > 25) {
+            isSwiping = true;
+            if (dx < 0) {
+              // Nach links wischen -> Swipe aktivieren
+              item.classList.add('swiped');
+              hasSwiped = true;
+            } else if (dx > 25) {
+              // Nach rechts wischen -> Swipe zurücksetzen
+              item.classList.remove('swiped');
+              hasSwiped = false;
+            }
+          } else if (absDy > absDx && absDy > 10) {
+            // Vertikales Scrollen – Swipe unterbrechen
+            if (hasSwiped) {
+              // nicht zurücksetzen, aber auch nicht weiter bearbeiten
+            }
           }
         }, { passive: true });
+
         item.addEventListener('touchend', () => {
+          // Wenn nach dem Loslassen der Finger nicht geswiped wurde, Klasse entfernen?
+          // Aber wenn geswiped, bleibt sie, bis der Benutzer auf den Löschbereich klickt oder zurückschiebt.
+          // Alles gut, wie es ist.
+          startX = 0;
+          startY = 0;
           isSwiping = false;
         }, { passive: true });
+
+        // Klick auf Löschbereich
         const deleteArea = item.querySelector('.swipe-delete-area');
         if (deleteArea) {
           deleteArea.addEventListener('click', (e) => {
@@ -1497,6 +1527,8 @@
             item.classList.remove('swiped');
           });
         }
+
+        // Klick auf den Inhalt schließt die Swipe
         const content = item.querySelector('.set-content');
         if (content) {
           content.addEventListener('click', () => {
