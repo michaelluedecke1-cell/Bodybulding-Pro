@@ -1,4 +1,4 @@
-const CACHE = 'bb-pro-v13.3';
+const CACHE = 'bb-pro-v13.5';
 const ASSETS = ['index.html', 'manifest.json', 'gym-123.png'];
 
 self.addEventListener('install', e => {
