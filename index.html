@@ -86,7 +86,6 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.3);
       touch-action: pan-y;
       position: relative;
-      overflow: hidden;
     }
     .list-item:active { background: rgba(255,255,255,0.08); transform: scale(0.98); }
     .list-item .info { flex: 1; }
@@ -105,18 +104,6 @@
       cursor: pointer; padding: 0 4px; transition: color 0.2s;
     }
     .list-item .actions .del { color: #e74c3c; }
-    /* Swipe-Delete Overlay */
-    .list-item .swipe-delete {
-      position: absolute; right: -80px; top: 0; bottom: 0;
-      width: 80px; background: #e74c3c;
-      display: flex; align-items: center; justify-content: center;
-      color: #fff; font-weight: 700; font-size: 0.8rem;
-      transition: right 0.3s ease;
-      border-radius: 0 14px 14px 0;
-    }
-    .list-item.swiped .swipe-delete { right: 0; }
-    .list-item.swiped { transform: translateX(-80px); transition: transform 0.3s ease; }
-
     .plan-radio {
       appearance: none;
       width: 24px; height: 24px;
@@ -167,45 +154,46 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ===== DETAIL-OVERLAY ===== */
+    /* ===== DETAIL-OVERLAY (kompakter für kleine Bildschirme) ===== */
     #detailContainer {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
       z-index: 1000;
       background: #0d0d1a;
       overflow-y: auto;
-      padding: 12px;
+      padding: 8px;
       display: none;
     }
     .detail-card {
       background: rgba(255,255,255,0.04);
       border-radius: 14px;
-      padding: 14px;
+      padding: 10px 12px;
       border: 1px solid rgba(255,255,255,0.06);
       max-width: 480px;
       margin: 0 auto;
     }
     .detail-card .row {
-      display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 8px;
+      display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 6px;
     }
-    .detail-card .row label { flex: 1; min-width: 80px; font-size: 0.75rem; color: #aaa; }
+    .detail-card .row label { flex: 1; min-width: 70px; font-size: 0.7rem; color: #aaa; }
     .detail-card input, .detail-card textarea, .detail-card select {
       width: 100%; background: rgba(255,255,255,0.06);
       border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 10px; padding: 8px 10px; color: #fff;
-      font-size: 0.85rem; transition: border 0.2s;
+      border-radius: 8px; padding: 6px 8px; color: #fff;
+      font-size: 0.8rem; transition: border 0.2s;
+      min-height: 36px;
     }
     .detail-card input:focus, .detail-card textarea:focus, .detail-card select:focus {
       border-color: #2ecc71; outline: none;
     }
     .btn-row {
-      display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap;
+      display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap;
     }
     .btn-row button {
-      flex: 1; padding: 10px; border: none; border-radius: 12px;
-      font-weight: 700; font-size: 0.85rem; cursor: pointer;
+      flex: 1; padding: 8px 10px; border: none; border-radius: 10px;
+      font-weight: 700; font-size: 0.75rem; cursor: pointer;
       transition: transform 0.1s;
-      min-height: 44px;
+      min-height: 38px;
     }
     .btn-row button:active { transform: scale(0.96); }
     .btn-save {
@@ -222,74 +210,74 @@
       color: #fff; box-shadow: 0 4px 12px rgba(243,156,18,0.3);
     }
 
-    /* ===== Weitere Styles ===== */
+    /* ===== Weitere Styles (kompakter) ===== */
     .plan-exercise-list {
       list-style: none; padding: 0; margin: 4px 0;
     }
     .plan-exercise-list li {
-      display: flex; align-items: center; gap: 10px;
+      display: flex; align-items: center; gap: 8px;
       background: rgba(255,255,255,0.04);
-      padding: 8px 10px; border-radius: 10px;
+      padding: 6px 8px; border-radius: 8px;
       margin-bottom: 4px; border: 1px solid rgba(255,255,255,0.06);
     }
     .plan-exercise-list li input[type="checkbox"] {
-      width: 20px; height: 20px; accent-color: #2ecc71; flex-shrink: 0;
+      width: 18px; height: 18px; accent-color: #2ecc71; flex-shrink: 0;
     }
-    .plan-exercise-list li .ex-name { flex: 1; font-size: 0.8rem; }
-    .plan-exercise-list li .ex-type { font-size: 0.65rem; color: #888; }
+    .plan-exercise-list li .ex-name { flex: 1; font-size: 0.75rem; }
+    .plan-exercise-list li .ex-type { font-size: 0.6rem; color: #888; }
     .plan-exercise-list li .move-buttons { display: flex; gap: 4px; }
     .plan-exercise-list li .move-buttons button {
       background: rgba(255,255,255,0.06);
-      border: none; color: #ddd; font-size: 1.2rem;
-      width: 44px; height: 44px; border-radius: 6px; cursor: pointer;
+      border: none; color: #ddd; font-size: 1rem;
+      width: 36px; height: 36px; border-radius: 6px; cursor: pointer;
       display: flex; align-items: center; justify-content: center;
     }
     .plan-exercise-list li .move-buttons button:active { background: rgba(255,255,255,0.12); }
     .exercise-entry {
       background: rgba(255,255,255,0.04);
-      border-radius: 14px;
-      padding: 10px 12px;
-      margin-bottom: 10px;
+      border-radius: 12px;
+      padding: 8px 10px;
+      margin-bottom: 8px;
       border: 1px solid rgba(255,255,255,0.06);
     }
     .exercise-entry .ex-header {
       display: flex; justify-content: space-between; align-items: center;
     }
-    .exercise-entry .ex-header .ex-name { font-weight: 600; font-size: 0.85rem; }
+    .exercise-entry .ex-header .ex-name { font-weight: 600; font-size: 0.8rem; }
     .exercise-entry .ex-header .ex-actions button {
-      background: none; border: none; color: #aaa; font-size: 0.9rem;
+      background: none; border: none; color: #aaa; font-size: 0.8rem;
       cursor: pointer; padding: 0 4px;
     }
     .exercise-entry .ex-header .ex-actions .del { color: #e74c3c; }
     .exercise-entry img {
       max-width: 100%;
-      max-height: 100px;
+      max-height: 80px;
       object-fit: contain;
-      border-radius: 8px;
+      border-radius: 6px;
       margin: 4px 0;
       background: rgba(0,0,0,0.3);
     }
     .exercise-entry .sets-table input[type="number"] {
-      width: 56px; font-size: 0.85rem; padding: 6px 4px;
+      width: 48px; font-size: 0.75rem; padding: 4px 2px;
       background: rgba(255,255,255,0.06);
       border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 8px; color: #fff; text-align: center;
+      border-radius: 6px; color: #fff; text-align: center;
       -moz-appearance: textfield;
-      min-height: 44px;
+      min-height: 34px;
     }
     .exercise-entry .sets-table input[type="number"]::-webkit-outer-spin-button,
     .exercise-entry .sets-table input[type="number"]::-webkit-inner-spin-button {
       -webkit-appearance: none; margin: 0;
     }
     .exercise-entry .sets-table .set-controls {
-      display: flex; align-items: center; gap: 6px;
+      display: flex; align-items: center; gap: 4px;
     }
     .exercise-entry .sets-table .set-controls button {
       background: rgba(255,255,255,0.06);
       border: none; color: #ddd;
-      font-size: 1.4rem;
-      width: 44px; height: 44px;
-      border-radius: 10px; cursor: pointer;
+      font-size: 1.2rem;
+      width: 36px; height: 36px;
+      border-radius: 8px; cursor: pointer;
       display: flex; align-items: center; justify-content: center;
       font-weight: 700;
     }
@@ -300,17 +288,17 @@
       width: 100%; border-collapse: collapse; margin: 4px 0;
     }
     .exercise-entry .sets-table th {
-      text-align: left; padding: 4px 4px; color: #888;
-      font-weight: 400; font-size: 0.65rem; border-bottom: 1px solid rgba(255,255,255,0.06);
+      text-align: left; padding: 3px 4px; color: #888;
+      font-weight: 400; font-size: 0.6rem; border-bottom: 1px solid rgba(255,255,255,0.06);
     }
     .exercise-entry .sets-table td {
-      padding: 4px 4px; border-bottom: 1px solid rgba(255,255,255,0.04);
+      padding: 3px 4px; border-bottom: 1px solid rgba(255,255,255,0.04);
       vertical-align: middle;
     }
     .exercise-entry .sets-table .btn-remove-set {
       background: none; border: none; color: #e74c3c;
-      font-size: 1.2rem; cursor: pointer; padding: 0 6px;
-      width: 44px; height: 44px;
+      font-size: 1rem; cursor: pointer; padding: 0 4px;
+      width: 36px; height: 36px;
     }
     .exercise-entry .sets-table .set-number.done {
       color: #2ecc71;
@@ -323,7 +311,7 @@
     .exercise-entry .sets-table .set-number.active {
       background: rgba(46, 204, 113, 0.15);
       border-radius: 4px;
-      padding: 0 6px;
+      padding: 0 4px;
       font-weight: 700;
       color: #2ecc71;
     }
@@ -335,20 +323,20 @@
       100% { transform: scale(1); opacity: 1; }
     }
     .exercise-entry .set-progress {
-      font-size: 0.65rem; color: #aaa; margin: 3px 0;
+      font-size: 0.6rem; color: #aaa; margin: 2px 0;
       display: flex; justify-content: space-between;
     }
     .exercise-entry .set-progress .current-set-label {
       color: #2ecc71; font-weight: 600;
     }
     .exercise-entry .ex-actions-row {
-      display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px;
+      display: flex; gap: 4px; flex-wrap: wrap; margin-top: 4px;
     }
     .exercise-entry .ex-actions-row button {
-      padding: 8px 12px; font-size: 0.75rem; font-weight: 600;
-      min-height: 44px; border: none; border-radius: 10px; cursor: pointer;
+      padding: 4px 8px; font-size: 0.7rem; font-weight: 600;
+      min-height: 34px; border: none; border-radius: 8px; cursor: pointer;
       background: rgba(255,255,255,0.06); color: #ddd;
-      flex: 1; min-width: 70px; transition: background 0.2s, transform 0.1s;
+      flex: 1; min-width: 60px; transition: background 0.2s, transform 0.1s;
       display: flex; align-items: center; justify-content: center; gap: 4px;
     }
     .exercise-entry .ex-actions-row button:active { transform: scale(0.96); }
@@ -366,30 +354,30 @@
     }
     .exercise-entry .timer-wrapper {
       position: relative;
-      width: 80px;
-      height: 80px;
-      margin: 4px auto 6px;
+      width: 64px;
+      height: 64px;
+      margin: 2px auto 4px;
       display: flex;
       align-items: center;
       justify-content: center;
     }
     .exercise-entry .timer-wrapper canvas {
-      width: 80px;
-      height: 80px;
+      width: 64px;
+      height: 64px;
       border-radius: 50%;
       display: block;
     }
     .exercise-entry .timer-wrapper .timer-text {
       position: absolute;
-      font-size: 1.2rem;
+      font-size: 1rem;
       font-weight: 700;
       color: #fff;
       text-align: center;
-      line-height: 1.2;
+      line-height: 1.1;
       pointer-events: none;
     }
     .exercise-entry .timer-wrapper .timer-text .sub {
-      font-size: 0.6rem;
+      font-size: 0.5rem;
       font-weight: 400;
       color: #888;
       display: block;
@@ -404,70 +392,70 @@
     }
     .exercise-entry .ex-notiz {
       background: rgba(255,255,255,0.04);
-      padding: 4px 8px; border-radius: 8px; margin-top: 4px;
+      padding: 4px 6px; border-radius: 6px; margin-top: 4px;
     }
     .exercise-entry .ex-notiz textarea {
       width: 100%; background: transparent; border: none;
-      color: #ddd; resize: vertical; font-size: 0.75rem;
-      outline: none; min-height: 24px;
+      color: #ddd; resize: vertical; font-size: 0.7rem;
+      outline: none; min-height: 20px;
     }
     .volume-summary {
       background: rgba(255,255,255,0.04);
-      padding: 6px 10px;
-      border-radius: 10px;
-      margin: 8px 0 4px;
+      padding: 4px 8px;
+      border-radius: 8px;
+      margin: 6px 0 4px;
       display: flex;
       flex-wrap: wrap;
-      gap: 12px;
+      gap: 8px;
       justify-content: space-around;
       border: 1px solid rgba(255,255,255,0.06);
     }
     .volume-summary .item { text-align: center; }
-    .volume-summary .item .label { font-size: 0.6rem; color: #888; }
-    .volume-summary .item .value { font-size: 0.95rem; font-weight: 700; color: #2ecc71; }
+    .volume-summary .item .label { font-size: 0.55rem; color: #888; }
+    .volume-summary .item .value { font-size: 0.85rem; font-weight: 700; color: #2ecc71; }
     .cardio-row {
-      display: flex; gap: 10px; margin: 4px 0; align-items: center;
+      display: flex; gap: 6px; margin: 4px 0; align-items: center;
       background: rgba(255,255,255,0.04);
-      padding: 4px 10px; border-radius: 10px;
+      padding: 4px 8px; border-radius: 8px;
     }
-    .cardio-row label { font-size: 0.7rem; color: #aaa; }
+    .cardio-row label { font-size: 0.65rem; color: #aaa; }
     .cardio-row input {
-      width: 64px; background: rgba(255,255,255,0.06);
+      width: 56px; background: rgba(255,255,255,0.06);
       border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 8px; color: #fff; padding: 6px 4px; font-size: 0.8rem;
-      min-height: 44px;
+      border-radius: 6px; color: #fff; padding: 4px 4px; font-size: 0.75rem;
+      min-height: 34px;
     }
     .calendar-container {
       background: rgba(255,255,255,0.04);
       border-radius: 14px;
-      padding: 14px;
+      padding: 12px;
       border: 1px solid rgba(255,255,255,0.06);
       margin-bottom: 12px;
     }
     .calendar-header {
       display: flex; justify-content: space-between; align-items: center;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
-    .calendar-header .month-year { font-size: 1rem; font-weight: 600; }
+    .calendar-header .month-year { font-size: 0.9rem; font-weight: 600; }
     .calendar-header .nav-btn {
       background: rgba(255,255,255,0.06);
-      border: none; color: #ddd; font-size: 1.1rem;
-      width: 40px; height: 40px; border-radius: 50%; cursor: pointer;
+      border: none; color: #ddd; font-size: 1rem;
+      width: 36px; height: 36px; border-radius: 50%; cursor: pointer;
       display: flex; align-items: center; justify-content: center;
       transition: background 0.2s;
     }
     .calendar-header .nav-btn:active { background: rgba(255,255,255,0.12); }
     .calendar-grid {
       display: grid; grid-template-columns: repeat(7, 1fr);
-      gap: 3px; text-align: center;
+      gap: 2px; text-align: center;
     }
     .calendar-grid .day-name {
-      font-size: 0.6rem; color: #666; padding: 4px 0;
+      font-size: 0.55rem; color: #666; padding: 3px 0;
     }
     .calendar-grid .day-cell {
       background: rgba(255,255,255,0.04);
-      border-radius: 6px; padding: 6px 0;
-      font-size: 0.75rem; cursor: default; transition: background 0.2s;
+      border-radius: 4px; padding: 4px 0;
+      font-size: 0.7rem; cursor: default; transition: background 0.2s;
       position: relative;
     }
     .calendar-grid .day-cell.other-month { color: #444; }
@@ -477,22 +465,22 @@
     }
     .calendar-grid .day-cell.has-training::after {
       content: ''; position: absolute; bottom: 2px; left: 50%;
-      transform: translateX(-50%); width: 4px; height: 4px;
+      transform: translateX(-50%); width: 3px; height: 3px;
       border-radius: 50%; background: #2ecc71;
     }
     .calendar-grid .day-cell.today { border: 1px solid #f39c12; }
     .calendar-grid .day-cell:active { background: rgba(255,255,255,0.08); }
     .calendar-year-grid {
       display: grid; grid-template-columns: repeat(3, 1fr);
-      gap: 10px; margin: 8px 0;
+      gap: 8px; margin: 6px 0;
     }
     .calendar-year-grid .month-card {
       background: rgba(255,255,255,0.04);
-      border-radius: 10px; padding: 6px 4px;
+      border-radius: 8px; padding: 4px 2px;
       text-align: center; border: 1px solid rgba(255,255,255,0.06);
     }
     .calendar-year-grid .month-card .month-name {
-      font-size: 0.6rem; color: #aaa; margin-bottom: 2px;
+      font-size: 0.55rem; color: #aaa; margin-bottom: 2px;
     }
     .calendar-year-grid .month-card .mini-days {
       display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px;
@@ -501,61 +489,61 @@
       aspect-ratio: 1; border-radius: 2px;
       background: rgba(255,255,255,0.04);
       display: flex; align-items: center; justify-content: center;
-      font-size: 0.35rem; color: #555; cursor: default;
+      font-size: 0.3rem; color: #555; cursor: default;
     }
     .calendar-year-grid .month-card .mini-day.has-training {
       background: #2ecc71; color: #0d0d1a; font-weight: 700; cursor: pointer;
     }
     .calendar-year-grid .month-card .mini-day.other-month { opacity: 0.3; }
     .calendar-stats {
-      display: flex; gap: 12px; justify-content: center;
-      flex-wrap: wrap; margin-top: 10px; font-size: 0.75rem; color: #aaa;
+      display: flex; gap: 8px; justify-content: center;
+      flex-wrap: wrap; margin-top: 8px; font-size: 0.7rem; color: #aaa;
     }
-    .calendar-stats span { background: rgba(255,255,255,0.04); padding: 4px 12px; border-radius: 16px; }
+    .calendar-stats span { background: rgba(255,255,255,0.04); padding: 3px 10px; border-radius: 14px; }
     .calendar-stats .count { color: #2ecc71; font-weight: 700; }
     .stat-card {
       background: rgba(255,255,255,0.04);
       border-radius: 14px;
-      padding: 14px;
+      padding: 12px;
       border: 1px solid rgba(255,255,255,0.06);
     }
     .stat-card .stat-value {
-      font-size: 1.5rem; font-weight: 700; color: #2ecc71;
+      font-size: 1.3rem; font-weight: 700; color: #2ecc71;
     }
-    .stat-card .stat-label { font-size: 0.7rem; color: #aaa; }
+    .stat-card .stat-label { font-size: 0.65rem; color: #aaa; }
     .stat-progress-list {
       list-style: none; padding: 0; margin: 0;
     }
     .stat-progress-list li {
       background: rgba(255,255,255,0.04);
-      border-radius: 10px; padding: 10px 12px;
+      border-radius: 10px; padding: 8px 10px;
       margin-bottom: 6px; border: 1px solid rgba(255,255,255,0.06);
       display: flex; flex-direction: column;
     }
     .stat-progress-list .ex-name {
-      font-weight: 600; font-size: 0.85rem; color: #ddd;
+      font-weight: 600; font-size: 0.8rem; color: #ddd;
     }
     .stat-progress-list .ex-stats {
       display: flex; justify-content: space-between; align-items: center;
       margin-top: 2px;
     }
     .stat-progress-list .ex-current {
-      font-size: 1rem; font-weight: 700; color: #2ecc71;
+      font-size: 0.9rem; font-weight: 700; color: #2ecc71;
     }
     .stat-progress-list .ex-change {
-      font-size: 0.8rem; font-weight: 600;
+      font-size: 0.75rem; font-weight: 600;
     }
     .stat-progress-list .ex-change.up { color: #2ecc71; }
     .stat-progress-list .ex-change.down { color: #e74c3c; }
     .stat-progress-list .ex-change.neutral { color: #888; }
     .stat-progress-list .ex-previous {
-      font-size: 0.65rem; color: #888; margin-top: 2px;
+      font-size: 0.6rem; color: #888; margin-top: 2px;
     }
     .stat-toggle {
-      display: inline-flex; align-items: center; gap: 6px;
+      display: inline-flex; align-items: center; gap: 4px;
       background: rgba(255,255,255,0.06);
-      padding: 4px 12px; border-radius: 16px;
-      font-size: 0.7rem; cursor: pointer; border: 1px solid rgba(255,255,255,0.08);
+      padding: 3px 10px; border-radius: 14px;
+      font-size: 0.65rem; cursor: pointer; border: 1px solid rgba(255,255,255,0.08);
       user-select: none; transition: background 0.2s;
     }
     .stat-toggle.active { background: rgba(46,204,113,0.15); border-color: #2ecc71; }
@@ -569,53 +557,51 @@
     .backup-overlay.active { display: flex; }
     .backup-modal {
       background: #1a1a2e;
-      padding: 24px;
-      border-radius: 18px;
-      max-width: 90%; width: 380px;
+      padding: 20px;
+      border-radius: 16px;
+      max-width: 90%; width: 360px;
       text-align: center;
       border: 1px solid rgba(255,255,255,0.06);
       box-shadow: 0 20px 60px rgba(0,0,0,0.6);
     }
-    .backup-modal h3 { margin-bottom: 6px; font-size: 1.2rem; }
+    .backup-modal h3 { margin-bottom: 6px; font-size: 1.1rem; }
     .backup-modal .backup-info {
-      font-size: 0.75rem; color: #888; margin-bottom: 14px;
+      font-size: 0.7rem; color: #888; margin-bottom: 12px;
     }
     .backup-modal .backup-info span { color: #2ecc71; }
     .backup-modal .btn-row {
-      display: flex; gap: 10px; justify-content: center;
-      flex-wrap: wrap; margin-top: 14px;
+      display: flex; gap: 8px; justify-content: center;
+      flex-wrap: wrap; margin-top: 10px;
     }
     .backup-modal .btn-row button {
-      padding: 8px 16px; border: none; border-radius: 10px;
-      font-weight: 600; cursor: pointer; transition: transform 0.1s; font-size: 0.8rem;
-      min-height: 44px;
+      padding: 6px 14px; border: none; border-radius: 8px;
+      font-weight: 600; cursor: pointer; transition: transform 0.1s; font-size: 0.75rem;
+      min-height: 38px;
     }
     .backup-modal .btn-row button:active { transform: scale(0.96); }
     .wake-toggle {
       display: inline-flex; align-items: center; gap: 4px;
       background: rgba(255,255,255,0.06);
-      padding: 4px 12px; border-radius: 16px;
-      font-size: 0.7rem; cursor: pointer; transition: background 0.3s;
+      padding: 3px 10px; border-radius: 14px;
+      font-size: 0.65rem; cursor: pointer; transition: background 0.3s;
       border: 1px solid rgba(255,255,255,0.08); user-select: none;
-      min-height: 44px;
+      min-height: 34px;
     }
     .wake-toggle.active { background: rgba(46,204,113,0.15); border-color: #2ecc71; }
     .wake-toggle:active { transform: scale(0.96); }
     .chart-container {
       background: rgba(255,255,255,0.04);
-      border-radius: 10px; padding: 8px;
+      border-radius: 8px; padding: 6px;
       margin: 4px 0; border: 1px solid rgba(255,255,255,0.06);
       overflow-x: auto;
     }
-    .chart-container canvas { width: 100%; height: 80px; }
-
+    .chart-container canvas { width: 100%; height: 70px; }
     .calendar-two-col {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 10px;
     }
 
-    /* ===== PRINT ===== */
     @media print {
       body * { visibility: hidden; }
       #printArea, #printArea * { visibility: visible; }
@@ -625,7 +611,7 @@
       #printArea table { width: 100%; border-collapse: collapse; margin: 8px 0; }
       #printArea th, #printArea td { border: 1px solid #ddd; padding: 6px 8px; text-align: left; }
       #printArea th { background: #f0f0f0; }
-      #printArea .exercise-block { margin-bottom: 16px; border-bottom: 1px solid #ccc; padding-bottom: 8px; }
+      #printArea .exercise-block { margin-bottom: 12px; border-bottom: 1px solid #ccc; padding-bottom: 6px; }
     }
 
     @media (min-width: 600px) {
@@ -667,7 +653,7 @@
       <div class="backup-modal">
         <h3>💾 Backup & Wiederherstellung</h3>
         <p class="backup-info" id="backupInfo">Letztes Backup: <span id="lastBackupDate">–</span></p>
-        <p style="margin-bottom:10px; font-size:0.8rem; color:#aaa;">Automatisches Backup wird bei jedem Speichern erstellt.</p>
+        <p style="margin-bottom:8px; font-size:0.75rem; color:#aaa;">Automatisches Backup wird bei jedem Speichern erstellt.</p>
         <div class="btn-row">
           <button class="btn-save" id="btnExport">⬇️ Exportieren</button>
           <button class="btn-cancel" id="btnImportTrigger">⬆️ Importieren</button>
@@ -678,7 +664,7 @@
       </div>
     </div>
 
-    <!-- Druckbereich (versteckt) -->
+    <!-- Druckbereich -->
     <div id="printArea" style="display:none;"></div>
   </div>
 
@@ -725,10 +711,9 @@
     let wakeLock = null, wakeLockManual = false;
     let overallTimerStart = null, overallTimerInterval = null, overallTimerRunning = false;
     let lastBackupDate = null;
-    // Virtual Scrolling
-    let visibleLogs = [];
     let logPage = 0;
     const LOGS_PER_PAGE = 20;
+    let visibleLogs = [];
 
     // ===== DOM-REFERENZEN =====
     const pageExercises = document.getElementById('page-exercises');
@@ -855,7 +840,7 @@
       }
     }
 
-    // ===== SPEICHERN & LADEN (mit Spinner) =====
+    // ===== SPEICHERN & LADEN =====
     function saveData() {
       showSpinner();
       idbSet('bb_exercises', exercises).catch(console.warn);
@@ -870,7 +855,6 @@
         console.log('✅ Auto-Backup gespeichert');
         hideSpinner();
       }).catch(() => { hideSpinner(); });
-      // Spinner wird nach 500ms ausgeblendet, falls die Promise zu lang dauert
       setTimeout(hideSpinner, 500);
     }
     async function loadData() {
@@ -967,14 +951,14 @@
       const ctx = canvas.getContext('2d');
       const w = canvas.width, h = canvas.height;
       ctx.clearRect(0, 0, w, h);
-      const cx = w/2, cy = h/2, r = Math.min(w,h)/2 - 8;
+      const cx = w/2, cy = h/2, r = Math.min(w,h)/2 - 6;
       const progress = total > 0 ? remaining / total : 1;
       const startAngle = -Math.PI/2;
       const endAngle = startAngle + (progress * 2 * Math.PI);
       ctx.beginPath();
       ctx.arc(cx, cy, r, 0, 2 * Math.PI);
       ctx.strokeStyle = 'rgba(255,255,255,0.08)';
-      ctx.lineWidth = 6;
+      ctx.lineWidth = 5;
       ctx.stroke();
       const grad = ctx.createConicGradient(startAngle, cx, cy);
       grad.addColorStop(0, '#2ecc71');
@@ -983,29 +967,22 @@
       ctx.beginPath();
       ctx.arc(cx, cy, r, startAngle, endAngle);
       ctx.strokeStyle = grad;
-      ctx.lineWidth = 6;
+      ctx.lineWidth = 5;
       ctx.lineCap = 'round';
       ctx.stroke();
       if (remaining < 5 && remaining > 0) {
         ctx.shadowColor = '#e74c3c';
-        ctx.shadowBlur = 20;
+        ctx.shadowBlur = 16;
         ctx.beginPath();
         ctx.arc(cx, cy, r, startAngle, endAngle);
         ctx.strokeStyle = 'rgba(231,76,60,0.3)';
-        ctx.lineWidth = 10;
+        ctx.lineWidth = 8;
         ctx.stroke();
         ctx.shadowBlur = 0;
       }
     }
 
-    // ===== RENDER-FUNKTIONEN =====
-    function renderAll() {
-      renderExercises(); renderPlans(); renderLogs();
-      if (currentTab === 'calendar') renderCalendar();
-      if (currentTab === 'stats') renderStats();
-    }
-
-    // ===== LAZY LOADING BILDER =====
+    // ===== LAZY LOADING =====
     function lazyLoadImages(container) {
       if (!('IntersectionObserver' in window)) return;
       const images = container.querySelectorAll('img[data-src]');
@@ -1022,7 +999,13 @@
       images.forEach(img => observer.observe(img));
     }
 
-    // ===== RENDER ÜBUNGEN =====
+    // ===== RENDER-FUNKTIONEN =====
+    function renderAll() {
+      renderExercises(); renderPlans(); renderLogs();
+      if (currentTab === 'calendar') renderCalendar();
+      if (currentTab === 'stats') renderStats();
+    }
+
     function renderExercises() {
       if (!exercises.length) {
         exerciseList.innerHTML = `<div class="empty-state">💪 Keine Übungen vorhanden.<br/>Klicke auf ➕, um eine anzulegen.</div>`;
@@ -1044,7 +1027,6 @@
               <button class="edit" data-id="${ex.id}" title="Bearbeiten">✏️</button>
               <button class="del" data-id="${ex.id}" title="Löschen">🗑️</button>
             </div>
-            <div class="swipe-delete">🗑️ Löschen</div>
           </div>
         `;
       }).join('');
@@ -1057,11 +1039,9 @@
       });
       exerciseList.querySelectorAll('.list-item').forEach(item => {
         item.addEventListener('click', () => openExerciseForm(item.dataset.id));
-        initSwipeDelete(item, () => deleteExercise(item.dataset.id));
       });
     }
 
-    // ===== RENDER PLÄNE =====
     function renderPlans() {
       if (!plans.length) {
         planList.innerHTML = `<div class="empty-state">📋 Keine Trainingspläne.<br/>Klicke auf ➕, um einen zu erstellen.</div>`;
@@ -1081,7 +1061,6 @@
               <button class="edit" data-id="${plan.id}" title="Bearbeiten">✏️</button>
               <button class="del" data-id="${plan.id}" title="Löschen">🗑️</button>
             </div>
-            <div class="swipe-delete">🗑️ Löschen</div>
           </div>
         `;
       }).join('');
@@ -1106,11 +1085,9 @@
           if (e.target.closest('input, button')) return;
           openPlanForm(item.dataset.id);
         });
-        initSwipeDelete(item, () => deletePlan(item.dataset.id));
       });
     }
 
-    // ===== RENDER LOGS (Virtual Scrolling) =====
     function renderLogs(loadMore = false) {
       if (!logs.length) {
         logList.innerHTML = `<div class="empty-state">📝 Keine Trainingslogs.<br/>Klicke auf ➕, um ein Training zu protokollieren.</div>`;
@@ -1137,13 +1114,12 @@
               <button class="edit" data-id="${log.id}" title="Bearbeiten">✏️</button>
               <button class="del" data-id="${log.id}" title="Löschen">🗑️</button>
             </div>
-            <div class="swipe-delete">🗑️ Löschen</div>
           </div>
         `;
       }).join('');
 
       if (end < total) {
-        html += `<button id="loadMoreLogs" style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); border-radius:12px; padding:12px; color:#aaa; cursor:pointer; width:100%; font-size:0.85rem; min-height:44px;">Mehr laden (${end}/${total})</button>`;
+        html += `<button id="loadMoreLogs" style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); border-radius:10px; padding:10px; color:#aaa; cursor:pointer; width:100%; font-size:0.8rem; min-height:40px;">Mehr laden (${end}/${total})</button>`;
       }
       logList.innerHTML = html;
 
@@ -1155,41 +1131,9 @@
       });
       logList.querySelectorAll('.list-item').forEach(item => {
         item.addEventListener('click', () => openLogForm(item.dataset.id, false));
-        initSwipeDelete(item, () => deleteLog(item.dataset.id));
       });
       const loadBtn = document.getElementById('loadMoreLogs');
       if (loadBtn) loadBtn.addEventListener('click', () => { logPage++; renderLogs(true); });
-    }
-
-    // ===== SWIPE-DELETE =====
-    function initSwipeDelete(element, onDelete) {
-      let startX = 0, currentX = 0, isSwiping = false;
-      element.addEventListener('touchstart', (e) => {
-        const touch = e.touches[0];
-        startX = touch.clientX;
-        isSwiping = true;
-      }, { passive: true });
-      element.addEventListener('touchmove', (e) => {
-        if (!isSwiping) return;
-        const touch = e.touches[0];
-        currentX = touch.clientX;
-        const diff = startX - currentX;
-        if (diff > 10) {
-          element.classList.add('swiped');
-        } else if (diff < -10) {
-          element.classList.remove('swiped');
-        }
-      }, { passive: true });
-      element.addEventListener('touchend', (e) => {
-        isSwiping = false;
-        if (element.classList.contains('swiped')) {
-          if (onDelete) onDelete();
-        }
-      }, { passive: true });
-      // Klick außerhalb zum Zurücksetzen
-      document.addEventListener('click', () => {
-        document.querySelectorAll('.list-item.swiped').forEach(el => el.classList.remove('swiped'));
-      });
     }
 
     // ===== CRUD =====
@@ -1200,7 +1144,7 @@
       detailContainer.style.display = 'block';
       detailContainer.innerHTML = `
         <div class="detail-card">
-          <h3 style="margin-bottom:8px; font-size:1rem;">${isEdit ? 'Übung bearbeiten' : 'Neue Übung'}</h3>
+          <h3 style="margin-bottom:6px; font-size:0.9rem;">${isEdit ? 'Übung bearbeiten' : 'Neue Übung'}</h3>
           <div class="row"><label>Name</label><input type="text" id="formExName" value="${isEdit ? ex.name : ''}" placeholder="z.B. Bankdrücken" /></div>
           <div class="row"><label>Typ</label>
             <select id="formExType">
@@ -1212,7 +1156,7 @@
           <div class="row" style="flex-direction:column; gap:4px;">
             <label>Bild (vom Gerät)</label>
             <input type="file" id="formExImageFile" accept="image/*" />
-            ${isEdit && ex.image ? `<img src="${ex.image}" style="max-width:80px; border-radius:6px; margin-top:4px;" />` : ''}
+            ${isEdit && ex.image ? `<img src="${ex.image}" style="max-width:70px; border-radius:6px; margin-top:4px;" />` : ''}
           </div>
           <div class="btn-row">
             <button class="btn-save" id="btnSaveExercise">${isEdit ? 'Aktualisieren' : 'Speichern'}</button>
@@ -1260,7 +1204,7 @@
       saveData(); renderAll();
     }
 
-    // ===== PLAN (mit Druckfunktion) =====
+    // ===== PLAN =====
     function openPlanForm(id = null) {
       const isEdit = !!id;
       const plan = isEdit ? plans.find(p => p.id === id) : null;
@@ -1268,12 +1212,12 @@
       detailContainer.style.display = 'block';
       detailContainer.innerHTML = `
         <div class="detail-card">
-          <h3 style="margin-bottom:8px; font-size:1rem;">${isEdit ? 'Plan bearbeiten' : 'Neuer Plan'}</h3>
+          <h3 style="margin-bottom:6px; font-size:0.9rem;">${isEdit ? 'Plan bearbeiten' : 'Neuer Plan'}</h3>
           <div class="row"><label>Name</label><input type="text" id="formPlanName" value="${isEdit ? plan.name : ''}" placeholder="z.B. Push-Tag" /></div>
           <div class="row" style="flex-direction:column; gap:4px;">
             <label>Übungen (Reihenfolge durch Pfeile änderbar)</label>
             <ul class="plan-exercise-list" id="planExerciseList"></ul>
-            <span style="font-size:0.6rem; color:#888;">✔ Auswählen, ⬆⬇ Reihenfolge ändern</span>
+            <span style="font-size:0.55rem; color:#888;">✔ Auswählen, ⬆⬇ Reihenfolge ändern</span>
           </div>
           <div class="btn-row">
             <button class="btn-save" id="btnSavePlan">${isEdit ? 'Aktualisieren' : 'Speichern'}</button>
@@ -1378,7 +1322,7 @@
       saveData(); renderAll();
     }
 
-    // ===== DRUCKFUNKTION FÜR PLAN =====
+    // ===== DRUCKFUNKTION =====
     function printPlan(planId) {
       const plan = plans.find(p => p.id === planId);
       if (!plan) return;
@@ -1436,7 +1380,6 @@
       openLogForm(newLog.id, true);
     }
 
-    // ===== LETZTES TRAINING FORTSETZEN =====
     function resumeLastTraining() {
       if (!logs.length) { alert('Kein Training vorhanden.'); return; }
       const sorted = [...logs].sort((a, b) => (a.date || '').localeCompare(b.date || '') * -1);
@@ -1451,7 +1394,7 @@
         overallTimerStart = Date.now();
         overallTimerRunning = true;
         if (overallTimerInterval) clearInterval(overallTimerInterval);
-        overallTimerInterval = setInterval(updateOverallTimer, 1000);
+        overallTimerInterval = setInterval(() => {}, 1000);
         if (!wakeLockManual) requestWakeLock();
       }
     }
@@ -1462,9 +1405,8 @@
       releaseWakeLock();
       wakeLockManual = false;
     }
-    function updateOverallTimer() {}
 
-    // ===== LOG-FORM (mit minimalen DOM-Updates) =====
+    // ===== LOG-FORM (kompakt) =====
     function openLogForm(id = null, startTimer = false) {
       if (editingType === 'log' && editingId === id && !startTimer) {
         updateVolumeDisplay(id);
@@ -1597,20 +1539,20 @@
               <div class="ex-header">
                 <span class="ex-name">${ex.name} ${ex.type === 'cardio' ? '🏃' : '🏋️'}</span>
                 <div class="ex-actions">
-                  <button class="del" data-exid="${exId}" title="Aus Log entfernen" style="background:none; border:none; color:#e74c3c; cursor:pointer; font-size:1.2rem; padding:0 8px;">✕</button>
+                  <button class="del" data-exid="${exId}" title="Aus Log entfernen" style="background:none; border:none; color:#e74c3c; cursor:pointer; font-size:1rem; padding:0 6px;">✕</button>
                 </div>
               </div>
-              ${ex.image ? `<img data-src="${ex.image}" alt="${ex.name}" style="max-width:100%; max-height:100px; object-fit:contain; border-radius:8px; margin:4px 0; background:rgba(0,0,0,0.3);" />` : ''}
-              <div style="margin:2px 0; font-size:0.7rem; color:#aaa;">Pause: ${formatTime(ex.pause || 90)}</div>
+              ${ex.image ? `<img data-src="${ex.image}" alt="${ex.name}" style="max-width:100%; max-height:80px; object-fit:contain; border-radius:6px; margin:4px 0; background:rgba(0,0,0,0.3);" />` : ''}
+              <div style="margin:2px 0; font-size:0.65rem; color:#aaa;">Pause: ${formatTime(ex.pause || 90)}</div>
               <div class="timer-wrapper" id="timer-wrapper-${log.id}-${exId}">
-                <canvas id="timer-${log.id}-${exId}-canvas" width="80" height="80"></canvas>
+                <canvas id="timer-${log.id}-${exId}-canvas" width="64" height="64"></canvas>
                 <div class="timer-text" id="timer-${log.id}-${exId}">${formatTime(ex.pause || 90)}<span class="sub">Pause</span></div>
               </div>
               <div class="ex-actions-row">
                 <button class="btn-timer" data-logid="${log.id}" data-exid="${exId}">▶️ Timer starten</button>
               </div>
               ${setHtml}
-              ${ex.type === 'strength' ? `<div style="font-size:0.7rem; color:#aaa; text-align:right;">Volumen: ${exVolume} kg</div>` : ''}
+              ${ex.type === 'strength' ? `<div style="font-size:0.65rem; color:#aaa; text-align:right;">Volumen: ${exVolume} kg</div>` : ''}
               <div class="ex-notiz">
                 <textarea class="ex-notiz-text" data-logid="${log.id}" data-exid="${exId}" placeholder="Notiz ...">${entry.notiz || ''}</textarea>
               </div>
@@ -1618,12 +1560,12 @@
           `;
         });
       } else {
-        exercisesHtml = `<div class="empty-state" style="padding:10px 0;">Wähle einen Plan aus, um Übungen zu laden.</div>`;
+        exercisesHtml = `<div class="empty-state" style="padding:8px 0;">Wähle einen Plan aus, um Übungen zu laden.</div>`;
       }
 
       const wakeToggleHtml = `
-        <div style="display:flex; align-items:center; gap:6px; margin:4px 0 6px; flex-wrap:wrap;">
-          <span style="font-size:0.7rem; color:#aaa;">🖥️ Bildschirm:</span>
+        <div style="display:flex; align-items:center; gap:4px; margin:4px 0 6px; flex-wrap:wrap;">
+          <span style="font-size:0.65rem; color:#aaa;">🖥️ Bildschirm:</span>
           <div class="wake-toggle ${wakeLock ? 'active' : ''}" id="wakeToggleBtn" style="cursor:pointer;">
             ${wakeLock ? '🖥️ an' : '🖥️ aus'}
           </div>
@@ -1632,7 +1574,7 @@
 
       detailContainer.innerHTML = `
         <div class="detail-card">
-          <h3 style="margin-bottom:6px; font-size:0.95rem;">${isEdit ? 'Training bearbeiten' : 'Neues Training'}</h3>
+          <h3 style="margin-bottom:4px; font-size:0.9rem;">${isEdit ? 'Training bearbeiten' : 'Neues Training'}</h3>
           ${wakeToggleHtml}
           <div class="row"><label>Plan</label><select id="formLogPlan"><option value="">-- Plan wählen --</option>${planOptions}</select></div>
           <div class="row"><label>Datum</label><input type="date" id="formLogDate" value="${log.date || getToday()}" /></div>
@@ -1695,7 +1637,7 @@
       });
     }
 
-    // ===== LOG-OPERATIONEN (mit minimalen DOM-Updates) =====
+    // ===== LOG-OPERATIONEN =====
     function collectLogEntries(logId) {
       const log = logs.find(l => l.id === logId);
       if (!log) return;
@@ -1728,7 +1670,6 @@
       });
       log.entries = entries;
     }
-
     function addSetToLogEntry(logId, exId) {
       const log = logs.find(l => l.id === logId);
       if (!log) return;
@@ -1740,7 +1681,6 @@
       saveData();
       openLogForm(logId, overallTimerRunning);
     }
-
     function removeSetFromLogEntry(logId, exId, idx) {
       const log = logs.find(l => l.id === logId);
       if (!log) return;
@@ -1751,7 +1691,6 @@
       saveData();
       openLogForm(logId, overallTimerRunning);
     }
-
     function updateSetValueInLog(logId, exId, idx, field, value) {
       const log = logs.find(l => l.id === logId);
       if (!log) return;
@@ -1759,16 +1698,13 @@
       if (!entry || !entry.sets[idx]) return;
       entry.sets[idx][field] = value;
       saveData();
-      // Nur Volumen aktualisieren (kein Neu-Rendering)
       updateVolumeDisplay(logId);
-      // Optional: Set-Status im DOM aktualisieren (minimaler DOM-Update)
       const row = document.querySelector(`.exercise-entry[data-exid="${exId}"] .sets-table tbody tr[data-setidx="${idx}"]`);
       if (row) {
         const input = row.querySelector(`.set-${field}`);
         if (input) input.value = value;
       }
     }
-
     function updateCardioData(logId, exId, field, value) {
       const log = logs.find(l => l.id === logId);
       if (!log) return;
@@ -1777,7 +1713,6 @@
       entry.cardioData[field] = value;
       saveData();
     }
-
     function updateNotizInLog(logId, exId, value) {
       const log = logs.find(l => l.id === logId);
       if (!log) return;
@@ -1786,7 +1721,6 @@
       entry.notiz = value;
       saveData();
     }
-
     function removeExerciseFromLog(logId, exId) {
       const log = logs.find(l => l.id === logId);
       if (!log) return;
@@ -1794,7 +1728,6 @@
       saveData();
       openLogForm(logId, overallTimerRunning);
     }
-
     function saveLogForm() {
       const logId = editingId;
       let log = logs.find(l => l.id === logId);
@@ -1813,7 +1746,6 @@
       renderAll();
       closeDetail();
     }
-
     function deleteLog(id) {
       if (!confirm('Training aus dem Log löschen?')) return;
       logs = logs.filter(l => l.id !== id);
@@ -1994,17 +1926,17 @@
           </div>
         </div>
         <div class="stat-card">
-          <div style="font-weight:600; margin-bottom:6px; font-size:0.9rem;">📊 Tägliches Volumen (letzte 7 Tage)</div>
-          <div style="display:flex; gap:3px; justify-content:space-around; align-items:flex-end; height:80px; padding-top:6px;">
+          <div style="font-weight:600; margin-bottom:6px; font-size:0.85rem;">📊 Tägliches Volumen (letzte 7 Tage)</div>
+          <div style="display:flex; gap:3px; justify-content:space-around; align-items:flex-end; height:70px; padding-top:4px;">
       `;
       const maxDayVol = Math.max(...days.map(d => d.vol), 1);
       days.forEach(d => {
-        const height = Math.max(4, (d.vol / maxDayVol) * 64);
+        const height = Math.max(4, (d.vol / maxDayVol) * 56);
         html += `
           <div style="display:flex; flex-direction:column; align-items:center; flex:1;">
-            <div style="background:#2ecc71; width:100%; max-width:20px; height:${height}px; border-radius:3px 3px 0 0;"></div>
-            <div style="font-size:0.55rem; color:#888; margin-top:3px; text-align:center;">${d.label}</div>
-            <div style="font-size:0.5rem; color:#aaa;">${d.vol > 0 ? d.vol.toLocaleString() : '-'}</div>
+            <div style="background:#2ecc71; width:100%; max-width:18px; height:${height}px; border-radius:3px 3px 0 0;"></div>
+            <div style="font-size:0.5rem; color:#888; margin-top:2px; text-align:center;">${d.label}</div>
+            <div style="font-size:0.45rem; color:#aaa;">${d.vol > 0 ? d.vol.toLocaleString() : '-'}</div>
           </div>
         `;
       });
@@ -2012,7 +1944,7 @@
       html += `
         <div class="stat-card">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; flex-wrap:wrap; gap:4px;">
-            <span style="font-weight:600; font-size:0.9rem;">📈 Fortschritt pro Übung</span>
+            <span style="font-weight:600; font-size:0.85rem;">📈 Fortschritt pro Übung</span>
             <div class="stat-toggle ${showAllStats ? 'active' : ''}" id="statToggle">
               ${showAllStats ? '👁️ Alle anzeigen' : '👁️‍🗨️ Nur Veränderung'}
             </div>
@@ -2109,7 +2041,7 @@
         <div style="display:flex; justify-content:space-between; margin-top:6px;">
           <button class="nav-btn" id="calPrev">‹ Vorheriger</button>
           <button class="nav-btn" id="calNext">Nächster ›</button>
-          <button class="nav-btn" id="calYearView" style="background:linear-gradient(135deg,#f39c12,#e67e22); color:#fff; padding:0 10px; font-size:0.8rem;">📅 Jahr</button>
+          <button class="nav-btn" id="calYearView" style="background:linear-gradient(135deg,#f39c12,#e67e22); color:#fff; padding:0 10px; font-size:0.75rem;">📅 Jahr</button>
         </div>
       `;
 
@@ -2152,7 +2084,7 @@
             <button class="nav-btn" id="yearPrev">‹</button>
             <span class="month-year">${year}</span>
             <button class="nav-btn" id="yearNext">›</button>
-            <button class="nav-btn" id="yearMonthView" style="background:linear-gradient(135deg,#f39c12,#e67e22); color:#fff; padding:0 10px; font-size:0.8rem;">📅 Monat</button>
+            <button class="nav-btn" id="yearMonthView" style="background:linear-gradient(135deg,#f39c12,#e67e22); color:#fff; padding:0 10px; font-size:0.75rem;">📅 Monat</button>
           </div>
           <div class="calendar-year-grid">
       `;
@@ -2299,7 +2231,6 @@
       }
     }
 
-    // ===== VOLUMEN-UPDATE =====
     function updateVolumeDisplay(logId) {
       const log = logs.find(l => l.id === logId);
       if (!log) return;
