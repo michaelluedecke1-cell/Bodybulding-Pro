@@ -337,7 +337,7 @@
       outline: none; min-height: 20px;
     }
 
-    /* ===== NEU: SET-ITEM (eine Zeile, mit Swipe) ===== */
+    /* ===== SET-ITEM (eine Zeile, mit Swipe) ===== */
     .set-list {
       display: flex;
       flex-direction: column;
@@ -1140,6 +1140,7 @@
       });
     }
 
+    // ===== LOGS (ohne Dauer) =====
     function renderLogs(loadMore = false) {
       if (!logs.length) {
         logList.innerHTML = `<div class="empty-state">📝 Keine Trainingslogs.<br/>Klicke auf ➕, um ein Training zu protokollieren.</div>`;
@@ -1161,7 +1162,7 @@
           <div class="list-item" data-id="${log.id}" data-type="log">
             <div class="thumbnail">📅</div>
             <div class="info"><h4>${planName}</h4>
-            <div class="sub">📅 ${formatDate(log.date)} • ${exCount} Übungen • ⏱️ ${formatDuration(log.duration || 0)}</div></div>
+            <div class="sub">📅 ${formatDate(log.date)} • ${exCount} Übungen</div></div>
             <div class="actions">
               <button class="edit" data-id="${log.id}" title="Bearbeiten">✏️</button>
               <button class="del" data-id="${log.id}" title="Löschen">🗑️</button>
@@ -1482,36 +1483,26 @@
           const absDx = Math.abs(dx);
           const absDy = Math.abs(dy);
 
-          // Nur horizontal swipen, wenn horizontale Bewegung dominiert und über Schwellwert
           if (absDx > absDy && absDx > 25) {
             isSwiping = true;
             if (dx < 0) {
-              // Nach links wischen -> Swipe aktivieren
               item.classList.add('swiped');
               hasSwiped = true;
             } else if (dx > 25) {
-              // Nach rechts wischen -> Swipe zurücksetzen
               item.classList.remove('swiped');
               hasSwiped = false;
             }
           } else if (absDy > absDx && absDy > 10) {
-            // Vertikales Scrollen – Swipe unterbrechen
-            if (hasSwiped) {
-              // nicht zurücksetzen, aber auch nicht weiter bearbeiten
-            }
+            // vertikales Scrollen – nichts tun
           }
         }, { passive: true });
 
         item.addEventListener('touchend', () => {
-          // Wenn nach dem Loslassen der Finger nicht geswiped wurde, Klasse entfernen?
-          // Aber wenn geswiped, bleibt sie, bis der Benutzer auf den Löschbereich klickt oder zurückschiebt.
-          // Alles gut, wie es ist.
           startX = 0;
           startY = 0;
           isSwiping = false;
         }, { passive: true });
 
-        // Klick auf Löschbereich
         const deleteArea = item.querySelector('.swipe-delete-area');
         if (deleteArea) {
           deleteArea.addEventListener('click', (e) => {
@@ -1528,7 +1519,6 @@
           });
         }
 
-        // Klick auf den Inhalt schließt die Swipe
         const content = item.querySelector('.set-content');
         if (content) {
           content.addEventListener('click', () => {
@@ -1538,7 +1528,7 @@
       });
     }
 
-    // ===== LOG-FORM (kompakt, Sets in einer Zeile) =====
+    // ===== LOG-FORM (ohne Timer-Start-Button, ohne Dauer) =====
     function openLogForm(id = null, startTimer = false) {
       if (editingType === 'log' && editingId === id && !startTimer) {
         updateVolumeDisplay(id);
@@ -1710,6 +1700,7 @@
         </div>
       `;
 
+      // Kein Timer-Start-Button und keine Dauer-Anzeige mehr
       detailContainer.innerHTML = `
         <div class="detail-card">
           <h3 style="margin-bottom:4px; font-size:0.9rem;">${isEdit ? 'Training bearbeiten' : 'Neues Training'}</h3>
@@ -1730,7 +1721,6 @@
       `;
       lazyLoadImages(detailContainer);
 
-      // Swipe für Set-Items initialisieren
       const setLists = detailContainer.querySelectorAll('.set-list');
       setLists.forEach(list => initSwipeForSetItems(list));
 
