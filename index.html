@@ -7,7 +7,6 @@
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#0d0d1a" />
   <style>
-    /* ===== GLOBAL ===== */
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
     html, body {
       overscroll-behavior: none;
@@ -133,7 +132,6 @@
       text-align: center; color: #666; padding: 30px 0; font-size: 0.85rem;
     }
 
-    /* ===== SPINNER ===== */
     #spinnerOverlay {
       display: none;
       position: fixed;
@@ -154,7 +152,6 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ===== DETAIL-OVERLAY (kompakt) ===== */
     #detailContainer {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
@@ -210,7 +207,6 @@
       color: #fff; box-shadow: 0 4px 12px rgba(243,156,18,0.3);
     }
 
-    /* ===== PLAN-LISTE ===== */
     .plan-exercise-list {
       list-style: none; padding: 0; margin: 4px 0;
     }
@@ -234,7 +230,6 @@
     }
     .plan-exercise-list li .move-buttons button:active { background: rgba(255,255,255,0.12); }
 
-    /* ===== EXERCISE-ENTRY (kompakt) ===== */
     .exercise-entry {
       background: rgba(255,255,255,0.04);
       border-radius: 12px;
@@ -337,7 +332,6 @@
       outline: none; min-height: 20px;
     }
 
-    /* ===== SET-ITEM (eine Zeile, mit Swipe) ===== */
     .set-list {
       display: flex;
       flex-direction: column;
@@ -346,7 +340,8 @@
     }
     .set-item {
       display: flex;
-      align-items: center;
+      flex-direction: column;
+      align-items: stretch;
       background: rgba(255,255,255,0.04);
       border-radius: 8px;
       padding: 4px 6px;
@@ -355,6 +350,11 @@
       overflow: hidden;
       touch-action: pan-y;
       min-height: 44px;
+    }
+    .set-item .set-main {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
       transition: transform 0.3s ease;
     }
     .set-item .set-content {
@@ -362,7 +362,6 @@
       align-items: center;
       gap: 6px;
       width: 100%;
-      transition: transform 0.3s ease;
       flex-wrap: nowrap;
     }
     .set-item .set-number {
@@ -429,6 +428,20 @@
     }
     .set-item .set-controls button.inc { color: #2ecc71; }
     .set-item .set-controls button.dec { color: #e74c3c; }
+
+    .set-item .set-last-hint {
+      font-size: 0.55rem;
+      color: #666;
+      padding-left: 34px;
+      margin-top: 1px;
+      line-height: 1.2;
+      letter-spacing: 0.2px;
+    }
+    .set-item .set-last-hint strong {
+      color: #888;
+      font-weight: 600;
+    }
+
     .set-item .swipe-delete-area {
       position: absolute;
       right: -70px;
@@ -449,11 +462,10 @@
     .set-item.swiped .swipe-delete-area {
       right: 0;
     }
-    .set-item.swiped .set-content {
+    .set-item.swiped .set-main {
       transform: translateX(-70px);
     }
 
-    /* ===== WEITERE ELEMENTE ===== */
     .volume-summary {
       background: rgba(255,255,255,0.04);
       padding: 4px 8px;
@@ -721,7 +733,6 @@
   </div>
 
   <script>
-    // ===== INDEXED-DB =====
     const dbPromise = new Promise((resolve, reject) => {
       const request = indexedDB.open('BodybuildingProDB', 1);
       request.onupgradeneeded = (e) => { e.target.result.createObjectStore('store'); };
@@ -747,11 +758,9 @@
       });
     }
 
-    // ===== SPINNER =====
     function showSpinner() { document.getElementById('spinnerOverlay').classList.add('active'); }
     function hideSpinner() { document.getElementById('spinnerOverlay').classList.remove('active'); }
 
-    // ===== GLOBALE VARIABLEN =====
     let exercises = [], plans = [], logs = [];
     let currentTab = 'exercises', editingId = null, editingType = null;
     let calendarDate = new Date();
@@ -767,7 +776,6 @@
     const LOGS_PER_PAGE = 20;
     let visibleLogs = [];
 
-    // ===== DOM-REFERENZEN =====
     const pageExercises = document.getElementById('page-exercises');
     const pagePlans = document.getElementById('page-plans');
     const pageLogs = document.getElementById('page-logs');
@@ -793,7 +801,6 @@
     const lastBackupDateSpan = document.getElementById('lastBackupDate');
     const printArea = document.getElementById('printArea');
 
-    // ===== HILFSFUNKTIONEN =====
     function generateId() { return Date.now().toString(36) + Math.random().toString(36).substr(2, 5); }
     function formatTime(sec) {
       const m = String(Math.floor(sec / 60)).padStart(2, '0');
@@ -850,7 +857,6 @@
       }
     }
 
-    // ===== WAKE LOCK =====
     async function requestWakeLock() {
       try {
         if ('wakeLock' in navigator) {
@@ -878,7 +884,6 @@
       }
     }
 
-    // ===== PERSISTENT STORAGE =====
     async function enablePersistentStorage() {
       if ('storage' in navigator && 'persist' in navigator.storage) {
         try {
@@ -892,9 +897,8 @@
       }
     }
 
-    // ===== SPEICHERN & LADEN =====
-    function saveData() {
-      showSpinner();
+    function saveData(silent = false) {
+      if (!silent) showSpinner();
       idbSet('bb_exercises', exercises).catch(console.warn);
       idbSet('bb_plans', plans).catch(console.warn);
       idbSet('bb_logs', logs).catch(console.warn);
@@ -904,10 +908,9 @@
         lastBackupDate = new Date().toLocaleString('de-DE');
         localStorage.setItem('bb_last_backup', lastBackupDate);
         if (lastBackupDateSpan) lastBackupDateSpan.textContent = lastBackupDate;
-        console.log('✅ Auto-Backup gespeichert');
-        hideSpinner();
-      }).catch(() => { hideSpinner(); });
-      setTimeout(hideSpinner, 500);
+        if (!silent) hideSpinner();
+      }).catch(() => { if (!silent) hideSpinner(); });
+      if (!silent) setTimeout(hideSpinner, 500);
     }
     async function loadData() {
       showSpinner();
@@ -975,7 +978,6 @@
       hideSpinner();
     }
 
-    // ===== LETZTE TRAININGSDATEN =====
     function getLastTrainingDataForExercise(exerciseId) {
       const sortedLogs = [...logs].sort((a, b) => (a.date || '').localeCompare(b.date || '') * -1);
       for (const log of sortedLogs) {
@@ -992,13 +994,24 @@
       return { sets: [{ kg: 0, wdh: 0 }], notiz: '', currentSetIndex: 0, cardioData: { time: 0, distance: 0 } };
     }
 
-    // ===== VOLUMEN =====
+    function getPreviousTrainingSets(exerciseId, currentLogId) {
+      const sortedLogs = [...logs]
+        .filter(l => l.id !== currentLogId)
+        .sort((a, b) => (a.date || '').localeCompare(b.date || '') * -1);
+      for (const log of sortedLogs) {
+        const entry = log.entries.find(e => e.exerciseId === exerciseId);
+        if (entry && entry.sets && entry.sets.length > 0) {
+          return entry.sets.map(set => ({ ...set }));
+        }
+      }
+      return null;
+    }
+
     function calcVolume(entry) {
       if (!entry.sets) return 0;
       return entry.sets.reduce((sum, set) => sum + (set.kg || 0) * (set.wdh || 0), 0);
     }
 
-    // ===== TIMER KREIS =====
     function drawTimerCircle(canvas, remaining, total) {
       const ctx = canvas.getContext('2d');
       const w = canvas.width, h = canvas.height;
@@ -1034,7 +1047,6 @@
       }
     }
 
-    // ===== LAZY LOADING =====
     function lazyLoadImages(container) {
       if (!('IntersectionObserver' in window)) return;
       const images = container.querySelectorAll('img[data-src]');
@@ -1051,7 +1063,6 @@
       images.forEach(img => observer.observe(img));
     }
 
-    // ===== RENDER-FUNKTIONEN =====
     function renderAll() {
       renderExercises(); renderPlans(); renderLogs();
       if (currentTab === 'calendar') renderCalendar();
@@ -1140,7 +1151,6 @@
       });
     }
 
-    // ===== LOGS (ohne Dauer) =====
     function renderLogs(loadMore = false) {
       if (!logs.length) {
         logList.innerHTML = `<div class="empty-state">📝 Keine Trainingslogs.<br/>Klicke auf ➕, um ein Training zu protokollieren.</div>`;
@@ -1189,7 +1199,6 @@
       if (loadBtn) loadBtn.addEventListener('click', () => { logPage++; renderLogs(true); });
     }
 
-    // ===== CRUD =====
     function openExerciseForm(id = null) {
       const isEdit = !!id;
       const ex = isEdit ? exercises.find(e => e.id === id) : null;
@@ -1257,7 +1266,6 @@
       saveData(); renderAll();
     }
 
-    // ===== PLAN =====
     function openPlanForm(id = null) {
       const isEdit = !!id;
       const plan = isEdit ? plans.find(p => p.id === id) : null;
@@ -1375,7 +1383,6 @@
       saveData(); renderAll();
     }
 
-    // ===== DRUCKFUNKTION =====
     function printPlan(planId) {
       const plan = plans.find(p => p.id === planId);
       if (!plan) return;
@@ -1396,7 +1403,6 @@
       }, 300);
     }
 
-    // ===== QUICKSTART =====
     function quickStart() {
       if (!activePlanId) {
         alert('Kein aktiver Plan ausgewählt. Wähle einen Plan mit dem ⭕ Kästchen aus.');
@@ -1441,7 +1447,6 @@
       openLogForm(lastLog.id, false);
     }
 
-    // ===== GESAMTTIMER =====
     function startOverallTimer() {
       if (!overallTimerRunning) {
         overallTimerStart = Date.now();
@@ -1459,20 +1464,17 @@
       wakeLockManual = false;
     }
 
-    // ===== SWIPE FÜR SET-ITEMS (verbessert) =====
     function initSwipeForSetItems(container) {
       const items = container.querySelectorAll('.set-item');
       items.forEach(item => {
         let startX = 0, startY = 0;
         let isSwiping = false;
-        let hasSwiped = false;
 
         item.addEventListener('touchstart', (e) => {
           const touch = e.touches[0];
           startX = touch.clientX;
           startY = touch.clientY;
           isSwiping = false;
-          hasSwiped = false;
         }, { passive: true });
 
         item.addEventListener('touchmove', (e) => {
@@ -1487,13 +1489,9 @@
             isSwiping = true;
             if (dx < 0) {
               item.classList.add('swiped');
-              hasSwiped = true;
             } else if (dx > 25) {
               item.classList.remove('swiped');
-              hasSwiped = false;
             }
-          } else if (absDy > absDx && absDy > 10) {
-            // vertikales Scrollen – nichts tun
           }
         }, { passive: true });
 
@@ -1528,7 +1526,6 @@
       });
     }
 
-    // ===== LOG-FORM (ohne Timer-Start-Button, ohne Dauer) =====
     function openLogForm(id = null, startTimer = false) {
       if (editingType === 'log' && editingId === id && !startTimer) {
         updateVolumeDisplay(id);
@@ -1540,7 +1537,7 @@
         log = { id: generateId(), planId: '', date: getToday(), duration: 0, entries: [] };
         editingId = log.id;
         logs.push(log);
-        saveData();
+        saveData(true);
         if (startTimer) startOverallTimer();
         else {
           overallTimerRunning = false; overallTimerStart = null;
@@ -1580,7 +1577,7 @@
             };
           });
           log.entries = entries;
-          saveData();
+          saveData(true);
         } else {
           entries = [];
           exerciseIds = [];
@@ -1599,7 +1596,7 @@
           };
         });
         log.entries = entries;
-        saveData();
+        saveData(true);
       }
       let totalVolume = entries.reduce((sum, entry) => sum + calcVolume(entry), 0);
       let exercisesHtml = '';
@@ -1610,6 +1607,7 @@
           const entry = entries.find(e => e.exerciseId === exId) || { exerciseId: exId, sets: [{ kg: 0, wdh: 0 }], cardioData: { time: 0, distance: 0 }, notiz: '', currentSetIndex: 0 };
           const sets = entry.sets || [{ kg: 0, wdh: 0 }];
           const currentSetIdx = entry.currentSetIndex || 0;
+          const lastSets = getPreviousTrainingSets(exId, log.id);
           let setHtml = '';
           let exVolume = 0;
           if (ex.type === 'cardio') {
@@ -1632,20 +1630,25 @@
               let classes = 'set-number';
               if (isDone) classes += ' done';
               else if (isActive) classes += ' active';
+              const lastSet = lastSets && lastSets[si] ? lastSets[si] : null;
+              const lastHint = lastSet ? `<div class="set-last-hint">↩ Letztes Mal: <strong>${lastSet.kg} kg × ${lastSet.wdh}</strong></div>` : '';
               return `
                 <div class="set-item" data-setidx="${si}" data-logid="${log.id}" data-exid="${exId}">
-                  <div class="set-content">
-                    <span class="${classes}">${si+1}</span>
-                    <div class="set-controls">
-                      <button class="dec" data-logid="${log.id}" data-exid="${exId}" data-idx="${si}" data-field="kg" data-step="0.5">−</button>
-                      <input type="number" class="set-kg" value="${set.kg}" data-logid="${log.id}" data-exid="${exId}" data-idx="${si}" step="0.5" />
-                      <button class="inc" data-logid="${log.id}" data-exid="${exId}" data-idx="${si}" data-field="kg" data-step="0.5">+</button>
+                  <div class="set-main">
+                    <div class="set-content">
+                      <span class="${classes}">${si+1}</span>
+                      <div class="set-controls">
+                        <button class="dec" data-logid="${log.id}" data-exid="${exId}" data-idx="${si}" data-field="kg" data-step="0.5">−</button>
+                        <input type="number" class="set-kg" value="${set.kg}" data-logid="${log.id}" data-exid="${exId}" data-idx="${si}" step="0.5" />
+                        <button class="inc" data-logid="${log.id}" data-exid="${exId}" data-idx="${si}" data-field="kg" data-step="0.5">+</button>
+                      </div>
+                      <div class="set-controls">
+                        <button class="dec" data-logid="${log.id}" data-exid="${exId}" data-idx="${si}" data-field="wdh" data-step="1">−</button>
+                        <input type="number" class="set-wdh" value="${set.wdh}" data-logid="${log.id}" data-exid="${exId}" data-idx="${si}" step="1" />
+                        <button class="inc" data-logid="${log.id}" data-exid="${exId}" data-idx="${si}" data-field="wdh" data-step="1">+</button>
+                      </div>
                     </div>
-                    <div class="set-controls">
-                      <button class="dec" data-logid="${log.id}" data-exid="${exId}" data-idx="${si}" data-field="wdh" data-step="1">−</button>
-                      <input type="number" class="set-wdh" value="${set.wdh}" data-logid="${log.id}" data-exid="${exId}" data-idx="${si}" step="1" />
-                      <button class="inc" data-logid="${log.id}" data-exid="${exId}" data-idx="${si}" data-field="wdh" data-step="1">+</button>
-                    </div>
+                    ${lastHint}
                   </div>
                   <div class="swipe-delete-area">🗑️ Löschen</div>
                 </div>
@@ -1700,7 +1703,6 @@
         </div>
       `;
 
-      // Kein Timer-Start-Button und keine Dauer-Anzeige mehr
       detailContainer.innerHTML = `
         <div class="detail-card">
           <h3 style="margin-bottom:4px; font-size:0.9rem;">${isEdit ? 'Training bearbeiten' : 'Neues Training'}</h3>
@@ -1749,7 +1751,7 @@
           } else {
             logObj.entries = [];
           }
-          saveData();
+          saveData(true);
         }
         openLogForm(editingId, overallTimerRunning);
       });
@@ -1769,7 +1771,6 @@
       });
     }
 
-    // ===== LOG-OPERATIONEN =====
     function collectLogEntries(logId) {
       const log = logs.find(l => l.id === logId);
       if (!log) return;
@@ -1802,26 +1803,38 @@
       });
       log.entries = entries;
     }
+
+    function preserveScrollAndRerender(logId) {
+      const scrollY = detailContainer.scrollTop;
+      openLogForm(logId, overallTimerRunning);
+      requestAnimationFrame(() => {
+        detailContainer.scrollTop = scrollY;
+      });
+    }
+
     function addSetToLogEntry(logId, exId) {
       const log = logs.find(l => l.id === logId);
       if (!log) return;
+      collectLogEntries(logId);
       let entry = log.entries.find(e => e.exerciseId === exId);
       if (!entry) { entry = { exerciseId: exId, sets: [], cardioData: { time: 0, distance: 0 }, notiz: '', currentSetIndex: 0 }; log.entries.push(entry); }
       const last = entry.sets[entry.sets.length - 1] || { kg: 0, wdh: 0 };
       entry.sets.push({ kg: last.kg, wdh: last.wdh });
       if ((entry.currentSetIndex || 0) >= entry.sets.length) entry.currentSetIndex = entry.sets.length - 1;
-      saveData();
-      openLogForm(logId, overallTimerRunning);
+      saveData(true);
+      preserveScrollAndRerender(logId);
     }
     function removeSetFromLogEntry(logId, exId, idx) {
       const log = logs.find(l => l.id === logId);
       if (!log) return;
       const entry = log.entries.find(e => e.exerciseId === exId);
       if (!entry || entry.sets.length <= 1) { alert('Mindestens ein Satz muss bleiben.'); return; }
-      entry.sets.splice(idx, 1);
-      if ((entry.currentSetIndex || 0) >= entry.sets.length) entry.currentSetIndex = entry.sets.length - 1;
-      saveData();
-      openLogForm(logId, overallTimerRunning);
+      collectLogEntries(logId);
+      const entry2 = log.entries.find(e => e.exerciseId === exId);
+      entry2.sets.splice(idx, 1);
+      if ((entry2.currentSetIndex || 0) >= entry2.sets.length) entry2.currentSetIndex = entry2.sets.length - 1;
+      saveData(true);
+      preserveScrollAndRerender(logId);
     }
     function updateSetValueInLog(logId, exId, idx, field, value) {
       const log = logs.find(l => l.id === logId);
@@ -1829,10 +1842,8 @@
       const entry = log.entries.find(e => e.exerciseId === exId);
       if (!entry || !entry.sets[idx]) return;
       entry.sets[idx][field] = value;
-      saveData();
+      saveData(true);
       updateVolumeDisplay(logId);
-      const input = document.querySelector(`.set-item[data-logid="${logId}"][data-exid="${exId}"][data-setidx="${idx}"] .set-${field}`);
-      if (input) input.value = value;
     }
     function updateCardioData(logId, exId, field, value) {
       const log = logs.find(l => l.id === logId);
@@ -1840,7 +1851,7 @@
       let entry = log.entries.find(e => e.exerciseId === exId);
       if (!entry) { entry = { exerciseId: exId, sets: [], cardioData: { time: 0, distance: 0 }, notiz: '', currentSetIndex: 0 }; log.entries.push(entry); }
       entry.cardioData[field] = value;
-      saveData();
+      saveData(true);
     }
     function updateNotizInLog(logId, exId, value) {
       const log = logs.find(l => l.id === logId);
@@ -1848,14 +1859,15 @@
       let entry = log.entries.find(e => e.exerciseId === exId);
       if (!entry) { entry = { exerciseId: exId, sets: [], cardioData: { time: 0, distance: 0 }, notiz: '', currentSetIndex: 0 }; log.entries.push(entry); }
       entry.notiz = value;
-      saveData();
+      saveData(true);
     }
     function removeExerciseFromLog(logId, exId) {
       const log = logs.find(l => l.id === logId);
       if (!log) return;
+      collectLogEntries(logId);
       log.entries = log.entries.filter(e => e.exerciseId !== exId);
-      saveData();
-      openLogForm(logId, overallTimerRunning);
+      saveData(true);
+      preserveScrollAndRerender(logId);
     }
     function saveLogForm() {
       const logId = editingId;
@@ -1881,7 +1893,19 @@
       saveData(); renderAll();
     }
 
-    // ===== PAUSENTIMER =====
+    function updateSetStatusUI(exEntry, currentSetIdx, totalSets) {
+      const setItems = exEntry.querySelectorAll('.set-item');
+      setItems.forEach((item, si) => {
+        const numEl = item.querySelector('.set-number');
+        if (!numEl) return;
+        numEl.classList.remove('done', 'active');
+        if (si < currentSetIdx) numEl.classList.add('done');
+        else if (si === currentSetIdx) numEl.classList.add('active');
+      });
+      const progressLabel = exEntry.querySelector('.current-set-label');
+      if (progressLabel) progressLabel.textContent = Math.min(currentSetIdx + 1, totalSets);
+    }
+
     function updateTimerDisplay() {
       if (!timerRunning) return;
       const now = Date.now();
@@ -1969,7 +1993,6 @@
       timerInterval = setInterval(updateTimerDisplay, 1000);
     }
 
-    // ===== STATISTIK =====
     let showAllStats = false;
     function renderStats() {
       if (!statsContainer) return;
@@ -2107,7 +2130,6 @@
       });
     }
 
-    // ===== KALENDER =====
     function renderCalendar() {
       if (!calendarContainer) return;
       if (calendarView === 'year') {
@@ -2278,7 +2300,6 @@
       });
     }
 
-    // ===== BACKUP =====
     function exportData() {
       const data = { exercises, plans, logs };
       const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -2329,7 +2350,6 @@
       }
     }
 
-    // ===== UI =====
     function hideAllPages() { document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); }
     function closeDetail() {
       if (overallTimerRunning) releaseOverallTimer();
@@ -2368,7 +2388,6 @@
       if (display) display.textContent = total + ' kg';
     }
 
-    // ===== EVENT DELEGATION =====
     detailContainer.addEventListener('click', function(e) {
       if (editingType !== 'log') return;
       const target = e.target;
@@ -2425,8 +2444,8 @@
           if (entry) {
             const newIdx = Math.min(idx + 1, entry.sets.length);
             entry.currentSetIndex = newIdx;
-            saveData();
-            openLogForm(logId, overallTimerRunning);
+            saveData(true);
+            updateSetStatusUI(exEntry, newIdx, entry.sets.length);
           }
         }
       }
@@ -2452,7 +2471,6 @@
       }
     });
 
-    // ===== EVENT LISTENER =====
     tabBtns.forEach(btn => {
       btn.addEventListener('click', () => { showTab(btn.dataset.tab); });
     });
@@ -2481,7 +2499,6 @@
       }
     }, { passive: true });
 
-    // ===== INIT =====
     async function initApp() {
       await loadData();
       enablePersistentStorage();
