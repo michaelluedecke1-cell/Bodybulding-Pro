@@ -52,6 +52,10 @@
       background: linear-gradient(135deg, #3498db, #2980b9);
       color: #fff; box-shadow: 0 4px 12px rgba(52,152,219,0.3);
     }
+    .btn-icon.print {
+      background: linear-gradient(135deg, #7f8c8d, #34495e);
+      color: #fff; box-shadow: 0 4px 12px rgba(127,140,141,0.3);
+    }
     .btn-icon.quickstart {
       background: linear-gradient(135deg, #f39c12, #e67e22);
       color: #fff; box-shadow: 0 4px 12px rgba(243,156,18,0.3);
@@ -201,10 +205,6 @@
     .btn-danger {
       background: linear-gradient(135deg, #e74c3c, #c0392b);
       color: #fff; box-shadow: 0 4px 12px rgba(231,76,60,0.3);
-    }
-    .btn-print {
-      background: linear-gradient(135deg, #f39c12, #e67e22);
-      color: #fff; box-shadow: 0 4px 12px rgba(243,156,18,0.3);
     }
 
     .plan-exercise-list {
@@ -695,6 +695,7 @@
         <button class="btn-icon resume" id="btnResumeLast" title="Letztes Training fortsetzen">⏯️</button>
         <button class="btn-icon quickstart" id="btnQuickStart" title="Training starten">▶️</button>
         <button class="btn-icon backup" id="btnBackup" title="Backup & Auto-Backup">💾</button>
+        <button class="btn-icon print" id="btnPrint" title="Aktiven Plan drucken">🖨️</button>
         <button class="btn-icon primary" id="btnGlobalAdd" title="Neu">➕</button>
       </div>
     </header>
@@ -790,6 +791,7 @@
     const btnGlobalAdd = document.getElementById('btnGlobalAdd');
     const btnQuickStart = document.getElementById('btnQuickStart');
     const btnResumeLast = document.getElementById('btnResumeLast');
+    const btnPrint = document.getElementById('btnPrint');
     const tabBtns = document.querySelectorAll('.tab-btn');
     const backupOverlay = document.getElementById('backupOverlay');
     const btnBackup = document.getElementById('btnBackup');
@@ -1282,7 +1284,6 @@
           </div>
           <div class="btn-row">
             <button class="btn-save" id="btnSavePlan">${isEdit ? 'Aktualisieren' : 'Speichern'}</button>
-            ${isEdit ? `<button class="btn-print" id="btnPrintPlan">🖨️ Plan drucken</button>` : ''}
             <button class="btn-cancel" id="btnCancelDetail">Abbrechen</button>
             ${isEdit ? `<button class="btn-danger" id="btnDeletePlan">Löschen</button>` : ''}
           </div>
@@ -1294,7 +1295,6 @@
       document.getElementById('btnCancelDetail').addEventListener('click', closeDetail);
       if (isEdit) {
         document.getElementById('btnDeletePlan').addEventListener('click', () => { deletePlan(id); closeDetail(); });
-        document.getElementById('btnPrintPlan')?.addEventListener('click', () => printPlan(id));
       }
     }
     function updatePlanExerciseList(container, selectedIds) {
@@ -1387,20 +1387,77 @@
       const plan = plans.find(p => p.id === planId);
       if (!plan) return;
       const exercisesInPlan = plan.exerciseIds.map(id => exercises.find(e => e.id === id)).filter(Boolean);
+
       let html = `<div id="printArea" style="display:block; background:#fff; color:#000; padding:20px; font-family:sans-serif;">`;
-      html += `<h2>📋 Trainingsplan: ${plan.name}</h2>`;
-      html += `<p style="color:#666; margin-bottom:12px;">Erstellt am ${new Date().toLocaleDateString('de-DE')}</p>`;
+      html += `<h2 style="margin-bottom:4px; font-size:20px;">📋 Trainingsplan: ${plan.name}</h2>`;
+      html += `<p style="color:#666; margin-bottom:16px; font-size:12px;">Erstellt am ${new Date().toLocaleDateString('de-DE')}</p>`;
+
       exercisesInPlan.forEach((ex, idx) => {
-        html += `<div class="exercise-block"><strong>${idx+1}. ${ex.name}</strong> (${ex.type === 'cardio' ? 'Cardio' : 'Kraft'}) – Pause: ${formatTime(ex.pause || 90)}</div>`;
+        const lastSets = getPreviousTrainingSets(ex.id, null);
+        let lastInfo = '';
+
+        if (ex.type === 'cardio') {
+          const sortedLogs = [...logs].sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+          let cardio = null;
+          for (const log of sortedLogs) {
+            const entry = log.entries.find(e => e.exerciseId === ex.id);
+            if (entry && entry.cardioData && (entry.cardioData.time > 0 || entry.cardioData.distance > 0)) {
+              cardio = entry.cardioData;
+              break;
+            }
+          }
+          if (cardio) {
+            lastInfo = `<div style="font-size:12px; color:#333; margin-top:6px; background:#f5f5f5; padding:4px 8px; border-radius:4px;"><strong>Letztes Mal:</strong> ⏱️ ${cardio.time} min · 📏 ${cardio.distance} km</div>`;
+          }
+        } else if (lastSets && lastSets.length > 0) {
+          const setsStr = lastSets.map((s, i) => `<span style="display:inline-block; margin-right:10px;"><strong>Satz ${i+1}:</strong> ${s.kg} kg × ${s.wdh} Wdh</span>`).join('');
+          lastInfo = `<div style="font-size:12px; color:#333; margin-top:6px; background:#f5f5f5; padding:4px 8px; border-radius:4px;"><strong>Letztes Mal:</strong> ${setsStr}</div>`;
+        } else {
+          lastInfo = `<div style="font-size:12px; color:#888; margin-top:6px; font-style:italic;">Noch keine Trainingsdaten</div>`;
+        }
+
+        const imgHtml = ex.image
+          ? `<img src="${ex.image}" style="width:90px; height:90px; object-fit:cover; border-radius:6px; border:1px solid #ccc; flex-shrink:0;" />`
+          : `<div style="width:90px; height:90px; background:#f0f0f0; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:38px; flex-shrink:0; border:1px solid #ccc;">${ex.type === 'cardio' ? '🏃' : '🏋️'}</div>`;
+
+        html += `
+          <div style="margin-bottom:14px; padding:10px; border:1px solid #ddd; border-radius:8px; display:flex; gap:12px; align-items:flex-start; page-break-inside:avoid; break-inside:avoid;">
+            ${imgHtml}
+            <div style="flex:1; min-width:0;">
+              <div style="font-weight:700; font-size:14px; margin-bottom:2px;">${idx+1}. ${ex.name}</div>
+              <div style="font-size:12px; color:#666;">${ex.type === 'cardio' ? '🏃 Cardio' : '🏋️ Kraft'} · Pause: ${formatTime(ex.pause || 90)}</div>
+              ${lastInfo}
+            </div>
+          </div>
+        `;
       });
-      html += `<p style="margin-top:16px; color:#888; font-size:0.8rem;">––– Ende des Plans –––</p>`;
+
+      html += `<p style="margin-top:16px; color:#888; font-size:12px; text-align:center;">––– Ende des Plans –––</p>`;
       html += `</div>`;
+
       printArea.innerHTML = html;
       printArea.style.display = 'block';
       setTimeout(() => {
         window.print();
         setTimeout(() => { printArea.style.display = 'none'; }, 500);
       }, 300);
+    }
+
+    function printActivePlan() {
+      if (!activePlanId) {
+        alert('Kein aktiver Plan ausgewählt.\n\nWähle im Tab "📋 Pläne" einen Plan mit dem ⭕ Kästchen aus und versuche es erneut.');
+        showTab('plans');
+        return;
+      }
+      const plan = plans.find(p => p.id === activePlanId);
+      if (!plan) {
+        alert('Der aktive Plan existiert nicht mehr. Wähle einen neuen aktiven Plan.');
+        activePlanId = null;
+        saveData();
+        renderPlans();
+        return;
+      }
+      printPlan(activePlanId);
     }
 
     function quickStart() {
@@ -2079,20 +2136,28 @@
         </div>
         <div class="stat-card">
           <div style="font-weight:600; margin-bottom:6px; font-size:0.85rem;">📊 Tägliches Volumen (letzte 7 Tage)</div>
-          <div style="display:flex; gap:3px; justify-content:space-around; align-items:flex-end; height:70px; padding-top:4px;">
       `;
       const maxDayVol = Math.max(...days.map(d => d.vol), 1);
+      let barsHtml = '', labelsHtml = '', valuesHtml = '';
       days.forEach(d => {
-        const height = Math.max(4, (d.vol / maxDayVol) * 56);
-        html += `
-          <div style="display:flex; flex-direction:column; align-items:center; flex:1;">
-            <div style="background:#2ecc71; width:100%; max-width:18px; height:${height}px; border-radius:3px 3px 0 0;"></div>
-            <div style="font-size:0.5rem; color:#888; margin-top:2px; text-align:center;">${d.label}</div>
-            <div style="font-size:0.45rem; color:#aaa;">${d.vol > 0 ? d.vol.toLocaleString() : '-'}</div>
-          </div>
-        `;
+        const barH = d.vol > 0 ? Math.max(4, (d.vol / maxDayVol) * 72) : 2;
+        barsHtml += `<div style="flex:1; display:flex; justify-content:center; align-items:flex-end; height:100%;">
+          <div style="background:linear-gradient(to top, #27ae60, #2ecc71); width:75%; max-width:22px; height:${barH}px; border-radius:3px 3px 0 0; box-shadow:0 2px 6px rgba(46,204,113,0.25);"></div>
+        </div>`;
+        labelsHtml += `<div style="flex:1; text-align:center; font-size:0.5rem; color:#888; white-space:nowrap;">${d.label}</div>`;
+        valuesHtml += `<div style="flex:1; text-align:center; font-size:0.45rem; color:#2ecc71; font-weight:600;">${d.vol > 0 ? d.vol.toLocaleString() : '–'}</div>`;
       });
-      html += `</div></div>`;
+      html += `
+        <div style="display:flex; gap:3px; height:80px; padding:0 2px; align-items:stretch;">
+          ${barsHtml}
+        </div>
+        <div style="display:flex; gap:3px; padding:4px 2px 0; border-top:1px solid rgba(255,255,255,0.08);">
+          ${labelsHtml}
+        </div>
+        <div style="display:flex; gap:3px; padding:0 2px;">
+          ${valuesHtml}
+        </div>
+      </div>`;
       html += `
         <div class="stat-card">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; flex-wrap:wrap; gap:4px;">
@@ -2481,6 +2546,7 @@
     });
     btnQuickStart.addEventListener('click', quickStart);
     btnResumeLast.addEventListener('click', resumeLastTraining);
+    btnPrint.addEventListener('click', printActivePlan);
     btnBackup.addEventListener('click', () => {
       backupOverlay.classList.add('active');
       if (lastBackupDateSpan) lastBackupDateSpan.textContent = lastBackupDate || '–';
