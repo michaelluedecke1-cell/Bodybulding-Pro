@@ -2,12 +2,18 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Bodybuilding Pro</title>
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#0d0d1a" />
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
     html, body {
       overscroll-behavior: none;
       background: #0d0d1a;
@@ -40,10 +46,11 @@
       border: none; color: #ddd; font-size: 1.2rem;
       width: 40px; height: 40px; border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
-      cursor: pointer; transition: background 0.2s, transform 0.1s;
+      cursor: pointer; transition: background 0.2s;
       min-width: 40px;
+      touch-action: manipulation;
     }
-    .btn-icon:active { transform: scale(0.94); background: rgba(255,255,255,0.12); }
+    .btn-icon:active { background: rgba(255,255,255,0.16); }
     .btn-icon.primary {
       background: linear-gradient(135deg, #2ecc71, #27ae60);
       color: #fff; box-shadow: 0 4px 12px rgba(46,204,113,0.3);
@@ -71,11 +78,11 @@
     .tab-btn {
       flex: 1; background: transparent; border: none; color: #888;
       padding: 8px 0; font-weight: 600; font-size: 0.65rem;
-      border-radius: 10px; cursor: pointer; transition: all 0.2s;
+      border-radius: 10px; cursor: pointer; transition: background 0.2s, color 0.2s;
       min-width: 44px;
+      touch-action: manipulation;
     }
     .tab-btn.active { background: rgba(255,255,255,0.08); color: #fff; }
-    .tab-btn:active { transform: scale(0.96); }
     .page { display: none; flex-direction: column; gap: 12px; }
     .page.active { display: flex; }
     .list-item {
@@ -85,12 +92,12 @@
       display: flex; align-items: center; gap: 12px;
       border-left: 4px solid #f39c12;
       cursor: pointer;
-      transition: background 0.15s, transform 0.1s;
+      transition: background 0.15s;
       box-shadow: 0 2px 8px rgba(0,0,0,0.3);
       touch-action: pan-y;
       position: relative;
     }
-    .list-item:active { background: rgba(255,255,255,0.08); transform: scale(0.98); }
+    .list-item:active { background: rgba(255,255,255,0.08); }
     .list-item .info { flex: 1; }
     .list-item .info h4 { font-size: 0.9rem; font-weight: 600; margin-bottom: 1px; }
     .list-item .info .sub { font-size: 0.7rem; color: #aaa; }
@@ -105,6 +112,7 @@
     .list-item .actions button {
       background: none; border: none; color: #aaa; font-size: 1rem;
       cursor: pointer; padding: 0 4px; transition: color 0.2s;
+      touch-action: manipulation;
     }
     .list-item .actions .del { color: #e74c3c; }
     .plan-radio {
@@ -162,6 +170,8 @@
       z-index: 1000;
       background: #0d0d1a;
       overflow-y: auto;
+      overflow-anchor: none;
+      -webkit-overflow-scrolling: touch;
       padding: 8px;
       display: none;
     }
@@ -181,7 +191,7 @@
       width: 100%; background: rgba(255,255,255,0.06);
       border: 1px solid rgba(255,255,255,0.1);
       border-radius: 8px; padding: 6px 8px; color: #fff;
-      font-size: 0.8rem; transition: border 0.2s;
+      font-size: 0.8rem; transition: border-color 0.2s;
       min-height: 36px;
     }
     .detail-card input:focus, .detail-card textarea:focus, .detail-card select:focus {
@@ -193,10 +203,11 @@
     .btn-row button {
       flex: 1; padding: 8px 10px; border: none; border-radius: 10px;
       font-weight: 700; font-size: 0.75rem; cursor: pointer;
-      transition: transform 0.1s;
+      transition: background 0.15s, opacity 0.15s;
       min-height: 38px;
+      touch-action: manipulation;
     }
-    .btn-row button:active { transform: scale(0.96); }
+    .btn-row button:active { opacity: 0.85; }
     .btn-save {
       background: linear-gradient(135deg, #2ecc71, #27ae60);
       color: #fff; box-shadow: 0 4px 12px rgba(46,204,113,0.3);
@@ -233,7 +244,7 @@
       color: #666;
       font-size: 1.2rem;
       padding: 4px 8px;
-      touch-action: none; /* Verhindert Scrollen beim Ziehen */
+      touch-action: none;
       user-select: none;
     }
     .plan-exercise-list li .drag-handle:active {
@@ -247,6 +258,7 @@
       padding: 8px 10px;
       margin-bottom: 8px;
       border: 1px solid rgba(255,255,255,0.06);
+      contain: layout style;
     }
     .exercise-entry .ex-header {
       display: flex; justify-content: space-between; align-items: center;
@@ -255,11 +267,13 @@
     .exercise-entry .ex-header .ex-actions button {
       background: none; border: none; color: #aaa; font-size: 0.8rem;
       cursor: pointer; padding: 0 4px;
+      touch-action: manipulation;
     }
     .exercise-entry .ex-header .ex-actions .del { color: #e74c3c; }
     .exercise-entry img {
-      max-width: 100%;
-      max-height: 80px;
+      display: block;
+      width: 100%;
+      height: 80px;
       object-fit: contain;
       border-radius: 6px;
       margin: 4px 0;
@@ -279,10 +293,12 @@
       padding: 4px 8px; font-size: 0.7rem; font-weight: 600;
       min-height: 34px; border: none; border-radius: 8px; cursor: pointer;
       background: rgba(255,255,255,0.06); color: #ddd;
-      flex: 1; min-width: 60px; transition: background 0.2s, transform 0.1s;
+      flex: 1; min-width: 60px; transition: background 0.15s, opacity 0.15s;
       display: flex; align-items: center; justify-content: center; gap: 4px;
+      touch-action: manipulation;
+      user-select: none;
     }
-    .exercise-entry .ex-actions-row button:active { transform: scale(0.96); }
+    .exercise-entry .ex-actions-row button:active { opacity: 0.85; }
     .exercise-entry .ex-actions-row .btn-timer {
       background: linear-gradient(135deg, #3498db, #2980b9);
       color: #fff; box-shadow: 0 4px 10px rgba(52,152,219,0.3);
@@ -339,8 +355,8 @@
     }
     .exercise-entry .ex-notiz textarea {
       width: 100%; background: transparent; border: none;
-      color: #ddd; resize: vertical; font-size: 0.7rem;
-      outline: none; min-height: 20px;
+      color: #ddd; resize: vertical; font-size: 0.75rem;
+      outline: none; min-height: 24px;
     }
 
     .set-list {
@@ -355,7 +371,7 @@
       align-items: stretch;
       background: rgba(255,255,255,0.04);
       border-radius: 8px;
-      padding: 4px 6px;
+      padding: 5px 6px;
       border: 1px solid rgba(255,255,255,0.06);
       position: relative;
       overflow: hidden;
@@ -366,11 +382,12 @@
       display: flex;
       flex-direction: column;
       width: 100%;
-      transition: transform 0.3s ease;
+      transition: transform 0.25s ease;
     }
     .set-item .set-content {
       display: flex;
       align-items: center;
+      justify-content: space-between;
       gap: 6px;
       width: 100%;
       flex-wrap: nowrap;
@@ -378,9 +395,16 @@
     .set-item .set-number {
       font-size: 0.75rem;
       font-weight: 600;
-      min-width: 28px;
+      width: 36px;
+      min-width: 36px;
+      height: 24px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       text-align: center;
       flex-shrink: 0;
+      border-radius: 4px;
+      user-select: none;
     }
     .set-item .set-number.done {
       color: #2ecc71;
@@ -391,28 +415,28 @@
     }
     .set-item .set-number.active {
       background: rgba(46, 204, 113, 0.15);
-      border-radius: 4px;
-      padding: 0 6px;
       font-weight: 700;
       color: #2ecc71;
     }
     .set-item .set-controls {
       display: flex;
       align-items: center;
-      gap: 2px;
+      gap: 3px;
       flex-shrink: 0;
     }
     .set-item .set-controls input[type="number"] {
-      width: 40px;
-      font-size: 0.75rem;
-      padding: 4px 2px;
+      width: 48px;
+      height: 32px;
+      min-height: 32px;
+      font-size: 0.8rem;
+      padding: 2px;
       background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.12);
       border-radius: 6px;
       color: #fff;
       text-align: center;
       -moz-appearance: textfield;
-      min-height: 32px;
+      touch-action: manipulation;
     }
     .set-item .set-controls input[type="number"]::-webkit-outer-spin-button,
     .set-item .set-controls input[type="number"]::-webkit-inner-spin-button {
@@ -420,22 +444,26 @@
       margin: 0;
     }
     .set-item .set-controls button {
-      background: rgba(255,255,255,0.06);
+      background: rgba(255,255,255,0.08);
       border: none;
       color: #ddd;
-      font-size: 1.2rem;
+      font-size: 1.15rem;
       width: 32px;
       height: 32px;
+      min-height: 32px;
       border-radius: 6px;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: 700;
+      touch-action: manipulation;
+      user-select: none;
+      flex-shrink: 0;
+      transition: background 0.1s;
     }
     .set-item .set-controls button:active {
-      background: rgba(255,255,255,0.15);
-      transform: scale(0.95);
+      background: rgba(255,255,255,0.22);
     }
     .set-item .set-controls button.inc { color: #2ecc71; }
     .set-item .set-controls button.dec { color: #e74c3c; }
@@ -443,8 +471,8 @@
     .set-item .set-last-hint {
       font-size: 0.55rem;
       color: #666;
-      padding-left: 34px;
-      margin-top: 1px;
+      padding-left: 42px;
+      margin-top: 2px;
       line-height: 1.2;
       letter-spacing: 0.2px;
     }
@@ -467,8 +495,9 @@
       font-weight: 700;
       font-size: 0.7rem;
       border-radius: 0 8px 8px 0;
-      transition: right 0.3s ease;
+      transition: right 0.25s ease;
       cursor: pointer;
+      user-select: none;
     }
     .set-item.swiped .swipe-delete-area {
       right: 0;
@@ -498,10 +527,11 @@
     }
     .cardio-row label { font-size: 0.65rem; color: #aaa; }
     .cardio-row input {
-      width: 56px; background: rgba(255,255,255,0.06);
+      width: 60px; background: rgba(255,255,255,0.06);
       border: 1px solid rgba(255,255,255,0.1);
       border-radius: 6px; color: #fff; padding: 4px 4px; font-size: 0.75rem;
-      min-height: 34px;
+      min-height: 32px;
+      height: 32px;
     }
     .calendar-container {
       background: rgba(255,255,255,0.04);
@@ -625,7 +655,6 @@
       user-select: none; transition: background 0.2s;
     }
     .stat-toggle.active { background: rgba(46,204,113,0.15); border-color: #2ecc71; }
-    .stat-toggle:active { transform: scale(0.96); }
     .backup-overlay {
       display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(0,0,0,0.7);
@@ -653,10 +682,9 @@
     }
     .backup-modal .btn-row button {
       padding: 6px 14px; border: none; border-radius: 8px;
-      font-weight: 600; cursor: pointer; transition: transform 0.1s; font-size: 0.75rem;
+      font-weight: 600; cursor: pointer; font-size: 0.75rem;
       min-height: 38px;
     }
-    .backup-modal .btn-row button:active { transform: scale(0.96); }
     .wake-toggle {
       display: inline-flex; align-items: center; gap: 4px;
       background: rgba(255,255,255,0.06);
@@ -666,7 +694,6 @@
       min-height: 34px;
     }
     .wake-toggle.active { background: rgba(46,204,113,0.15); border-color: #2ecc71; }
-    .wake-toggle:active { transform: scale(0.96); }
     .chart-container {
       background: rgba(255,255,255,0.04);
       border-radius: 8px; padding: 6px;
@@ -773,6 +800,15 @@
     function showSpinner() { document.getElementById('spinnerOverlay').classList.add('active'); }
     function hideSpinner() { document.getElementById('spinnerOverlay').classList.remove('active'); }
 
+    function escapeHtml(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
     let exercises = [], plans = [], logs = [];
     let currentTab = 'exercises', editingId = null, editingType = null;
     let calendarDate = new Date();
@@ -865,7 +901,6 @@
       }
     }
 
-    // --- BILD KOMPRIMIERUNG ---
     function compressImage(file, maxSize = 400, quality = 0.7) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -893,21 +928,19 @@
         reader.readAsDataURL(file);
       });
     }
-    // --------------------------
 
     async function requestWakeLock() {
       try {
         if ('wakeLock' in navigator) {
           if (wakeLock) { try { await wakeLock.release(); } catch(e) {} wakeLock = null; }
           wakeLock = await navigator.wakeLock.request('screen');
-          console.log('✅ WakeLock aktiviert');
           updateWakeToggleUI(true);
         }
-      } catch (err) { console.warn('WakeLock nicht verfügbar:', err); updateWakeToggleUI(false); }
+      } catch (err) { updateWakeToggleUI(false); }
     }
     function releaseWakeLock() {
       if (wakeLock) {
-        try { wakeLock.release(); wakeLock = null; console.log('✅ WakeLock freigegeben'); updateWakeToggleUI(false); } catch(e) {}
+        try { wakeLock.release(); wakeLock = null; updateWakeToggleUI(false); } catch(e) {}
       } else { updateWakeToggleUI(false); }
     }
     function toggleWakeLock() {
@@ -926,12 +959,8 @@
       if ('storage' in navigator && 'persist' in navigator.storage) {
         try {
           const isPersisted = await navigator.storage.persisted();
-          if (!isPersisted) {
-            const granted = await navigator.storage.persist();
-            if (granted) console.log('✅ Persistent Storage aktiviert');
-            else console.warn('⚠️ Persistent Storage nicht gewährt');
-          } else console.log('✅ Persistent Storage bereits aktiv');
-        } catch (err) { console.warn('⚠️ Fehler:', err); }
+          if (!isPersisted) await navigator.storage.persist();
+        } catch (err) {}
       }
     }
 
@@ -950,6 +979,7 @@
       }).catch(() => { if (!silent) hideSpinner(); });
       if (!silent) setTimeout(hideSpinner, 500);
     }
+
     async function loadData() {
       showSpinner();
       try {
@@ -991,7 +1021,6 @@
           logs = autoBackup.logs;
           activePlanId = autoBackup.activePlanId || null;
           saveData();
-          console.log('✅ Auto-Backup wiederhergestellt');
         } else {
           const ex1 = { id: generateId(), name: 'Schulterpresse (Maschine)', image: '', pause: 90, type: 'strength' };
           const ex2 = { id: generateId(), name: 'Rudermaschine sitzend', image: '', pause: 90, type: 'strength' };
@@ -1043,6 +1072,17 @@
         }
       }
       return null;
+    }
+
+    function getLastNoteForExercise(exerciseId) {
+      const sortedLogs = [...logs].sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+      for (const log of sortedLogs) {
+        const entry = log.entries.find(e => e.exerciseId === exerciseId);
+        if (entry && entry.notiz && entry.notiz.trim() !== '') {
+          return entry.notiz.trim();
+        }
+      }
+      return '';
     }
 
     function calcVolume(entry) {
@@ -1115,14 +1155,14 @@
       exerciseList.innerHTML = exercises.map(ex => {
         let thumbHtml = '';
         if (ex.image && ex.image.startsWith('data:image')) {
-          thumbHtml = `<img data-src="${ex.image}" alt="${ex.name}" />`;
+          thumbHtml = `<img data-src="${ex.image}" alt="${escapeHtml(ex.name)}" />`;
         } else {
           thumbHtml = getExerciseIcon(ex);
         }
         return `
           <div class="list-item" data-id="${ex.id}" data-type="exercise">
             <div class="thumbnail">${thumbHtml}</div>
-            <div class="info"><h4>${ex.name}</h4>
+            <div class="info"><h4>${escapeHtml(ex.name)}</h4>
             <div class="sub">⏱️ ${formatTime(ex.pause || 90)} • ${ex.type === 'cardio' ? 'Cardio' : 'Kraft'}</div></div>
             <div class="actions">
               <button class="edit" data-id="${ex.id}" title="Bearbeiten">✏️</button>
@@ -1154,7 +1194,7 @@
           <div class="list-item" data-id="${plan.id}" data-type="plan" style="${isActive ? 'border-left-color: #2ecc71;' : ''}">
             <div class="thumbnail">📋</div>
             <div class="info">
-              <h4>${plan.name} ${isActive ? '⭐' : ''}</h4>
+              <h4>${escapeHtml(plan.name)} ${isActive ? '⭐' : ''}</h4>
               <div class="sub">🏋️ ${plan.exerciseIds ? plan.exerciseIds.length : 0} Übungen</div>
             </div>
             <div class="actions">
@@ -1209,7 +1249,7 @@
         return `
           <div class="list-item" data-id="${log.id}" data-type="log">
             <div class="thumbnail">📅</div>
-            <div class="info"><h4>${planName}</h4>
+            <div class="info"><h4>${escapeHtml(planName)}</h4>
             <div class="sub">📅 ${formatDate(log.date)} • ${exCount} Übungen</div></div>
             <div class="actions">
               <button class="edit" data-id="${log.id}" title="Bearbeiten">✏️</button>
@@ -1245,7 +1285,7 @@
       detailContainer.innerHTML = `
         <div class="detail-card">
           <h3 style="margin-bottom:6px; font-size:0.9rem;">${isEdit ? 'Übung bearbeiten' : 'Neue Übung'}</h3>
-          <div class="row"><label>Name</label><input type="text" id="formExName" value="${isEdit ? ex.name : ''}" placeholder="z.B. Bankdrücken" /></div>
+          <div class="row"><label>Name</label><input type="text" id="formExName" value="${isEdit ? escapeHtml(ex.name) : ''}" placeholder="z.B. Bankdrücken" /></div>
           <div class="row"><label>Typ</label>
             <select id="formExType">
               <option value="strength" ${isEdit && ex.type === 'strength' ? 'selected' : ''}>Kraft (KG/WDH)</option>
@@ -1285,7 +1325,6 @@
         try {
           image = await compressImage(file, 400, 0.7);
         } catch (err) {
-          console.warn('Komprimierung fehlgeschlagen, nutze Original', err);
           image = await new Promise((resolve) => {
              const reader = new FileReader();
              reader.onload = e => resolve(e.target.result);
@@ -1325,7 +1364,7 @@
       detailContainer.innerHTML = `
         <div class="detail-card">
           <h3 style="margin-bottom:6px; font-size:0.9rem;">${isEdit ? 'Plan bearbeiten' : 'Neuer Plan'}</h3>
-          <div class="row"><label>Name</label><input type="text" id="formPlanName" value="${isEdit ? plan.name : ''}" placeholder="z.B. Push-Tag" /></div>
+          <div class="row"><label>Name</label><input type="text" id="formPlanName" value="${isEdit ? escapeHtml(plan.name) : ''}" placeholder="z.B. Push-Tag" /></div>
           <div class="row" style="flex-direction:column; gap:4px;">
             <label>Übungen (Am ☰ Griff ziehen)</label>
             <ul class="plan-exercise-list" id="planExerciseList"></ul>
@@ -1356,12 +1395,12 @@
       available.sort((a, b) => a.name.localeCompare(b.name));
       const allItems = [...ordered, ...available];
       
-      container.innerHTML = allItems.map((ex, index) => {
+      container.innerHTML = allItems.map((ex) => {
         const isChecked = selected.includes(ex.id);
         return `
           <li data-id="${ex.id}">
             <input type="checkbox" ${isChecked ? 'checked' : ''} />
-            <span class="ex-name">${ex.name}</span>
+            <span class="ex-name">${escapeHtml(ex.name)}</span>
             <span class="ex-type">(${ex.type === 'cardio' ? 'Cardio' : 'Kraft'})</span>
             <div class="drag-handle" title="Ziehen zum Sortieren">☰</div>
           </li>
@@ -1371,16 +1410,15 @@
       container.querySelectorAll('input[type="checkbox"]').forEach(cb => {
         cb.addEventListener('change', function() {
           const listItems = container.querySelectorAll('li');
-          const selectedIds = [];
+          const selIds = [];
           listItems.forEach(li => {
             const cbx = li.querySelector('input[type="checkbox"]');
-            if (cbx && cbx.checked) selectedIds.push(li.dataset.id);
+            if (cbx && cbx.checked) selIds.push(li.dataset.id);
           });
-          updatePlanExerciseList(container, selectedIds);
+          updatePlanExerciseList(container, selIds);
         });
       });
 
-      // --- TOUCH/MOUSE DRAG & DROP LOGIK ---
       container.querySelectorAll('.drag-handle').forEach(handle => {
         handle.addEventListener('pointerdown', function(e) {
           e.preventDefault();
@@ -1392,20 +1430,14 @@
             ev.preventDefault();
             const y = ev.clientY;
             const x = ev.clientX;
-            
             const target = document.elementFromPoint(x, y);
             if (!target) return;
-            
             const targetLi = target.closest('li');
             if (targetLi && targetLi !== li && targetLi.parentNode === container) {
               const rect = targetLi.getBoundingClientRect();
               const midY = rect.top + rect.height / 2;
-              
-              if (y < midY) {
-                container.insertBefore(li, targetLi);
-              } else {
-                container.insertBefore(li, targetLi.nextSibling);
-              }
+              if (y < midY) container.insertBefore(li, targetLi);
+              else container.insertBefore(li, targetLi.nextSibling);
             }
           };
 
@@ -1459,17 +1491,19 @@
       saveData(); renderAll();
     }
 
+    // --- DRUCKFUNKTION INKLUSIVE NOTIZEN ---
     function printPlan(planId) {
       const plan = plans.find(p => p.id === planId);
       if (!plan) return;
       const exercisesInPlan = plan.exerciseIds.map(id => exercises.find(e => e.id === id)).filter(Boolean);
 
-      let html = `<div id="printArea" style="display:block; background:#fff; color:#000; padding:20px; font-family:sans-serif;">`;
-      html += `<h2 style="margin-bottom:4px; font-size:20px;">📋 Trainingsplan: ${plan.name}</h2>`;
+      let html = `<div style="background:#fff; color:#000; padding:20px; font-family:sans-serif;">`;
+      html += `<h2 style="margin-bottom:4px; font-size:20px;">📋 Trainingsplan: ${escapeHtml(plan.name)}</h2>`;
       html += `<p style="color:#666; margin-bottom:16px; font-size:12px;">Erstellt am ${new Date().toLocaleDateString('de-DE')}</p>`;
 
       exercisesInPlan.forEach((ex, idx) => {
         const lastSets = getPreviousTrainingSets(ex.id, null);
+        const lastNote = getLastNoteForExercise(ex.id);
         let lastInfo = '';
 
         if (ex.type === 'cardio') {
@@ -1484,6 +1518,8 @@
           }
           if (cardio) {
             lastInfo = `<div style="font-size:12px; color:#333; margin-top:6px; background:#f5f5f5; padding:4px 8px; border-radius:4px;"><strong>Letztes Mal:</strong> ⏱️ ${cardio.time} min · 📏 ${cardio.distance} km</div>`;
+          } else {
+            lastInfo = `<div style="font-size:12px; color:#888; margin-top:6px; font-style:italic;">Noch keine Trainingsdaten</div>`;
           }
         } else if (lastSets && lastSets.length > 0) {
           const setsStr = lastSets.map((s, i) => `<span style="display:inline-block; margin-right:10px;"><strong>Satz ${i+1}:</strong> ${s.kg} kg × ${s.wdh} Wdh</span>`).join('');
@@ -1491,6 +1527,10 @@
         } else {
           lastInfo = `<div style="font-size:12px; color:#888; margin-top:6px; font-style:italic;">Noch keine Trainingsdaten</div>`;
         }
+
+        const noteHtml = lastNote
+          ? `<div style="font-size:12px; color:#222; margin-top:5px; background:#fff8e1; border-left:3px solid #f39c12; padding:5px 8px; border-radius:3px; white-space:pre-wrap;"><strong>📝 Notiz:</strong> ${escapeHtml(lastNote)}</div>`
+          : '';
 
         const imgHtml = ex.image
           ? `<img src="${ex.image}" style="width:90px; height:90px; object-fit:cover; border-radius:6px; border:1px solid #ccc; flex-shrink:0;" />`
@@ -1500,9 +1540,10 @@
           <div style="margin-bottom:14px; padding:10px; border:1px solid #ddd; border-radius:8px; display:flex; gap:12px; align-items:flex-start; page-break-inside:avoid; break-inside:avoid;">
             ${imgHtml}
             <div style="flex:1; min-width:0;">
-              <div style="font-weight:700; font-size:14px; margin-bottom:2px;">${idx+1}. ${ex.name}</div>
+              <div style="font-weight:700; font-size:14px; margin-bottom:2px;">${idx+1}. ${escapeHtml(ex.name)}</div>
               <div style="font-size:12px; color:#666;">${ex.type === 'cardio' ? '🏃 Cardio' : '🏋️ Kraft'} · Pause: ${formatTime(ex.pause || 90)}</div>
               ${lastInfo}
+              ${noteHtml}
             </div>
           </div>
         `;
@@ -1601,13 +1642,12 @@
       const items = container.querySelectorAll('.set-item');
       items.forEach(item => {
         let startX = 0, startY = 0;
-        let isSwiping = false;
 
         item.addEventListener('touchstart', (e) => {
+          if (e.target.closest('button, input')) return;
           const touch = e.touches[0];
           startX = touch.clientX;
           startY = touch.clientY;
-          isSwiping = false;
         }, { passive: true });
 
         item.addEventListener('touchmove', (e) => {
@@ -1618,11 +1658,10 @@
           const absDx = Math.abs(dx);
           const absDy = Math.abs(dy);
 
-          if (absDx > absDy && absDx > 25) {
-            isSwiping = true;
+          if (absDx > absDy && absDx > 30) {
             if (dx < 0) {
               item.classList.add('swiped');
-            } else if (dx > 25) {
+            } else if (dx > 30) {
               item.classList.remove('swiped');
             }
           }
@@ -1631,7 +1670,6 @@
         item.addEventListener('touchend', () => {
           startX = 0;
           startY = 0;
-          isSwiping = false;
         }, { passive: true });
 
         const deleteArea = item.querySelector('.swipe-delete-area');
@@ -1659,8 +1697,72 @@
       });
     }
 
-    function openLogForm(id = null, startTimer = false) {
-      if (editingType === 'log' && editingId === id && !startTimer) {
+    // Baut das HTML für die Sätze einer einzelnen Übung (für gezieltes Nachrendern ohne Bildschirm-Springen)
+    function buildSetsListHtml(logId, exId, sets, currentSetIdx, lastSets) {
+      return sets.map((set, si) => {
+        const isDone = si < currentSetIdx;
+        const isActive = si === currentSetIdx;
+        let classes = 'set-number';
+        if (isDone) classes += ' done';
+        else if (isActive) classes += ' active';
+        const lastSet = lastSets && lastSets[si] ? lastSets[si] : null;
+        const lastHint = lastSet ? `<div class="set-last-hint">↩ Letztes Mal: <strong>${lastSet.kg} kg × ${lastSet.wdh}</strong></div>` : '';
+        return `
+          <div class="set-item" data-setidx="${si}" data-logid="${logId}" data-exid="${exId}">
+            <div class="set-main">
+              <div class="set-content">
+                <span class="${classes}">${si+1}</span>
+                <div class="set-controls">
+                  <button type="button" class="dec" data-logid="${logId}" data-exid="${exId}" data-idx="${si}" data-field="kg" data-step="0.5">−</button>
+                  <input type="number" class="set-kg" value="${set.kg}" data-logid="${logId}" data-exid="${exId}" data-idx="${si}" step="0.5" inputmode="decimal" />
+                  <button type="button" class="inc" data-logid="${logId}" data-exid="${exId}" data-idx="${si}" data-field="kg" data-step="0.5">+</button>
+                </div>
+                <div class="set-controls">
+                  <button type="button" class="dec" data-logid="${logId}" data-exid="${exId}" data-idx="${si}" data-field="wdh" data-step="1">−</button>
+                  <input type="number" class="set-wdh" value="${set.wdh}" data-logid="${logId}" data-exid="${exId}" data-idx="${si}" step="1" inputmode="numeric" />
+                  <button type="button" class="inc" data-logid="${logId}" data-exid="${exId}" data-idx="${si}" data-field="wdh" data-step="1">+</button>
+                </div>
+              </div>
+              ${lastHint}
+            </div>
+            <div class="swipe-delete-area">🗑️ Löschen</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Aktualisiert gezielt nur die Sätze einer Übung im DOM (verhindert Wackeln & Scroll-Sprünge)
+    function renderExerciseSetsInDOM(logId, exId) {
+      const log = logs.find(l => l.id === logId);
+      if (!log) return;
+      const entry = log.entries.find(e => e.exerciseId === exId);
+      if (!entry) return;
+      const exBlock = detailContainer.querySelector(`.exercise-entry[data-exid="${exId}"]`);
+      if (!exBlock) return;
+
+      const sets = entry.sets || [{ kg: 0, wdh: 0 }];
+      const currentSetIdx = entry.currentSetIndex || 0;
+      const lastSets = getPreviousTrainingSets(exId, logId);
+
+      const setListEl = exBlock.querySelector('.set-list');
+      if (setListEl) {
+        setListEl.innerHTML = buildSetsListHtml(logId, exId, sets, currentSetIdx, lastSets);
+        initSwipeForSetItems(setListEl);
+      }
+
+      const progressEl = exBlock.querySelector('.set-progress');
+      if (progressEl) {
+        progressEl.innerHTML = `
+          <span>Satz <span class="current-set-label">${Math.min(currentSetIdx + 1, sets.length)}</span> von ${sets.length}</span>
+          <span style="color:#888;">(Nach links wischen zum Löschen)</span>
+        `;
+      }
+
+      updateVolumeDisplay(logId, exId);
+    }
+
+    function openLogForm(id = null, startTimer = false, forceRender = false) {
+      if (!forceRender && editingType === 'log' && editingId === id && !startTimer && detailContainer.style.display === 'block') {
         updateVolumeDisplay(id);
         return;
       }
@@ -1689,7 +1791,7 @@
       }
       editingType = 'log';
       detailContainer.style.display = 'block';
-      const planOptions = plans.map(p => `<option value="${p.id}" ${log.planId === p.id ? 'selected' : ''}>${p.name}</option>`).join('');
+      const planOptions = plans.map(p => `<option value="${p.id}" ${log.planId === p.id ? 'selected' : ''}>${escapeHtml(p.name)}</option>`).join('');
       const plan = plans.find(p => p.id === log.planId);
       let entries = [];
       let exerciseIds = [];
@@ -1734,7 +1836,7 @@
       let totalVolume = entries.reduce((sum, entry) => sum + calcVolume(entry), 0);
       let exercisesHtml = '';
       if (exerciseIds.length) {
-        exerciseIds.forEach((exId, idx) => {
+        exerciseIds.forEach((exId) => {
           const ex = exercises.find(e => e.id === exId);
           if (!ex) return;
           const entry = entries.find(e => e.exerciseId === exId) || { exerciseId: exId, sets: [{ kg: 0, wdh: 0 }], cardioData: { time: 0, distance: 0 }, notiz: '', currentSetIndex: 0 };
@@ -1749,44 +1851,15 @@
             setHtml = `
               <div class="cardio-row">
                 <label>⏱️ Zeit (min)</label>
-                <input type="number" class="cardio-time" value="${time}" step="0.5" data-logid="${log.id}" data-exid="${exId}" />
+                <input type="number" class="cardio-time" value="${time}" step="0.5" data-logid="${log.id}" data-exid="${exId}" inputmode="decimal" />
                 <label>📏 Distanz (km)</label>
-                <input type="number" class="cardio-dist" value="${dist}" step="0.1" data-logid="${log.id}" data-exid="${exId}" />
+                <input type="number" class="cardio-dist" value="${dist}" step="0.1" data-logid="${log.id}" data-exid="${exId}" inputmode="decimal" />
               </div>
             `;
             exVolume = 0;
           } else {
             exVolume = calcVolume(entry);
-            let setItems = sets.map((set, si) => {
-              const isDone = si < currentSetIdx;
-              const isActive = si === currentSetIdx;
-              let classes = 'set-number';
-              if (isDone) classes += ' done';
-              else if (isActive) classes += ' active';
-              const lastSet = lastSets && lastSets[si] ? lastSets[si] : null;
-              const lastHint = lastSet ? `<div class="set-last-hint">↩ Letztes Mal: <strong>${lastSet.kg} kg × ${lastSet.wdh}</strong></div>` : '';
-              return `
-                <div class="set-item" data-setidx="${si}" data-logid="${log.id}" data-exid="${exId}">
-                  <div class="set-main">
-                    <div class="set-content">
-                      <span class="${classes}">${si+1}</span>
-                      <div class="set-controls">
-                        <button class="dec" data-logid="${log.id}" data-exid="${exId}" data-idx="${si}" data-field="kg" data-step="0.5">−</button>
-                        <input type="number" class="set-kg" value="${set.kg}" data-logid="${log.id}" data-exid="${exId}" data-idx="${si}" step="0.5" />
-                        <button class="inc" data-logid="${log.id}" data-exid="${exId}" data-idx="${si}" data-field="kg" data-step="0.5">+</button>
-                      </div>
-                      <div class="set-controls">
-                        <button class="dec" data-logid="${log.id}" data-exid="${exId}" data-idx="${si}" data-field="wdh" data-step="1">−</button>
-                        <input type="number" class="set-wdh" value="${set.wdh}" data-logid="${log.id}" data-exid="${exId}" data-idx="${si}" step="1" />
-                        <button class="inc" data-logid="${log.id}" data-exid="${exId}" data-idx="${si}" data-field="wdh" data-step="1">+</button>
-                      </div>
-                    </div>
-                    ${lastHint}
-                  </div>
-                  <div class="swipe-delete-area">🗑️ Löschen</div>
-                </div>
-              `;
-            }).join('');
+            const setItems = buildSetsListHtml(log.id, exId, sets, currentSetIdx, lastSets);
             setHtml = `
               <div class="set-progress">
                 <span>Satz <span class="current-set-label">${Math.min(currentSetIdx + 1, sets.length)}</span> von ${sets.length}</span>
@@ -1794,31 +1867,31 @@
               </div>
               <div class="set-list">${setItems}</div>
               <div class="ex-actions-row">
-                <button class="btn-add-set" data-logid="${log.id}" data-exid="${exId}">➕ Satz</button>
+                <button type="button" class="btn-add-set" data-logid="${log.id}" data-exid="${exId}">➕ Satz</button>
               </div>
             `;
           }
           exercisesHtml += `
             <div class="exercise-entry" data-exid="${exId}" data-logid="${log.id}">
               <div class="ex-header">
-                <span class="ex-name">${ex.name} ${ex.type === 'cardio' ? '🏃' : '🏋️'}</span>
+                <span class="ex-name">${escapeHtml(ex.name)} ${ex.type === 'cardio' ? '🏃' : '🏋️'}</span>
                 <div class="ex-actions">
-                  <button class="del" data-exid="${exId}" title="Aus Log entfernen" style="background:none; border:none; color:#e74c3c; cursor:pointer; font-size:1rem; padding:0 6px;">✕</button>
+                  <button type="button" class="del" data-exid="${exId}" title="Aus Log entfernen" style="background:none; border:none; color:#e74c3c; cursor:pointer; font-size:1rem; padding:0 6px;">✕</button>
                 </div>
               </div>
-              ${ex.image ? `<img data-src="${ex.image}" alt="${ex.name}" style="max-width:100%; max-height:80px; object-fit:contain; border-radius:6px; margin:4px 0; background:rgba(0,0,0,0.3);" />` : ''}
+              ${ex.image ? `<img src="${ex.image}" alt="${escapeHtml(ex.name)}" />` : ''}
               <div style="margin:2px 0; font-size:0.65rem; color:#aaa;">Pause: ${formatTime(ex.pause || 90)}</div>
               <div class="timer-wrapper" id="timer-wrapper-${log.id}-${exId}">
                 <canvas id="timer-${log.id}-${exId}-canvas" width="64" height="64"></canvas>
                 <div class="timer-text" id="timer-${log.id}-${exId}">${formatTime(ex.pause || 90)}<span class="sub">Pause</span></div>
               </div>
               <div class="ex-actions-row">
-                <button class="btn-timer" data-logid="${log.id}" data-exid="${exId}">▶️ Timer starten</button>
+                <button type="button" class="btn-timer" data-logid="${log.id}" data-exid="${exId}">▶️ Timer starten</button>
               </div>
               ${setHtml}
-              ${ex.type === 'strength' ? `<div style="font-size:0.65rem; color:#aaa; text-align:right;">Volumen: ${exVolume} kg</div>` : ''}
+              ${ex.type === 'strength' ? `<div class="ex-vol-display" id="ex-vol-${log.id}-${exId}" style="font-size:0.65rem; color:#aaa; text-align:right; margin-top:2px;">Volumen: ${exVolume} kg</div>` : ''}
               <div class="ex-notiz">
-                <textarea class="ex-notiz-text" data-logid="${log.id}" data-exid="${exId}" placeholder="Notiz ...">${entry.notiz || ''}</textarea>
+                <textarea class="ex-notiz-text" data-logid="${log.id}" data-exid="${exId}" placeholder="Notiz ...">${escapeHtml(entry.notiz || '')}</textarea>
               </div>
             </div>
           `;
@@ -1845,16 +1918,15 @@
           <div id="logExercisesContainer">${exercisesHtml}</div>
           <div class="volume-summary">
             <div class="item"><span class="label">Gesamtvolumen</span><span class="value" id="totalVolumeDisplay">${totalVolume} kg</span></div>
-            <div class="item"><span class="label">Übungen</span><span class="value">${exerciseIds.length}</span></div>
+            <div class="item"><span class="label">Übungen</span><span class="value" id="totalExercisesCount">${exerciseIds.length}</span></div>
           </div>
           <div class="btn-row">
-            <button class="btn-save" id="btnSaveLog">${isEdit ? 'Aktualisieren' : 'Speichern'}</button>
-            <button class="btn-cancel" id="btnCancelDetail">Abbrechen</button>
-            ${isEdit ? `<button class="btn-danger" id="btnDeleteLog">Löschen</button>` : ''}
+            <button type="button" class="btn-save" id="btnSaveLog">${isEdit ? 'Aktualisieren' : 'Speichern'}</button>
+            <button type="button" class="btn-cancel" id="btnCancelDetail">Abbrechen</button>
+            ${isEdit ? `<button type="button" class="btn-danger" id="btnDeleteLog">Löschen</button>` : ''}
           </div>
         </div>
       `;
-      lazyLoadImages(detailContainer);
 
       const setLists = detailContainer.querySelectorAll('.set-list');
       setLists.forEach(list => initSwipeForSetItems(list));
@@ -1886,7 +1958,7 @@
           }
           saveData(true);
         }
-        openLogForm(editingId, overallTimerRunning);
+        openLogForm(editingId, overallTimerRunning, true);
       });
       document.getElementById('btnSaveLog').addEventListener('click', () => saveLogForm());
       document.getElementById('btnCancelDetail').addEventListener('click', closeDetail);
@@ -1907,7 +1979,7 @@
     function collectLogEntries(logId) {
       const log = logs.find(l => l.id === logId);
       if (!log) return;
-      const blocks = document.querySelectorAll('.exercise-entry');
+      const blocks = detailContainer.querySelectorAll('.exercise-entry');
       const entries = [];
       blocks.forEach(block => {
         const exId = block.dataset.exid;
@@ -1937,26 +2009,22 @@
       log.entries = entries;
     }
 
-    function preserveScrollAndRerender(logId) {
-      const scrollY = detailContainer.scrollTop;
-      openLogForm(logId, overallTimerRunning);
-      requestAnimationFrame(() => {
-        detailContainer.scrollTop = scrollY;
-      });
-    }
-
     function addSetToLogEntry(logId, exId) {
       const log = logs.find(l => l.id === logId);
       if (!log) return;
       collectLogEntries(logId);
       let entry = log.entries.find(e => e.exerciseId === exId);
-      if (!entry) { entry = { exerciseId: exId, sets: [], cardioData: { time: 0, distance: 0 }, notiz: '', currentSetIndex: 0 }; log.entries.push(entry); }
+      if (!entry) {
+        entry = { exerciseId: exId, sets: [], cardioData: { time: 0, distance: 0 }, notiz: '', currentSetIndex: 0 };
+        log.entries.push(entry);
+      }
       const last = entry.sets[entry.sets.length - 1] || { kg: 0, wdh: 0 };
       entry.sets.push({ kg: last.kg, wdh: last.wdh });
       if ((entry.currentSetIndex || 0) >= entry.sets.length) entry.currentSetIndex = entry.sets.length - 1;
       saveData(true);
-      preserveScrollAndRerender(logId);
+      renderExerciseSetsInDOM(logId, exId);
     }
+
     function removeSetFromLogEntry(logId, exId, idx) {
       const log = logs.find(l => l.id === logId);
       if (!log) return;
@@ -1967,8 +2035,9 @@
       entry2.sets.splice(idx, 1);
       if ((entry2.currentSetIndex || 0) >= entry2.sets.length) entry2.currentSetIndex = entry2.sets.length - 1;
       saveData(true);
-      preserveScrollAndRerender(logId);
+      renderExerciseSetsInDOM(logId, exId);
     }
+
     function updateSetValueInLog(logId, exId, idx, field, value) {
       const log = logs.find(l => l.id === logId);
       if (!log) return;
@@ -1976,8 +2045,9 @@
       if (!entry || !entry.sets[idx]) return;
       entry.sets[idx][field] = value;
       saveData(true);
-      updateVolumeDisplay(logId);
+      updateVolumeDisplay(logId, exId);
     }
+
     function updateCardioData(logId, exId, field, value) {
       const log = logs.find(l => l.id === logId);
       if (!log) return;
@@ -1986,6 +2056,7 @@
       entry.cardioData[field] = value;
       saveData(true);
     }
+
     function updateNotizInLog(logId, exId, value) {
       const log = logs.find(l => l.id === logId);
       if (!log) return;
@@ -1994,14 +2065,20 @@
       entry.notiz = value;
       saveData(true);
     }
+
     function removeExerciseFromLog(logId, exId) {
       const log = logs.find(l => l.id === logId);
       if (!log) return;
       collectLogEntries(logId);
       log.entries = log.entries.filter(e => e.exerciseId !== exId);
       saveData(true);
-      preserveScrollAndRerender(logId);
+      const block = detailContainer.querySelector(`.exercise-entry[data-exid="${exId}"]`);
+      if (block) block.remove();
+      const countEl = document.getElementById('totalExercisesCount');
+      if (countEl) countEl.textContent = log.entries.length;
+      updateVolumeDisplay(logId);
     }
+
     function saveLogForm() {
       const logId = editingId;
       let log = logs.find(l => l.id === logId);
@@ -2020,6 +2097,7 @@
       renderAll();
       closeDetail();
     }
+
     function deleteLog(id) {
       if (!confirm('Training aus dem Log löschen?')) return;
       logs = logs.filter(l => l.id !== id);
@@ -2047,7 +2125,7 @@
       timerRemainingSeconds = remaining;
       const display = document.getElementById(`timer-${currentTimerLogId}-${currentTimerExId}`);
       if (display) {
-        display.textContent = formatTime(remaining);
+        display.innerHTML = `${formatTime(remaining)}<span class="sub">Pause</span>`;
         const canvas = document.getElementById(`timer-${currentTimerLogId}-${currentTimerExId}-canvas`);
         if (canvas) drawTimerCircle(canvas, remaining, timerTotalSeconds);
         if (remaining <= 0) display.classList.add('alarm');
@@ -2067,7 +2145,7 @@
         const pauseSec = ex ? ex.pause || 90 : 90;
         const displayEl = document.getElementById(`timer-${currentTimerLogId}-${currentTimerExId}`);
         if (displayEl) {
-          displayEl.textContent = formatTime(pauseSec);
+          displayEl.innerHTML = `${formatTime(pauseSec)}<span class="sub">Pause</span>`;
           displayEl.classList.remove('alarm');
           const canvas = document.getElementById(`timer-${currentTimerLogId}-${currentTimerExId}-canvas`);
           if (canvas) drawTimerCircle(canvas, pauseSec, pauseSec);
@@ -2080,6 +2158,7 @@
         currentTimerExId = null;
       }
     }
+
     function toggleTimer(logId, exId, btnElement) {
       if (timerRunning && (currentTimerLogId !== logId || currentTimerExId !== exId)) {
         clearInterval(timerInterval);
@@ -2117,7 +2196,7 @@
       btnElement.classList.add('active');
       const display = document.getElementById(`timer-${logId}-${exId}`);
       if (display) {
-        display.textContent = formatTime(pauseSec);
+        display.innerHTML = `${formatTime(pauseSec)}<span class="sub">Pause</span>`;
         display.classList.remove('alarm');
         const canvas = document.getElementById(`timer-${logId}-${exId}-canvas`);
         if (canvas) drawTimerCircle(canvas, pauseSec, pauseSec);
@@ -2253,7 +2332,7 @@
           const percentStr = item.percent !== 0 ? (item.percent > 0 ? '+' : '') + item.percent.toFixed(1) + '%' : '±0%';
           html += `
             <li>
-              <div class="ex-name">${item.name}</div>
+              <div class="ex-name">${escapeHtml(item.name)}</div>
               <div class="ex-stats">
                 <span class="ex-current">${item.lastVolume.toLocaleString()} kg</span>
                 <span class="ex-change ${diffClass}">${sign} ${Math.abs(item.diff).toLocaleString()} kg (${percentStr})</span>
@@ -2521,9 +2600,16 @@
       }
     }
 
-    function updateVolumeDisplay(logId) {
+    function updateVolumeDisplay(logId, exId = null) {
       const log = logs.find(l => l.id === logId);
       if (!log) return;
+      if (exId) {
+        const entry = log.entries.find(e => e.exerciseId === exId);
+        const exVolEl = document.getElementById(`ex-vol-${logId}-${exId}`);
+        if (exVolEl && entry) {
+          exVolEl.textContent = `Volumen: ${calcVolume(entry)} kg`;
+        }
+      }
       const total = log.entries.reduce((sum, entry) => sum + calcVolume(entry), 0);
       const display = document.getElementById('totalVolumeDisplay');
       if (display) display.textContent = total + ' kg';
@@ -2562,7 +2648,7 @@
         if (field === 'wdh') val = Math.round(val);
         else val = Math.round(val * 10) / 10;
         input.value = val;
-        input.dispatchEvent(new Event('change', { bubbles: true }));
+        updateSetValueInLog(btn.dataset.logid, btn.dataset.exid, parseInt(btn.dataset.idx), field, val);
         return;
       }
       const btnDelEx = target.closest('.ex-header .del');
@@ -2573,7 +2659,7 @@
         return;
       }
       const setItem = target.closest('.set-item');
-      if (setItem && !target.closest('button') && !target.closest('input')) {
+      if (setItem && !target.closest('button') && !target.closest('input') && !target.closest('.swipe-delete-area')) {
         const exEntry = setItem.closest('.exercise-entry');
         const exId = exEntry.dataset.exid;
         const logId = exEntry.dataset.logid;
@@ -2592,7 +2678,7 @@
       }
     });
 
-    detailContainer.addEventListener('change', function(e) {
+    detailContainer.addEventListener('input', function(e) {
       if (editingType !== 'log') return;
       const target = e.target;
       if (target.classList.contains('set-kg')) {
@@ -2637,7 +2723,7 @@
     backupOverlay.addEventListener('click', function(e) { if (e.target === this) this.classList.remove('active'); });
     document.addEventListener('pointerdown', function(e) {
       if (e.target.closest('button') || e.target.closest('.list-item') || e.target.closest('.day-cell.has-training')) {
-        if (navigator.vibrate) navigator.vibrate(12);
+        if (navigator.vibrate) navigator.vibrate(10);
       }
     }, { passive: true });
 
